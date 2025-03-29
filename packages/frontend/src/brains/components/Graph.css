@@ -1,0 +1,60 @@
+.graph-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: white;
+}
+
+.graph-container {
+  width: 100%;
+  height: 100%;
+  background: white;
+}
+
+.graph-controls {
+  position: absolute !important;
+  top: 10px !important;
+  right: 10px !important;
+  z-index: 9999 !important;
+  display: flex !important;
+  gap: 8px !important;
+}
+
+.control-button {
+  background: white !important;
+  border: 1px solid #e2e8f0 !important;
+  padding: 6px 10px !important;
+  border-radius: 4px !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+}
+
+.control-button:hover {
+  background: #f7fafc !important;
+  border-color: #cbd5e0 !important;
+}
+
+.graph-error {
+  padding: 1rem;
+  color: #dc3545;
+  background: white;
+}
+
+/* Ensure SVG background is white */
+.graph-container svg {
+  background: white;
+}
+
+/* Target node ellipses */
+.graph-container svg .node ellipse {
+  fill: white !important;
+}
+
+/* Target edges */
+.graph-container svg .edge path {
+  fill: none !important;  /* Keep edges visible */
+}
+
+/* Keep text visible */
+.graph-container svg text {
+  fill: currentColor !important;
+}

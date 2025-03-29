@@ -1,0 +1,31 @@
+.output-node__content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.output-node__editor {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Ensure Monaco editor takes full height */
+.output-node__editor .monaco-editor {
+  position: absolute !important;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 100% !important;
+}
+
+/* Ensure editor content is properly contained */
+.output-node__editor .monaco-editor .overflow-guard {
+  width: 100% !important;
+  height: 100% !important;
+}

@@ -1,0 +1,121 @@
+/* Base modal styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: #ffffff;
+  padding: 24px;
+  border-radius: 8px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  width: 100%;
+  max-width: 400px;
+}
+
+.modal-content h2 {
+  margin: 0 0 24px 0;
+  font-size: 18px;
+  font-weight: 500;
+  color: #333;
+}
+
+.modal-content form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Input and Select styles - matching the app */
+.modal-content input,
+.modal-content select {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #333;
+  background: #ffffff;
+}
+
+.modal-content input:focus,
+.modal-content select:focus {
+  outline: none;
+  border-color: #2d78f2;
+  box-shadow: 0 0 0 2px rgba(45, 120, 242, 0.2);
+}
+
+/* Button container */
+.menu-actions {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: nowrap;
+}
+
+.menu-actions button {
+  flex: 0 0 auto;
+}
+
+/* Button styles matching the app's buttons */
+.modal-actions button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.modal-actions button[type="button"] {
+  background: #f1f3f4;
+  color: #333;
+}
+
+.modal-actions button[type="submit"] {
+  background: #2d78f2;
+  color: white;
+}
+
+.modal-actions button:hover {
+  transform: translateY(-1px);
+}
+
+.modal-actions button[type="button"]:hover {
+  background: #e8eaed;
+}
+
+.modal-actions button[type="submit"]:hover {
+  background: #1b62d4;
+}
+
+.modal-actions button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Animation */
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+} 

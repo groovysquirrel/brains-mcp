@@ -1,0 +1,612 @@
+/* ReactFlow Node Container Override */
+.react-flow__node {
+  width: fit-content !important;
+  height: fit-content !important;
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.react-flow__node-default {
+  width: fit-content !important;
+  height: fit-content !important;
+  padding: 0 !important;
+  border: none !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Base Variables */
+:root {
+  /* Typography */
+  --font-size-xs: 11px;
+  --font-size-sm: 12px;
+  --font-size-base: 14px;
+  
+  /* Component Sizes */
+  --header-height: 28px;
+  --control-button-size: 16px;
+  --header-button-size: 20px;
+  
+  /* Spacing */
+  --spacing-xxs: 2px;
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-lg: 16px;
+  
+  /* Colors */
+  --color-border: #E2E8F0;
+  --color-background: white;
+  --color-background-light: #FAFAFA;
+  --color-text: #2D3748;
+  --color-text-light: #718096;
+  --color-hover: #EDF2F7;
+  --color-danger: #E53E3E;
+  --color-danger-light: #FED7D7;
+  
+  /* Node Colors */
+  --color-input: #48bb78;
+  --color-output: #ed8936;
+  --color-prompt: #4299e1;
+  --color-data: #9f7aea;
+
+  /* Status Colors */
+  --color-status-idle: #CBD5E0;
+  --color-status-running: #4299E1;
+  --color-status-complete: #48BB78;
+  --color-status-error: #F56565;
+}
+
+/* Core Node Structure */
+.core-node {
+  background: var(--color-background);
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  font-size: var(--font-size-base);
+}
+
+/* Header */
+.core-node__header {
+  padding: var(--spacing-sm) var(--spacing-sm);
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--spacing-xs);
+  flex-shrink: 0;
+  background: var(--color-background-light);
+  border-radius: 8px 8px 0 0;
+  height: 32px;
+  transition: border-radius 0.2s ease;
+}
+
+/* Common header elements */
+.core-node__title,
+.core-node__controls,
+.prompt-node__header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.core-node__title {
+  font-size: var(--font-size-xs);
+  color: var(--color-text);
+  min-width: 0;  /* Allow title to shrink */
+  flex: 1;  /* Take available space */
+  padding-left: var(--spacing-xxs);
+}
+
+/* Node name editor styles */
+.core-node__title .node-name {
+  min-width: 0;
+  flex: 1;
+  position: relative;  /* For absolute positioning of edit mode */
+}
+
+.core-node__title .node-name span {
+  font-size: var(--font-size-xs);
+  color: var(--color-text);
+  cursor: text;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
+
+/* Editing state styles */
+.core-node__title .node-name-edit {
+  position: absolute;
+  left: -8px;  /* Extend slightly beyond the normal bounds */
+  right: -8px;
+  top: -6px;
+  bottom: -6px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  background: var(--color-background);
+  padding: 0 var(--spacing-xs);
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--color-border);
+}
+
+/* Hide other controls when editing */
+.core-node__title .node-name-edit ~ .core-node__title-actions,
+.core-node__title .node-name-edit ~ .core-node__controls {
+  visibility: hidden;
+}
+
+/* Title actions container */
+.core-node__title-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.core-node__title .node-name-input {
+  font-size: var(--font-size-xs);
+  padding: var(--spacing-xxs) var(--spacing-xs);
+  border: none;
+  background: transparent;
+  color: var(--color-text);
+  width: 100%;
+  min-width: 150px;
+  height: var(--control-button-size);
+}
+
+.core-node__title .node-name-input:focus {
+  outline: none;
+}
+
+/* When name is being edited, make the dropdown shrink */
+.core-node__title .node-name-edit {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  gap: var(--spacing-xxs);
+}
+
+.core-node__title .node-name-edit + .prompt-node__header-actions {
+  flex: 0 1 auto;  /* Allow shrinking */
+  min-width: 0;    /* Allow shrinking below content size */
+}
+
+.core-node__title .node-name-edit + .prompt-node__header-actions .prompt-node__model-select {
+  width: auto;     /* Allow width to be determined by container */
+  min-width: 80px; /* Minimum readable width */
+}
+
+.core-node__title .node-name-actions {
+  display: flex;
+  gap: var(--spacing-xxs);
+}
+
+.core-node__title .node-name-actions button {
+  padding: var(--spacing-xxs);
+  width: var(--control-button-size);
+  height: var(--control-button-size);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  border-radius: 3px;
+  color: var(--color-text-light);
+}
+
+.core-node__title .node-name-actions .confirm {
+  color: var(--color-status-complete);
+}
+
+.core-node__title .node-name-actions .cancel {
+  color: var(--color-status-error);
+}
+
+.core-node__title .node-name-actions button:hover {
+  background: var(--color-hover);
+}
+
+/* Common button styles */
+.core-node__button,
+.prompt-node__execute-button {
+  padding: var(--spacing-xxs);
+  height: var(--control-button-size);
+  font-size: var(--font-size-xs);
+  background: transparent;
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+  transition: all 0.2s ease;
+}
+
+.core-node__button {
+  width: var(--control-button-size);
+  border: none;
+}
+
+/* Common select styles */
+.core-node select,
+.prompt-node__model-select {
+  padding: 1px 4px;
+  height: var(--control-button-size);
+  font-size: var(--font-size-xs);
+  border: 1px solid var(--color-border);
+  border-radius: 3px;
+  background: var(--color-background);
+  color: var(--color-text);
+}
+
+.core-node__controls {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.core-node__button {
+  padding: 2px;
+  width: 20px;
+  height: 20px;
+  background: transparent;
+  border: none;
+  color: var(--color-text-light);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.core-node__button:hover {
+  background: var(--color-hover);
+  color: var(--color-text);
+}
+
+.core-node__button.delete-button:hover {
+  background: var(--color-danger-light);
+  color: var(--color-danger);
+}
+
+/* Content Area */
+.core-node__content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+  position: relative;
+  padding: var(--spacing-md);
+  overflow: hidden;
+}
+
+.core-node__content > * {
+  flex: 1;
+  min-height: 0;
+}
+
+/* Error display */
+.core-node__error {
+  width: 100%;
+  color: var(--color-error-text, #dc2626);
+  background: var(--color-error-bg, #fee2e2);
+  border: 1px solid var(--color-error-border, #ef4444);
+  padding: var(--spacing-sm);
+  border-radius: 4px;
+  font-size: var(--font-size-sm);
+  margin-bottom: var(--spacing-sm);
+  flex: 0 0 auto;
+}
+
+.core-node__error-title {
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 4px;
+}
+
+.core-node__error-message {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  padding: 6px 8px;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 3px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.core-node__error-details {
+  font-size: var(--font-size-xs);
+  margin-top: 4px;
+  opacity: 0.8;
+}
+
+/* Selected node state */
+
+
+/* Resize Handle */
+.core-node .resize-control {
+  position: absolute !important;
+  width: 10px !important;
+  height: 10px !important;
+  background: #fff !important;
+  border: 3px solid var(--color-prompt) !important;
+  border-radius: 3px !important;
+  bottom: -6px !important;
+  right: -6px !important;
+  cursor: se-resize !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
+  z-index: 10;
+  transition: all 0.2s ease;
+  opacity: 0;
+}
+
+/* Show resize handle only when node is selected */
+.core-node.selected .resize-control {
+  opacity: 1;
+}
+
+/* Hover states */
+.core-node .resize-control:hover {
+  background: var(--color-prompt) !important;
+  transform: scale(1.2);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Add a subtle highlight area for better UX */
+.core-node .resize-control::after {
+  content: '';
+  position: absolute;
+  right: -10px;
+  bottom: -10px;
+  width: 20px;
+  height: 20px;
+  background: transparent;
+  z-index: -1;
+}
+
+/* Handles */
+.react-flow__handle {
+  width: 8px;
+  height: 8px;
+  background: var(--color-text-light);
+  border: 2px solid white;
+  border-radius: 50%;
+  position: absolute;
+  transition: all 0.2s ease;
+}
+
+.react-flow__handle:hover {
+  background: var(--color-text);
+  transform: scale(1.2);
+}
+
+/* Handle Positions */
+.react-flow__handle-top { top: -4px; transform: translateX(-50%); }
+.react-flow__handle-bottom { bottom: -4px; transform: translateX(-50%); }
+.react-flow__handle-left { left: -4px; transform: translateY(-50%); }
+.react-flow__handle-right { right: -4px; transform: translateY(-50%); }
+
+/* Node Type Indicators */
+.input-node { border-left: 4px solid var(--color-input); }
+.output-node { border-left: 4px solid var(--color-output); }
+.prompt-node { border-left: 4px solid var(--color-prompt); }
+.data-node { border-left: 4px solid var(--color-data); }
+
+/* Status Indicators */
+.status-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-status-idle);
+  flex-shrink: 0;
+  transition: background-color 0.2s ease;
+  margin-right: var(--spacing-xs);
+}
+
+.status-indicator.status-idle { 
+  background: var(--color-status-idle); 
+}
+
+.status-indicator.status-running { 
+  background: var(--color-status-running);
+  animation: pulse 1.5s infinite;
+}
+
+.status-indicator.status-complete { 
+  background: var(--color-status-complete); 
+}
+
+.status-indicator.status-error { 
+  background: var(--color-status-error); 
+}
+
+@keyframes pulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+
+/* Collapsed State */
+.core-node.collapsed {
+  height: auto !important;
+  min-height: auto !important;
+  border-radius: 8px !important;
+}
+
+.core-node.collapsed .core-node__header {
+  border-bottom: none;
+  border-radius: 8px 8px 8px 0;
+}
+
+.core-node.collapsed .core-node__content {
+  height: 0 !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  opacity: 0 !important;
+  position: absolute !important;  /* Take out of flow but keep mounted */
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* Additional ReactFlow overrides */
+.react-flow__node {
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.react-flow__node-input,
+.react-flow__node-output,
+.react-flow__node-prompt,
+.react-flow__node-data {
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+/* Handle tooltips */
+.react-flow__handle::before {
+  content: attr(data-tooltip);
+  position: absolute;
+  background: var(--color-text);
+  color: white;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: 4px;
+  font-size: var(--font-size-sm);
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  z-index: 1000;
+}
+
+/* Position tooltips based on handle position */
+.react-flow__handle-top::before {
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-4px);
+}
+
+.react-flow__handle-bottom::before {
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+}
+
+.react-flow__handle-left::before {
+  right: 100%;
+  top: 50%;
+  transform: translateY(-50%) translateX(-4px);
+}
+
+.react-flow__handle-right::before {
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%) translateX(4px);
+}
+
+/* Show tooltip on hover */
+.react-flow__handle:hover::before {
+  opacity: 1;
+}
+
+/* Execute and Copy button styles */
+.input-node__execute-button,
+.prompt-node__execute-button {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: 2px 6px;
+  height: var(--control-button-size);
+  background: var(--color-status-complete);
+  color: white;
+  border: none;
+  border-radius: 3px;
+  font-size: var(--font-size-xs);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.output-node__copy-button {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: 2px 6px;
+  height: var(--control-button-size);
+  background: var(--color-background-light);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: 3px;
+  font-size: var(--font-size-xs);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.input-node__execute-button:hover:not(:disabled),
+.prompt-node__execute-button:hover:not(:disabled) {
+  background: #38A169;  /* Darker green on hover */
+}
+
+.output-node__copy-button:hover:not(:disabled) {
+  background: var(--color-hover);
+  border-color: var(--color-text-light);
+}
+
+.input-node__execute-button:disabled,
+.prompt-node__execute-button:disabled,
+.output-node__copy-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.input-node__execute-button svg,
+.prompt-node__execute-button svg,
+.output-node__copy-button svg {
+  width: 10px;
+  height: 10px;
+  flex-shrink: 0;
+}
+
+/* Hide custom elements when editing name */
+.core-node__title .node-name-edit ~ .core-node__header-custom {
+  visibility: hidden;
+}
+
+/* Core header elements */
+.core-node__header-core {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+/* Custom header elements */
+.core-node__header-custom {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  margin-left: var(--spacing-xs);
+  transition: opacity 0.2s ease;
+}
+
+.core-node__header-custom.hidden {
+  visibility: hidden;
+  opacity: 0;
+}

@@ -1,0 +1,22 @@
+{
+    "generators":
+    [
+        {
+            "name":"Justin's BRA prompt",
+            "type":"prompt",
+            "content":{
+                "promptName": "ITRG_BRA_vJ",
+                "defaultModel": "meta.llama3-70b-instruct-v1:0"
+            }
+        },
+        {
+            "name":"Martin's BRA prompt",
+            "type":"prompt",
+            "content":{
+                "promptName": "ITRG_BRA_vM",
+                "defaultModel": "meta.llama3-70b-instruct-v1:0"
+            }
+        }
+    ]
+
+}

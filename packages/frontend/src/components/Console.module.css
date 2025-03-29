@@ -1,0 +1,91 @@
+.console {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  padding: 5px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.console :global(.xterm) {
+  padding: 0;
+  margin: 0;
+  height: 100%;
+  width: 100%;
+}
+
+.console :global(.xterm-screen) {
+  height: calc(100% - 4px) !important;
+  width: 100% !important;
+}
+
+.console :global(.xterm-viewport) {
+  height: 100% !important;
+  width: 100% !important;
+  overflow-y: auto !important;
+}
+
+.dark {
+  background-color: #1e1e1e;
+}
+
+.light {
+  background-color: #f8f9fa;
+}
+
+.green {
+  background-color: #1e1e1e;
+}
+
+.dark :global(.xterm), 
+.light :global(.xterm),
+.green :global(.xterm) {
+  background-color: inherit !important;
+}
+
+.green :global(.xterm) {
+  color: #33ff00 !important;
+}
+
+.green :global(.xterm-helper-textarea) {
+  color: #33ff00 !important;
+}
+
+.green :global(.xterm-rows) {
+  color: #33ff00 !important;
+}
+
+.green :global(.xterm-cursor) {
+  background-color: #33ff00 !important;
+  color: #1e1e1e !important;
+}
+
+.green :global(.xterm-viewport) {
+  background-color: #1e1e1e !important;
+}
+
+.green :global(.xterm span) {
+  color: #33ff00 !important;
+}
+
+/* Common scrollbar hiding for all themes */
+.console :global(.xterm-viewport) {
+  overflow-y: auto !important;
+  scrollbar-width: none !important; /* Firefox */
+  -ms-overflow-style: none !important;  /* IE and Edge */
+}
+
+.console :global(.xterm-viewport::-webkit-scrollbar) {
+  display: none !important; /* Chrome, Safari and Opera */
+}
+
+/* Make sure all xterm elements take full height */
+.console :global(.xterm-rows),
+.console :global(.xterm-accessibility),
+.console :global(.xterm-selection-layer),
+.console :global(.xterm-link-layer),
+.console :global(.xterm-cursor-layer) {
+  height: 100% !important;
+}
+  

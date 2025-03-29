@@ -1,0 +1,112 @@
+.version-editor {
+  display: flex;
+  align-items: center;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-light);
+}
+
+.version-editor span {
+  color: var(--color-text-light);
+  font-size: var(--font-size-xs);
+}
+
+.version-editor select {
+  background: transparent;
+  border: none;
+  color: var(--color-text-light);
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+.version-editor select:focus {
+  outline: none;
+}
+
+.version-editor select option {
+  background: var(--color-background);
+  color: var(--color-text);
+  padding: var(--spacing-xs);
+}
+
+/* Version number editing */
+.version-numbers {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+
+.version-number {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+}
+
+.version-number span {
+  min-width: 16px;
+  text-align: center;
+}
+
+.version-dot {
+  color: var(--color-text-light);
+  user-select: none;
+  margin: 0 1px;
+}
+
+.version-number button {
+  padding: 1px !important;
+  min-width: 14px;
+  height: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent !important;
+  border: none !important;
+  color: var(--color-text-light) !important;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.version-number button:hover {
+  color: var(--color-text) !important;
+  background: var(--color-hover) !important;
+}
+
+.version-actions {
+  display: flex;
+  gap: 2px;
+  margin-left: 4px;
+}
+
+.version-actions button {
+  padding: 1px !important;
+  min-width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent !important;
+  border: none !important;
+  color: var(--color-text-light) !important;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.version-actions .confirm {
+  color: var(--color-text-light) !important;
+}
+
+.version-actions .confirm:hover {
+  color: var(--color-status-complete) !important;
+}
+
+.version-actions .cancel {
+  color: var(--color-text-light) !important;
+}
+
+.version-actions .cancel:hover {
+  color: var(--color-status-error) !important;
+} 

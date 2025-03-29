@@ -1,0 +1,52 @@
+{
+    "objects":
+    [
+        {
+            "objectType": "itrg-bra",
+            "tags": ["demo", "default"],
+            "transformers":[
+                {
+                    "description": "parse markdowns into model object",
+                    "fromView": "markdown",
+                    "toView": "object",
+                    "tags": ["demo", "default"],
+                    "transformerDetails":{
+                        "type":"utility",
+                        "language":"typescript",
+                        "customizable": false
+    
+                    }
+                },
+                {
+                    "description": "parse objects into dot graphs",
+                    "fromView": "object",
+                    "toView": "dot",
+                    "tags": ["demo", "default"],
+                    "transformerDetails":{
+                        "type":"utility",
+                        "language":"typescript",
+                        "customizable": false
+                    }
+                },
+                {
+                    "description": "parse objects into csvs",
+                    "fromView": "object",
+                    "toView": "csv",
+                    "tags": ["demo", "default"],
+                    "transformerDetails":{
+                        "type":"utility",
+                        "language":"typescript",
+                        "customizable": false
+                    }
+                }
+
+            ]
+    
+        }
+    ]
+
+}
+
+
+
+    

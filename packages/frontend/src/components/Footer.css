@@ -1,0 +1,91 @@
+.footer {
+  background-color: #111111 !important;
+  color: #ffffff !important;
+  padding: 2.5rem 2rem;
+  box-shadow: 0 -2px 16px rgba(0, 0, 0, 0.2);
+  margin-top: auto;
+  width: 100%;
+  position: relative;
+  z-index: 1;
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 2rem;
+  padding: 2rem 0;
+}
+
+.footer-company {
+  text-align: center;
+}
+
+.copyright {
+  margin: 0;
+  font-size: 0.9rem;
+  opacity: 0.9;
+  letter-spacing: 0.5px;
+}
+
+.footer-links {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  font-size: 0.85rem;
+  opacity: 0.8;
+}
+
+.footer a {
+  color: inherit;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+.footer a:hover {
+  opacity: 1;
+  text-decoration: underline;
+}
+
+.footer-separator {
+  color: #666;
+  font-size: 0.7rem;
+}
+
+div.App .footer {
+  background-color: #111111;
+  color: #ffffff;
+}
+
+.footer-nav {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 2rem;
+}
+
+.footer-nav-group {
+  display: flex;
+  gap: 2rem;
+}
+
+.footer-nav a {
+  color: #ffffff;
+  font-weight: 500;
+}
+
+.footer-bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.footer-legal {
+  display: flex;
+  gap: 1.5rem;
+  font-size: 0.85rem;
+}

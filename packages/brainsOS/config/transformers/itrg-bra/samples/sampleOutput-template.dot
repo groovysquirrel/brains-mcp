@@ -1,0 +1,184 @@
+digraph refArchitecture {
+    
+    subgraph cluster_defining {
+    bgcolor="lightsteelblue2" 
+    label="Defining Capabilities" 
+    fontcolor="black"
+    style=solid
+    fontname="Helvetica,Arial,sans-serif"
+    ranksep=0.2
+
+    node [fontname="Helvetica,Arial,sans-serif"]
+    edge [fontname="Helvetica,Arial,sans-serif"]
+
+    // Value Stream 1
+    subgraph cluster_vs1 {
+        fillcolor="white" 
+        fontcolor="black" 
+        style="filled" 
+        label="Value Stream 1" 
+        node [shape=box fillcolor="red" style="filled"]
+        // Level 1 Capability A
+        subgraph cluster_vs1a {
+            fillcolor="skyblue3" 
+            label="Level 1\nCapability A" 
+            fontcolor="white" 
+            style="filled" 
+            node [shape=box fillcolor="lightskyblue" style="filled"]
+            
+            //Level 2 Capabilities
+            n1A1 [label="Level 2\nCapability A1"];
+            n1A2 [label="Level 2\nCapability A2"];
+        }
+        n1A1 -> n1A2 [style=invis]
+        
+        // Level 1 Capability B
+        subgraph cluster_vs1b {
+            fillcolor="skyblue3" 
+            label="Level 1\nCapability B" 
+            fontcolor="white" 
+            style="filled" 
+            node [shape=box fillcolor="lightskyblue" style="filled"]
+            
+            //Level 2 Capabilities
+            n1B1 [label="Level 2\nCapability B1"];
+            n1B2 [label="Level 2\nCapability B2"];
+        }
+        n1B1 -> n1B2 [style=invis]
+    }
+    
+    // Value Stream 2
+    subgraph cluster_vs2 {
+        fillcolor="white" 
+        fontcolor="black" 
+        style="filled" 
+        label="Value Stream 2" 
+        
+        
+        // Level 1 Capability A
+        subgraph cluster_vs2a {
+            fillcolor="skyblue3" 
+            label="Level 1\nCapability A" 
+            fontcolor="white" 
+            style="filled" 
+            node [shape=box fillcolor="lightskyblue" style="filled"]
+            
+            //Level 2 Capabilities
+            n2A1 [label="Level 2\nCapability A1"];
+            n2A2 [label="Level 2\nCapability A2"];
+        }
+        
+        n2A1 -> n2A2 [style=invis]
+        
+        // Level 1 Capability B
+        subgraph cluster_vs2b {
+            fillcolor="skyblue3" 
+            label="Level 1\nCapability B" 
+            fontcolor="white" 
+            style="filled" 
+            node [shape=box fillcolor="lightskyblue" style="filled"]
+            
+            //Level 2 Capabilities
+            n2B1 [label="Level 2\nCapability B1"];
+            n2B2 [label="Level 2\nCapability B2"];
+        }
+        
+        n2B1 -> n2B2 [style=invis]
+    }
+    
+    // Value Stream 3
+    subgraph cluster_vs3 {
+        fillcolor="white" 
+        fontcolor="black" 
+        style="filled" 
+        label="Value Stream 3" 
+        
+        
+        // Level 1 Capability A
+        subgraph cluster_vs3a {
+            fillcolor="skyblue3" 
+            label="Level 1\nCapability A" 
+            fontcolor="white" 
+            style="filled" 
+            node [shape=box fillcolor="lightskyblue" style="filled"]
+            
+            //Level 2 Capabilities
+            n2C1 [label="Level 2\nCapability C1"];
+            n2C2 [label="Level 2\nCapability C2"];
+        }
+        
+        n2C1 -> n2C2 [style=invis]
+        
+        // Level 1 Capability B
+        subgraph cluster_vs3b {
+            fillcolor="skyblue3" 
+            label="Level 1\nCapability B" 
+            fontcolor="white" 
+            style="filled" 
+            node [shape=box fillcolor="lightskyblue" style="filled"]
+            
+            //Level 2 Capabilities
+            n2D1 [label="Level 2\nCapability D1"];
+            n2D2 [label="Level 2\nCapability D2"];
+        }
+        
+        n2D1 -> n2D2 [style=invis]
+        }
+        
+        
+    }
+
+    subgraph cluster_shared {
+        bgcolor="grey86" 
+        label="Shared Capabilities" 
+        fontcolor="black"
+        style=solid
+        fontname="Helvetica,Arial,sans-serif"
+        ranksep=0.2
+        rankdir=TB
+    
+        node [fontname="Helvetica,Arial,sans-serif"]
+        edge [fontname="Helvetica,Arial,sans-serif"]
+        
+        subgraph cluster_shared1 {
+            fillcolor="skyblue3" 
+            label="Shared Level 1\nCapability A" 
+            fontcolor="white" 
+            style="filled" 
+            node [shape=box fillcolor="lightskyblue" style="filled"]
+            
+            //Level 2 Capabilities
+            ns1A1 [label="Level 2\nCapability D1"];
+            ns1A2 [label="Level 2\nCapability D2"];
+            ns1A3 [label="Level 2\nCapability D2"];
+            ns1A4 [label="Level 2\nCapability D2"];
+            ns1A5 [label="Level 2\nCapability D2"];
+        }
+        
+        subgraph cluster_shared2 {
+            
+            fillcolor="skyblue3" 
+            label="Shared Level 1\nCapability B" 
+            fontcolor="white" 
+            style="filled" 
+            
+            node [shape=box fillcolor="lightskyblue" style="filled"]
+            
+            //Level 2 Capabilities
+            ns2A1 [label="Level 2\nCapability D1"];
+            ns2A2 [label="Level 2\nCapability D2"];
+            ns2A3 [label="Level 2\nCapability D2"];
+            ns2A4 [label="Level 2\nCapability D2"];
+            ns2A5 [label="Level 2\nCapability D2"];
+        }
+            
+    }
+    
+    //this is hacky but it puts the defining capabilities above the shared capabilities
+    n1A2 -> ns1A1  [style=invis]
+    n2D2 -> 
+    //this is also hacky but sets up the shared capabilities on top of each other
+    ns1A1 -> ns2A1  [style=invis]
+    
+    
+}

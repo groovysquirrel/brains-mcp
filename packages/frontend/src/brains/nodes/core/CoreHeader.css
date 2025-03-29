@@ -1,0 +1,119 @@
+.core-node__header {
+  padding: 4px 6px;
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  background: var(--color-background-light);
+  border-radius: 8px 8px 0 0;
+  height: 28px;
+}
+
+.core-node__title {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--color-text);
+}
+
+.core-node__controls {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.core-node__button {
+  padding: 1px;
+  width: 16px;
+  height: 16px;
+  background: transparent;
+  border: none;
+  color: var(--color-text-light);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+  transition: all 0.2s ease;
+}
+
+/* Status indicator */
+.status-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--status-idle);
+  flex-shrink: 0;
+}
+
+.status-indicator.status-running {
+  background: var(--status-running);
+  animation: pulse 1.5s infinite;
+}
+
+.status-indicator.status-complete {
+  background: var(--status-complete);
+}
+
+.status-indicator.status-error {
+  background: var(--status-error);
+}
+
+@keyframes pulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+
+/* Rest of existing styles */
+.core-name span {
+  cursor: text;
+  color: #333;
+}
+
+.core-name-input {
+  font-size: 14px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 4px 8px;
+  outline: none;
+  width: 100%;
+  min-width: 100px;
+  background: #f8f9fa;
+  color: #333;
+}
+
+.core-name-edit {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.core-name-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.core-name-actions button {
+  padding: 2px;
+  min-width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.core-name-actions .confirm {
+  color: #38a169;
+}
+
+.core-name-actions .cancel {
+  color: #e53e3e;
+} 

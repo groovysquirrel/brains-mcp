@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "jsx": "react-jsx",
+    "module": "esnext",
+    "types": ["jest", "node"],
+    "moduleResolution": "node",
+    "target": "es2015",
+    "resolveJsonModule": true,
+   
+  },
+
+}

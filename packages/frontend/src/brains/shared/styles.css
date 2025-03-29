@@ -1,0 +1,799 @@
+/* Base colors */
+:root {
+  --color-border: #e2e8f0;
+  --color-shadow: rgba(0, 0, 0, 0.1);
+  --color-text: #333;
+  --color-text-light: #718096;
+  
+  /* Status colors */
+  --status-idle: #CBD5E0;
+  --status-running: #4299E1;
+  --status-complete: #48BB78;
+  --status-error: #F56565;
+  
+  /* Spacing */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-lg: 16px;
+  
+  /* Node dimensions */
+  --node-width: 400px;
+  --node-header-height: 40px;
+}
+
+/* Common button styles */
+.node-button {
+  background: none;
+  border: none;
+  padding: var(--spacing-xs);
+  cursor: pointer;
+  color: var(--color-text-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.node-button:hover {
+  color: var(--color-text);
+}
+
+/* Common handle styles */
+.handle {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: white;
+}
+
+.handle-input {
+  border: 2px solid var(--status-running);
+}
+
+.handle-output {
+  border: 2px solid var(--status-complete);
+} 
+
+/* Resize Controls */
+.react-flow__node-resizer {
+  border: 2px solid var(--status-running) !important;
+  border-radius: 4px;
+}
+
+.react-flow__resize-control {
+  position: absolute;
+}
+
+.react-flow__resize-control.handle {
+  width: 10px !important;
+  height: 10px !important;
+  background-color: white !important;
+  border: 2px solid var(--status-running) !important;
+  border-radius: 2px !important;
+  transition: all 0.2s ease;
+}
+
+.react-flow__resize-control.handle:hover {
+  background-color: var(--status-running) !important;
+  transform: scale(1.2);
+}
+
+/* Make the bottom-right resize handle more prominent */
+.react-flow__resize-control.bottom.right {
+  width: 12px !important;
+  height: 12px !important;
+  cursor: nwse-resize;
+}
+
+/* Replace the existing selected node style */
+.react-flow__node.selected {
+  outline: none; /* Remove the full node outline */
+}
+
+/* Add highlight only to the header when selected */
+.react-flow__node.selected .node-header {
+  background-color: rgba(66, 153, 225, 0.1); /* Light blue background */
+  border-radius: 8px 8px 0 0;
+}
+
+/* Optional: Add a subtle border indicator */
+.react-flow__node.selected .node-wrapper {
+  border-color: var(--status-running);
+}
+
+/* Override ReactFlow's default node sizing */
+.react-flow__node {
+  height: auto !important;
+  width: auto !important;
+}
+
+/* Specifically target node types if needed */
+.react-flow__node-prompt,
+.react-flow__node-input,
+.react-flow__node-output {
+  height: auto !important;
+  width: auto !important;
+}
+
+/* Update node sizing */
+.react-flow__node-prompt,
+.react-flow__node-input,
+.react-flow__node-output {
+  width: auto !important;
+  
+  background: white !important;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  box-shadow: 0 2px 4px var(--color-shadow);
+}
+
+/* Node wrapper */
+.node-wrapper {
+  width: fit-content;
+  background: white;
+  border-radius: 8px;
+  padding: var(--spacing-xs);
+}
+
+/* Editor container */
+.editor-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  flex: 1;
+  display: flex;
+}
+
+/* Expanded content */
+.node-expanded-content {
+  min-width: var(--node-width);
+  width: 100%;
+  background: white;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px var(--color-shadow);
+  padding: var(--spacing-md);
+  position: relative;
+  overflow: hidden;
+}
+
+.node-content-inner {
+  height: 100%;
+  padding: 0;
+  margin: 0;
+}
+
+/* Add back resize controls */
+.node-expanded-content .react-flow__node-resizer {
+  border: none;
+  border-radius: 0;
+}
+
+/* Hide all resize handles except bottom-right */
+.node-expanded-content .react-flow__resize-control.handle {
+  display: none !important;
+}
+
+/* Make bottom-right resize handle prominent */
+.node-expanded-content .react-flow__resize-control.handle.bottom.right {
+  display: block !important;
+  width: 20px !important;
+  height: 20px !important;
+  background-color: white !important;
+  border: 2px solid var(--status-running) !important;
+  border-radius: 4px !important;
+  right: -10px !important;
+  bottom: -10px !important;
+  cursor: nwse-resize;
+  transition: all 0.2s ease;
+  pointer-events: all !important;
+  z-index: 10;
+}
+
+/* Add resize icon to handle */
+.node-expanded-content .react-flow__resize-control.handle.bottom.right::after {
+  content: '';
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
+  width: 6px;
+  height: 6px;
+  border-right: 2px solid var(--status-running);
+  border-bottom: 2px solid var(--status-running);
+}
+
+/* Hover effect for resize handle */
+.node-expanded-content .react-flow__resize-control.handle.bottom.right:hover {
+  background-color: var(--status-running) !important;
+  transform: scale(1.1);
+}
+
+.node-expanded-content .react-flow__resize-control.handle.bottom.right:hover::after {
+  border-color: white;
+}
+
+/* Prevent dragging on expanded content */
+.node-expanded-container,
+.node-expanded-content,
+.node-content-inner,
+.editor-container,
+.monaco-wrapper {
+  pointer-events: all !important;
+  user-select: none;
+}
+
+/* Make sure resize handle is clickable and not draggable */
+.node-expanded-content .react-flow__node-resizer,
+.node-expanded-content .react-flow__resize-control.handle.bottom.right {
+  pointer-events: all !important;
+  user-select: none;
+  cursor: nwse-resize !important;
+}
+
+/* Add noflow class to prevent dragging */
+.noflow {
+  pointer-events: all !important;
+  user-select: none;
+}
+
+/* Expanded content styles */
+.expanded-content-container {
+  pointer-events: auto;
+  transform-origin: bottom center;
+  filter: drop-shadow(0 -2px 10px rgba(0, 0, 0, 0.15));
+}
+
+.expanded-content {
+  background: white;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.expanded-content.maximized {
+  position: fixed !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: 8px !important;
+  transform: none !important;
+  background: white;
+  z-index: 9999;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Make maximized content look more like a modal */
+.expanded-content.maximized .window-controls {
+  background: #f8f9fa;
+  border-radius: 8px 8px 0 0;
+}
+
+.expanded-content.maximized .content-inner {
+  padding: var(--spacing-md);
+  background: #1e1e1e;
+}
+
+.content-inner {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.editor-container {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+.monaco-wrapper {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+}
+
+/* Preview content for prompt nodes */
+.preview-content {
+  flex: 0 0 auto;
+  height: 200px;
+  overflow-y: auto;
+  padding: var(--spacing-sm);
+  background: #f8f9fa;
+  font-family: monospace;
+  font-size: 12px;
+  white-space: pre-wrap;
+  border-top: 1px solid var(--color-border);
+}
+
+/* Input textarea */
+.input-textarea {
+  flex: 1;
+  width: 100%;
+  resize: none;
+  border: none;
+  padding: var(--spacing-sm);
+  font-size: 13px;
+  outline: none;
+}
+
+/* Allow interaction with Monaco editor */
+.monaco-editor,
+.monaco-editor .overflow-guard,
+.monaco-editor .monaco-scrollable-element {
+  pointer-events: auto !important;
+}
+
+/* Make editor container interactive but prevent drag */
+.editor-container {
+  pointer-events: auto !important;
+  user-select: text !important; /* Allow text selection */
+}
+
+/* Ensure resize handle stays on top and interactive */
+.expanded-content .react-flow__node-resizer {
+  z-index: 10;
+  pointer-events: auto !important;
+}
+
+/* Monaco specific styles */
+.monaco-wrapper {
+  height: 100%;
+  width: 100%;
+  pointer-events: auto !important;
+}
+
+.monaco-editor {
+  pointer-events: auto !important;
+}
+
+/* Override any interfering styles */
+.monaco-editor,
+.monaco-editor .overflow-guard,
+.monaco-editor .monaco-scrollable-element,
+.monaco-editor textarea {
+  pointer-events: auto !important;
+  user-select: text !important;
+}
+
+/* Ensure editor content is visible */
+.monaco-editor .mtk1 {
+  color: #d4d4d4 !important; /* Light gray text */
+}
+
+/* Make sure the cursor is visible */
+.monaco-editor .cursor {
+  background-color: white !important;
+}
+
+/* Draggable expanded content */
+.expanded-content {
+  position: relative;
+}
+
+.drag-handle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 24px;
+  background: #f8f9fa;
+  border-bottom: 1px solid var(--color-border);
+  border-radius: 8px 8px 0 0;
+  cursor: move;
+  display: flex;
+  align-items: center;
+  padding: 0 var(--spacing-md);
+  gap: var(--spacing-sm);
+}
+
+.drag-handle-dots {
+  color: var(--color-text-light);
+  font-size: 12px;
+  letter-spacing: 2px;
+}
+
+.drag-handle-name {
+  color: var(--color-text);
+  font-size: 12px;
+  font-weight: 500;
+  flex: 1;
+}
+
+/* Ensure content stays sharp when scaled */
+.expanded-content * {
+  backface-visibility: hidden;
+  -webkit-font-smoothing: subpixel-antialiased;
+}
+
+.zoomable-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+}
+
+.editor-container {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+}
+
+.monaco-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+/* Ensure Monaco editor takes full width */
+.monaco-editor {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.monaco-editor .overflow-guard {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Ensure Monaco editor stays contained */
+.monaco-editor,
+.monaco-editor .overflow-guard {
+  position: relative !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Force Monaco to respect container */
+.monaco-editor {
+  flex: 1 !important;
+  min-height: 0 !important;
+}
+
+.monaco-editor .overflow-guard {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Container hierarchy for width control */
+.expanded-content {
+  background: white;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+.content-inner {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  width: 100%;
+  overflow: hidden;
+}
+
+.editor-container {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+}
+
+.monaco-wrapper {
+  flex: 1;
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Force Monaco to stay within bounds */
+.monaco-editor {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: hidden !important;
+}
+
+.monaco-editor .overflow-guard {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: hidden !important;
+}
+
+/* Force Monaco's internal elements to respect width */
+.monaco-scrollable-element {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: hidden !important;
+}
+
+.zoom-outer {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.zoom-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+}
+
+/* Node header styles */
+.node-header {
+  padding: var(--spacing-xs);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-xs);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.header-name {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.node-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+/* Button styles */
+.collapse-button,
+.delete-button,
+.window-button {
+  background: none;
+  border: none;
+  padding: var(--spacing-xs);
+  cursor: pointer;
+  color: var(--color-text-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.collapse-button:hover,
+.delete-button:hover,
+.window-button:hover {
+  color: var(--color-text);
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.delete-button:hover {
+  color: #ff4444;
+}
+
+/* Window controls */
+.window-controls {
+  height: 40px;
+  padding: var(--spacing-sm);
+  background: #f8f9fa;
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.control-buttons {
+  display: flex;
+  gap: var(--spacing-xs);
+}
+
+.window-button {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.window-button svg {
+  width: 16px;
+  height: 16px;
+}
+
+.window-button:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.window-button.close:hover {
+  background: #ff4444;
+  color: white;
+}
+
+/* Ensure content fills maximized space */
+.expanded-content.maximized .content-inner {
+  flex: 1;
+  padding: var(--spacing-md);
+  background: #1e1e1e;
+}
+
+.expanded-content.maximized .editor-container {
+  flex: 1;
+  margin: 0;
+  border-radius: 0;
+}
+
+.expanded-content.maximized .monaco-wrapper {
+  border-radius: 0;
+}
+
+/* Make window controls more prominent */
+.window-controls {
+  height: 40px;
+  padding: var(--spacing-sm);
+  background: #f8f9fa;
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.window-button {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.window-button svg {
+  width: 16px;
+  height: 16px;
+}
+
+.window-button:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.window-button.close:hover {
+  background: #ff4444;
+  color: white;
+}
+
+/* Window controls bar */
+.window-controls {
+  height: 40px;
+  padding: var(--spacing-sm);
+  background: #f8f9fa;
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+/* Content area styling */
+.expanded-content {
+  background: white;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.content-inner {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-sm);
+  background: #1e1e1e; /* Match Monaco's dark theme */
+}
+
+.editor-container {
+  flex: 1;
+  display: flex;
+  border-radius: 4px;
+  overflow: hidden;
+  background: #1e1e1e;
+}
+
+.monaco-wrapper {
+  flex: 1;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+/* Maximized state adjustments */
+.expanded-content.maximized {
+  border-radius: 0;
+}
+
+.expanded-content.maximized .content-inner {
+  padding: var(--spacing-md);
+}
+
+/* Window control buttons */
+.window-button {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  color: var(--color-text-light);
+  transition: all 0.2s ease;
+}
+
+.window-button:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--color-text);
+}
+
+/* Resizer styles */
+.resize-handle {
+  width: 12px !important;
+  height: 12px !important;
+  background: white !important;
+  border: 2px solid var(--color-border) !important;
+  border-radius: 50% !important;
+  pointer-events: all !important;
+}
+
+.resize-line {
+  border: none !important;
+  background: transparent !important;
+}
+
+/* Make sure expanded content is interactive */
+.expanded-content {
+  pointer-events: all;
+  user-select: none;
+}
+
+.content-inner {
+  pointer-events: all;
+  user-select: text;
+}
+
+/* Make sure all node types have consistent base styling */
+.react-flow__node-input,
+.react-flow__node-prompt,
+.react-flow__node-output {
+  height: auto !important;
+  width: auto !important;
+  background: white !important;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  box-shadow: 0 2px 4px var(--color-shadow);
+}
+
+/* Remove any node-specific overrides */
+.react-flow__node {
+  transition: none !important;
+}
+
+/* Ensure consistent padding and margins */
+.react-flow__node {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+
+  

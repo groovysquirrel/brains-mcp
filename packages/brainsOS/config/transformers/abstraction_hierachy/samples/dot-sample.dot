@@ -1,0 +1,128 @@
+graph AbstractionHierarchy {
+    rankdir=TB;  // Top to Bottom layout
+    splines=false;  // Straight lines
+    node [shape=box, style="rounded, filled", fontname="Arial"];
+    edge [fontname="Arial", fontsize=9];
+    labelloc="t";
+    label="Abstraction Hierarchy for a Law Firm (Expanded Value Streams)";
+
+    // ===== NODES =====
+    
+    // 1. Business Objectives
+    subgraph FunctionalPurpose {
+        rank=same;
+        node [fillcolor="lightyellow"];
+        "BO1\nProfitability";
+        "BO2\nClient Satisfaction";
+        "BO3\nCompliance\nand Risk\nManagement";
+    }
+
+    // 2. Tradeoffs
+    subgraph AbstractFunctions {
+        rank=same;
+        node [fillcolor="lightblue"];
+        "T1\nQuality vs.\nEfficiency";
+        "T2\nPersonalized\nService vs.\nStandardization";
+        "T3\nRisk Mitigation\nvs. Innovation";
+    }
+
+    // 3. Value Streams
+    subgraph GeneralizedFunctions {
+        rank=same;
+        node [fillcolor="gray"];
+        "VS1\nClient Acquisition\nand Marketing";
+        "VS2\nClient Intake\nand Assessment";
+        "VS3\nCase Management";
+        "VS4\nLegal Research";
+        "VS5\nDocument Preparation\nand Review";
+        "VS6\nLitigation and\nCourt Proceedings";
+        "VS7\nBilling and\nInvoicing";
+        "VS8\nCompliance\nMonitoring";
+        "VS9\nTechnology\nImplementation";
+    }
+
+    // 4. Information Systems
+    subgraph PhysicalFunctions {
+        rank=same;
+        node [fillcolor="lightpink"];
+        "IS1\nCRM System";
+        "IS2\nClient Onboarding\nPortal";
+        "IS3\nCase Management\nSystem";
+        "IS4\nDocument Management\nSystem";
+        "IS5\nBilling and Accounting\nSystem";
+        "IS6\nCompliance Tracking\nSystem";
+        "IS7\nMarketing Automation\nTools";
+        "IS8\nLegal Research\nDatabases";
+        "IS9\nLitigation Support\nTools";
+        "IS10\nLegal Tech\nInnovations";
+    }
+
+    // 5. Data
+    subgraph PhysicalAttributes {
+        rank=same;
+        node [fillcolor="lightsalmon"];
+        "D1\nClient Data";
+        "D2\nCase Data";
+        "D3\nDocument Data";
+        "D4\nCompliance Data";
+        "D5\nFinancial Data";
+        "D6\nMarketing Data";
+        "D7\nResearch Data";
+        "D8\nLitigation Data";
+        "D9\nInnovation Data";
+    }
+
+    // ===== CONNECTIONS =====
+
+    // Business Objectives to Tradeoffs
+    "BO1\nProfitability" -- "T1\nQuality vs.\nEfficiency";
+    "BO2\nClient Satisfaction" -- "T1\nQuality vs.\nEfficiency";
+    "BO2\nClient Satisfaction" -- "T2\nPersonalized\nService vs.\nStandardization";
+    "BO3\nCompliance\nand Risk\nManagement" -- "T3\nRisk Mitigation\nvs. Innovation";
+
+    // Tradeoffs to Value Streams
+    "T1\nQuality vs.\nEfficiency" -- {
+        "VS1\nClient Acquisition\nand Marketing";
+        "VS2\nClient Intake\nand Assessment";
+        "VS3\nCase Management";
+        "VS4\nLegal Research";
+    }
+
+    "T2\nPersonalized\nService vs.\nStandardization" -- {
+        "VS2\nClient Intake\nand Assessment";
+        "VS5\nDocument Preparation\nand Review";
+        "VS6\nLitigation and\nCourt Proceedings";
+    }
+
+    "T3\nRisk Mitigation\nvs. Innovation" -- {
+        "VS7\nBilling and\nInvoicing";
+        "VS8\nCompliance\nMonitoring";
+        "VS9\nTechnology\nImplementation";
+    }
+
+    // Value Streams to Information Systems
+    "VS1\nClient Acquisition\nand Marketing" -- { "IS1\nCRM System"; "IS7\nMarketing Automation\nTools" };
+    "VS2\nClient Intake\nand Assessment" -- { "IS1\nCRM System"; "IS2\nClient Onboarding\nPortal" };
+    "VS3\nCase Management" -- "IS3\nCase Management\nSystem";
+    "VS4\nLegal Research" -- "IS8\nLegal Research\nDatabases";
+    "VS5\nDocument Preparation\nand Review" -- "IS4\nDocument Management\nSystem";
+    "VS6\nLitigation and\nCourt Proceedings" -- "IS9\nLitigation Support\nTools";
+
+    // Information Systems to Data
+    "IS1\nCRM System" -- "D1\nClient Data";
+    "IS2\nClient Onboarding\nPortal" -- "D1\nClient Data";
+    "IS3\nCase Management\nSystem" -- "D2\nCase Data";
+    "IS4\nDocument Management\nSystem" -- "D3\nDocument Data";
+    "IS5\nBilling and Accounting\nSystem" -- "D5\nFinancial Data";
+    "IS6\nCompliance Tracking\nSystem" -- "D4\nCompliance Data";
+    "IS7\nMarketing Automation\nTools" -- "D6\nMarketing Data";
+    "IS8\nLegal Research\nDatabases" -- "D7\nResearch Data";
+    "IS9\nLitigation Support\nTools" -- "D8\nLitigation Data";
+    "IS10\nLegal Tech\nInnovations" -- "D9\nInnovation Data";
+
+    // Value Stream Workflow Connections
+    "VS1\nClient Acquisition\nand Marketing" -- "VS2\nClient Intake\nand Assessment";
+    "VS2\nClient Intake\nand Assessment" -- "VS3\nCase Management";
+    "VS3\nCase Management" -- "VS4\nLegal Research";
+    "VS4\nLegal Research" -- "VS5\nDocument Preparation\nand Review";
+}  

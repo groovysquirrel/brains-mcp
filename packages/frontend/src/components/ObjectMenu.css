@@ -1,0 +1,347 @@
+/* Menu Panel */
+.menu-panel {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  background: #ffffff;
+  height: 100%;
+  min-width: 300px;
+  overflow-y: scroll;
+}
+
+/* Optional: If you want to style the scrollbar to be less obtrusive */
+.menu-panel::-webkit-scrollbar {
+  width: 8px;
+}
+
+.menu-panel::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.menu-panel::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.menu-panel::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Current item styling */
+.current-item-section {
+  background: #dde3ed;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.item-name {
+  font-size: 24px;
+  font-weight: 500;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+.item-version {
+  font-size: 16px;
+  color: #64748b;
+}
+
+.item-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+/* Version editor styling */
+.version-editor {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.version-numbers-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.version-label-row {
+  display: flex;
+  justify-content: space-around;
+  padding: 0 20px;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.version-numbers {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.version-input-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.version-input-group input {
+  width: 40px;
+  text-align: center;
+  padding: 4px;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  font-size: 14px;
+  background: white;
+  color: #1a1a1a;
+}
+
+.version-separator {
+  color: #64748b;
+  font-weight: 500;
+  margin: 0 2px;
+}
+
+/* Button styles */
+button {
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+button.primary {
+  background: #2d78f2;
+  color: white;
+}
+
+button.primary:hover {
+  background: #1b62d4;
+}
+
+button.secondary {
+  background: #2d78f2;
+  color: white;
+}
+
+button.secondary:hover {
+  background: #1b62d4;
+}
+
+button.micro {
+  padding: 2px 4px;
+  min-width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+button.small {
+  padding: 4px 8px;
+}
+
+.version-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.version-actions button {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Library Section */
+.library-section {
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.library-button {
+  width: 100%;
+  padding: 16px;
+  background: #2d78f2;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 18px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.library-content {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  margin-top: -8px;
+  padding: 24px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.library-content.open {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.library-button.open {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  border: 1px solid #e9ecef;
+  border-bottom: none;
+}
+
+.library-select-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.library-select-group label {
+  color: #6c757d;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.library-select-group select {
+  padding: 12px;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  font-size: 16px;
+  background: white;
+  color: #1a1a1a;
+  width: 100%;
+}
+
+/* Style the placeholder option differently if needed */
+.library-select-group select option {
+  color: #1a1a1a;
+  background: white;
+}
+
+/* Style the default "Choose from library..." option */
+.library-select-group select option[value=""] {
+  color: #64748b;
+}
+
+/* Messages */
+.success-message,
+.error-message {
+  padding: 12px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.success-message {
+  background: #d4edda;
+  color: #155724;
+}
+
+.error-message {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+/* Update the version header button styles */
+.version-header button {
+  background: #4477ff;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.version-header button:hover {
+  background: #3366ee;
+}
+
+.button-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Name editor styling */
+.name-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.name-input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  font-size: 16px;
+  background: white;
+  color: #1a1a1a;
+}
+
+.name-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.name-actions button {
+  flex: 1;
+  padding: 8px;
+  justify-content: center;
+}
+
+.name-actions button.secondary {
+  background: #6c757d;
+}
+
+.name-actions button.secondary:hover {
+  background: #5a6268;
+}
+
+/* Icon sizes */
+.menu-panel .bp4-icon {
+  width: 12px;
+  height: 12px;
+}
+
+/* Library button uses larger icons */
+.library-button .bp4-icon {
+  width: 16px;
+  height: 16px;
+}
+
+/* Flow variant styles */
+.flow-menu-panel {
+  background: transparent;
+  border: none;
+}

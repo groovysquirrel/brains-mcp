@@ -1,0 +1,414 @@
+{
+  "flows": [
+    {
+      "name": "example-flow",
+      "version": "1.0.0",
+      "createdBy": "system",
+      "content": {
+
+        "nodes": [
+            {
+                "id": "input-1",
+                "type": "input",
+                "position": {
+                    "x": -601.3454959075677,
+                    "y": 71.354837817786
+                },
+                "style": {
+                    "width": 319,
+                    "height": 230
+                },
+                "data": {
+                    "prompt": "Create a list of 6 critical value streams for a legal firm. These represent core sources of business value. ",
+                    "status": "complete",
+                    "collapsed": false
+                },
+                "width": 319,
+                "height": 230,
+                "selected": false,
+                "dragging": false,
+                "positionAbsolute": {
+                    "x": -601.3454959075677,
+                    "y": 71.354837817786
+                },
+                "resizing": false
+            },
+            {
+                "id": "prompt-1",
+                "type": "prompt",
+                "position": {
+                    "x": -184.79283256767917,
+                    "y": 141.14715310974395
+                },
+                "style": {
+                    "width": 576,
+                    "height": 508
+                },
+                "data": {
+                    "systemPrompt": "For each value stream, generate 6 business capabilities that are unique. Also create a list of business capabilities that span ALL the value streams. \n\nOutput the results as:\n\n# {value stream}\n## {value stream Description}\n\n# {Capability Name}\n## {Capability Description}\n",
+                    "defaultSystemPrompt": "Do your analysis as a pirate looking for treasure.",
+                    "model": "meta.llama3-70b-instruct-v1:0",
+                    "status": "complete",
+                    "collapsed": false,
+                    "error": "Unknown error",
+                    "result": "Here are 6 critical value streams for a legal firm:\n\n# Client Acquisition\n## Identifying and securing new clients for the firm\n\n# Client Relationship Management\n## Building and maintaining strong relationships with existing clients\n\n# Legal Service Delivery\n## Providing high-quality legal services to clients\n\n# Talent Acquisition and Development\n## Attracting, developing, and retaining top legal talent\n\n# Operational Efficiency\n## Optimizing internal processes and systems to reduce costs and improve productivity\n\n# Risk Management and Compliance\n## Identifying and mitigating risks, ensuring compliance with regulatory requirements\n\nNow, let's generate 6 business capabilities for each value stream:\n\n**Client Acquisition**\n\n# Lead Generation\n## Identifying and generating new leads for potential clients\n\n# Market Research\n## Conducting market research to identify trends and opportunities\n\n# Brand Management\n## Developing and maintaining a strong brand identity\n\n# Digital Marketing\n## Leveraging digital channels to promote the firm's services\n\n# Event Planning\n## Hosting and participating in events to attract new clients\n\n# Referral Management\n## Encouraging and incentivizing referrals from existing clients\n\n**Client Relationship Management**\n\n# Client Communication\n## Maintaining regular and effective communication with clients\n\n# Account Management\n## Managing and growing existing client relationships\n\n# Client Feedback and Insights\n## Collecting and acting on client feedback and insights\n\n# Relationship Building\n## Building personal relationships with key clients and stakeholders\n\n# Cross-Selling and Upselling\n## Identifying opportunities to sell additional services to existing clients\n\n# Client Retention\n## Developing strategies to retain existing clients\n\n**Legal Service Delivery**\n\n# Legal Research and Analysis\n## Conducting legal research and analysis to inform client advice\n\n# Case Management\n## Managing and coordinating legal cases and matters\n\n# Document Preparation\n## Preparing and reviewing legal documents and contracts\n\n# Client Advice and Counsel\n## Providing expert legal advice and counsel to clients\n\n# Litigation Support\n## Providing support for litigation and dispute resolution\n\n# Knowledge Management\n## Developing and sharing legal knowledge and expertise\n\n**Talent Acquisition and Development**\n\n# Recruitment\n## Attracting and selecting top legal talent\n\n# Onboarding and Training\n## Onboarding and training new hires\n\n# Performance Management\n## Managing and evaluating employee performance\n\n# Career Development\n## Developing and promoting employees' careers\n\n# Leadership Development\n## Developing leadership skills and capabilities\n\n# Diversity and Inclusion\n## Fostering a diverse and inclusive work environment\n\n**Operational Efficiency**\n\n# Process Improvement\n## Identifying and implementing process improvements\n\n# Technology Management\n## Managing and leveraging technology to improve operations\n\n# Financial Management\n## Managing the firm's financial resources and budgets\n\n# Vendor Management\n## Managing relationships with external vendors and suppliers\n\n# Facilities Management\n## Managing the firm's physical facilities and infrastructure\n\n# Risk Management\n## Identifying and mitigating operational risks\n\n**Risk Management and Compliance**\n\n# Compliance Management\n## Ensuring compliance with regulatory requirements\n\n# Risk Assessment\n## Identifying and assessing potential risks\n\n# Policy Development\n## Developing and implementing policies and procedures\n\n# Training and Awareness\n## Providing training and awareness programs for employees\n\n# Audit and Assurance\n## Conducting audits and providing assurance on compliance\n\n# Incident Response\n## Responding to and managing incidents and crises\n\nAnd here are 6 business capabilities that span ALL the value streams:\n\n# Data Analytics\n## Analyzing and interpreting data to inform business decisions\n\n# Project Management\n## Managing projects and initiatives across the firm\n\n# Change Management\n## Managing and implementing change across the firm\n\n# Communication and Collaboration\n## Facilitating effective communication and collaboration across the firm\n\n# Innovation and Idea Generation\n## Generating and developing new ideas and innovations\n\n# Strategic Planning\n## Developing and implementing strategic plans and initiatives"
+                },
+                "width": 576,
+                "height": 508,
+                "selected": false,
+                "positionAbsolute": {
+                    "x": -184.79283256767917,
+                    "y": 141.14715310974395
+                },
+                "dragging": false,
+                "resizing": false
+            },
+            {
+                "id": "value-streams",
+                "type": "output",
+                "position": {
+                    "x": 526.704924202965,
+                    "y": -24.204634791970662
+                },
+                "style": {
+                    "width": 505,
+                    "height": 752
+                },
+                "data": {
+                    "status": "complete",
+                    "collapsed": false,
+                    "inputs": {
+                        "input-left": "Here are 6 critical value streams for a legal firm:\n\n# VS1: Client Acquisition and Engagement\n## Managing relationships with potential and current clients, including marketing, lead generation, and client onboarding.\n\n# VS2: Legal Service Delivery\n## Providing high-quality legal services to clients, including legal research, document preparation, and court representation.\n\n# VS3: Matter Management\n## Managing the lifecycle of legal matters, including case intake, assignment, and tracking.\n\n# VS4: Billing and Collections\n## Managing the financial aspects of client relationships, including billing, invoicing, and collections.\n\n# VS5: Knowledge Management\n## Developing, maintaining, and sharing legal knowledge and expertise across the firm, including training and professional development.\n\n# VS6: Risk Management and Compliance\n## Identifying and mitigating risks to the firm, including compliance with legal and regulatory requirements, data security, and business continuity."
+                    },
+                    "result": "Here are 6 critical value streams for a legal firm:\n\n# Client Acquisition\n## Identifying and securing new clients for the firm\n\n# Client Relationship Management\n## Building and maintaining strong relationships with existing clients\n\n# Legal Service Delivery\n## Providing high-quality legal services to clients\n\n# Talent Acquisition and Development\n## Attracting, developing, and retaining top legal talent\n\n# Operational Efficiency\n## Optimizing internal processes and systems to reduce costs and improve productivity\n\n# Risk Management and Compliance\n## Identifying and mitigating risks, ensuring compliance with regulatory requirements\n\nNow, let's generate 6 business capabilities for each value stream:\n\n**Client Acquisition**\n\n# Lead Generation\n## Identifying and generating new leads for potential clients\n\n# Market Research\n## Conducting market research to identify trends and opportunities\n\n# Brand Management\n## Developing and maintaining a strong brand identity\n\n# Digital Marketing\n## Leveraging digital channels to promote the firm's services\n\n# Event Planning\n## Hosting and participating in events to attract new clients\n\n# Referral Management\n## Encouraging and incentivizing referrals from existing clients\n\n**Client Relationship Management**\n\n# Client Communication\n## Maintaining regular and effective communication with clients\n\n# Account Management\n## Managing and growing existing client relationships\n\n# Client Feedback and Insights\n## Collecting and acting on client feedback and insights\n\n# Relationship Building\n## Building personal relationships with key clients and stakeholders\n\n# Cross-Selling and Upselling\n## Identifying opportunities to sell additional services to existing clients\n\n# Client Retention\n## Developing strategies to retain existing clients\n\n**Legal Service Delivery**\n\n# Legal Research and Analysis\n## Conducting legal research and analysis to inform client advice\n\n# Case Management\n## Managing and coordinating legal cases and matters\n\n# Document Preparation\n## Preparing and reviewing legal documents and contracts\n\n# Client Advice and Counsel\n## Providing expert legal advice and counsel to clients\n\n# Litigation Support\n## Providing support for litigation and dispute resolution\n\n# Knowledge Management\n## Developing and sharing legal knowledge and expertise\n\n**Talent Acquisition and Development**\n\n# Recruitment\n## Attracting and selecting top legal talent\n\n# Onboarding and Training\n## Onboarding and training new hires\n\n# Performance Management\n## Managing and evaluating employee performance\n\n# Career Development\n## Developing and promoting employees' careers\n\n# Leadership Development\n## Developing leadership skills and capabilities\n\n# Diversity and Inclusion\n## Fostering a diverse and inclusive work environment\n\n**Operational Efficiency**\n\n# Process Improvement\n## Identifying and implementing process improvements\n\n# Technology Management\n## Managing and leveraging technology to improve operations\n\n# Financial Management\n## Managing the firm's financial resources and budgets\n\n# Vendor Management\n## Managing relationships with external vendors and suppliers\n\n# Facilities Management\n## Managing the firm's physical facilities and infrastructure\n\n# Risk Management\n## Identifying and mitigating operational risks\n\n**Risk Management and Compliance**\n\n# Compliance Management\n## Ensuring compliance with regulatory requirements\n\n# Risk Assessment\n## Identifying and assessing potential risks\n\n# Policy Development\n## Developing and implementing policies and procedures\n\n# Training and Awareness\n## Providing training and awareness programs for employees\n\n# Audit and Assurance\n## Conducting audits and providing assurance on compliance\n\n# Incident Response\n## Responding to and managing incidents and crises\n\nAnd here are 6 business capabilities that span ALL the value streams:\n\n# Data Analytics\n## Analyzing and interpreting data to inform business decisions\n\n# Project Management\n## Managing projects and initiatives across the firm\n\n# Change Management\n## Managing and implementing change across the firm\n\n# Communication and Collaboration\n## Facilitating effective communication and collaboration across the firm\n\n# Innovation and Idea Generation\n## Generating and developing new ideas and innovations\n\n# Strategic Planning\n## Developing and implementing strategic plans and initiatives"
+                },
+                "width": 505,
+                "height": 752,
+                "selected": false,
+                "positionAbsolute": {
+                    "x": 526.704924202965,
+                    "y": -24.204634791970662
+                },
+                "dragging": false,
+                "resizing": false
+            },
+            {
+                "id": "prompt-2",
+                "type": "prompt",
+                "position": {
+                    "x": 1167.8926890207654,
+                    "y": -92.08142471954604
+                },
+                "style": {
+                    "width": 451,
+                    "height": 706,
+                    "minWidth": 400
+                },
+                "data": {
+                    "systemPrompt": "Organize the list of value streams and business capabilities. \n\nGroup business capabilities by value stream, and by shared category.\n\nDescriptions should be 2 sentences long each.\n\nOutput the results like this:\n\n*** Defining capabilities ***\n# Value Stream: {value stream name}\n\n## Capability {#}: {capability name}\n### {capability Description}\n\n## Capability {#}: {capability name}\n### {capability Description}\n\n## Capability {#}: {capability name}\n### {capability Description}\n\n*** Shared Capabilities ***\n## Capability {#}: {capability name}\n### {capability Description}\n\n## Capability {#}: {capability name}\n### {capability Description}\n\n## Capability {#}: {capability name}\n### {capability Description}",
+                    "defaultSystemPrompt": "Do your analysis as a pirate looking for treasure.",
+                    "model": "meta.llama3-70b-instruct-v1:0",
+                    "status": "complete",
+                    "collapsed": false,
+                    "result": "Here is the organized list of value streams and business capabilities:\n\n*** Defining capabilities ***\n\n# Value Stream: Client Acquisition\n\n## Capability 1: Lead Generation\n### Identifying and generating new leads for potential clients\n\n## Capability 2: Market Research\n### Conducting market research to identify trends and opportunities\n\n## Capability 3: Brand Management\n### Developing and maintaining a strong brand identity\n\n## Capability 4: Digital Marketing\n### Leveraging digital channels to promote the firm's services\n\n## Capability 5: Event Planning\n### Hosting and participating in events to attract new clients\n\n## Capability 6: Referral Management\n### Encouraging and incentivizing referrals from existing clients\n\n# Value Stream: Client Relationship Management\n\n## Capability 1: Client Communication\n### Maintaining regular and effective communication with clients\n\n## Capability 2: Account Management\n### Managing and growing existing client relationships\n\n## Capability 3: Client Feedback and Insights\n### Collecting and acting on client feedback and insights\n\n## Capability 4: Relationship Building\n### Building personal relationships with key clients and stakeholders\n\n## Capability 5: Cross-Selling and Upselling\n### Identifying opportunities to sell additional services to existing clients\n\n## Capability 6: Client Retention\n### Developing strategies to retain existing clients\n\n# Value Stream: Legal Service Delivery\n\n## Capability 1: Legal Research and Analysis\n### Conducting legal research and analysis to inform client advice\n\n## Capability 2: Case Management\n### Managing and coordinating legal cases and matters\n\n## Capability 3: Document Preparation\n### Preparing and reviewing legal documents and contracts\n\n## Capability 4: Client Advice and Counsel\n### Providing expert legal advice and counsel to clients\n\n## Capability 5: Litigation Support\n### Providing support for litigation and dispute resolution\n\n## Capability 6: Knowledge Management\n### Developing and sharing legal knowledge and expertise\n\n# Value Stream: Talent Acquisition and Development\n\n## Capability 1: Recruitment\n### Attracting and selecting top legal talent\n\n## Capability 2: Onboarding and Training\n### Onboarding and training new hires\n\n## Capability 3: Performance Management\n### Managing and evaluating employee performance\n\n## Capability 4: Career Development\n### Developing and promoting employees' careers\n\n## Capability 5: Leadership Development\n### Developing leadership skills and capabilities\n\n## Capability 6: Diversity and Inclusion\n### Fostering a diverse and inclusive work environment\n\n# Value Stream: Operational Efficiency\n\n## Capability 1: Process Improvement\n### Identifying and implementing process improvements\n\n## Capability 2: Technology Management\n### Managing and leveraging technology to improve operations\n\n## Capability 3: Financial Management\n### Managing the firm's financial resources and budgets\n\n## Capability 4: Vendor Management\n### Managing relationships with external vendors and suppliers\n\n## Capability 5: Facilities Management\n### Managing the firm's physical facilities and infrastructure\n\n## Capability 6: Risk Management\n### Identifying and mitigating operational risks\n\n# Value Stream: Risk Management and Compliance\n\n## Capability 1: Compliance Management\n### Ensuring compliance with regulatory requirements\n\n## Capability 2: Risk Assessment\n### Identifying and assessing potential risks\n\n## Capability 3: Policy Development\n### Developing and implementing policies and procedures\n\n## Capability 4: Training and Awareness\n### Providing training and awareness programs for employees\n\n## Capability 5: Audit and Assurance\n### Conducting audits and providing assurance on compliance\n\n## Capability 6: Incident Response\n### Responding to and managing incidents and crises\n\n*** Shared Capabilities ***\n\n## Capability 1: Data Analytics\n### Analyzing and interpreting data to inform business decisions\n\n## Capability 2: Project Management\n### Managing projects and initiatives across the firm\n\n## Capability 3: Change Management\n### Managing and implementing change across the firm\n\n## Capability 4: Communication and Collaboration\n### Facilitating effective communication and collaboration across the firm\n\n## Capability 5: Innovation and Idea Generation\n### Generating and developing new ideas and innovations\n\n## Capability 6: Strategic Planning\n### Developing and implementing strategic plans and initiatives"
+                },
+                "width": 451,
+                "height": 706,
+                "selected": false,
+                "positionAbsolute": {
+                    "x": 1167.8926890207654,
+                    "y": -92.08142471954604
+                },
+                "dragging": false,
+                "resizing": false
+            },
+            {
+                "id": "capability-list",
+                "type": "output",
+                "position": {
+                    "x": 1689.1738902085024,
+                    "y": 91.2503075851264
+                },
+                "style": {
+                    "width": 645,
+                    "height": 504
+                },
+                "data": {
+                    "status": "complete",
+                    "collapsed": false,
+                    "result": "Here is the organized list of value streams and business capabilities:\n\n*** Defining capabilities ***\n\n# Value Stream: Client Acquisition\n\n## Capability 1: Lead Generation\n### Identifying and generating new leads for potential clients\n\n## Capability 2: Market Research\n### Conducting market research to identify trends and opportunities\n\n## Capability 3: Brand Management\n### Developing and maintaining a strong brand identity\n\n## Capability 4: Digital Marketing\n### Leveraging digital channels to promote the firm's services\n\n## Capability 5: Event Planning\n### Hosting and participating in events to attract new clients\n\n## Capability 6: Referral Management\n### Encouraging and incentivizing referrals from existing clients\n\n# Value Stream: Client Relationship Management\n\n## Capability 1: Client Communication\n### Maintaining regular and effective communication with clients\n\n## Capability 2: Account Management\n### Managing and growing existing client relationships\n\n## Capability 3: Client Feedback and Insights\n### Collecting and acting on client feedback and insights\n\n## Capability 4: Relationship Building\n### Building personal relationships with key clients and stakeholders\n\n## Capability 5: Cross-Selling and Upselling\n### Identifying opportunities to sell additional services to existing clients\n\n## Capability 6: Client Retention\n### Developing strategies to retain existing clients\n\n# Value Stream: Legal Service Delivery\n\n## Capability 1: Legal Research and Analysis\n### Conducting legal research and analysis to inform client advice\n\n## Capability 2: Case Management\n### Managing and coordinating legal cases and matters\n\n## Capability 3: Document Preparation\n### Preparing and reviewing legal documents and contracts\n\n## Capability 4: Client Advice and Counsel\n### Providing expert legal advice and counsel to clients\n\n## Capability 5: Litigation Support\n### Providing support for litigation and dispute resolution\n\n## Capability 6: Knowledge Management\n### Developing and sharing legal knowledge and expertise\n\n# Value Stream: Talent Acquisition and Development\n\n## Capability 1: Recruitment\n### Attracting and selecting top legal talent\n\n## Capability 2: Onboarding and Training\n### Onboarding and training new hires\n\n## Capability 3: Performance Management\n### Managing and evaluating employee performance\n\n## Capability 4: Career Development\n### Developing and promoting employees' careers\n\n## Capability 5: Leadership Development\n### Developing leadership skills and capabilities\n\n## Capability 6: Diversity and Inclusion\n### Fostering a diverse and inclusive work environment\n\n# Value Stream: Operational Efficiency\n\n## Capability 1: Process Improvement\n### Identifying and implementing process improvements\n\n## Capability 2: Technology Management\n### Managing and leveraging technology to improve operations\n\n## Capability 3: Financial Management\n### Managing the firm's financial resources and budgets\n\n## Capability 4: Vendor Management\n### Managing relationships with external vendors and suppliers\n\n## Capability 5: Facilities Management\n### Managing the firm's physical facilities and infrastructure\n\n## Capability 6: Risk Management\n### Identifying and mitigating operational risks\n\n# Value Stream: Risk Management and Compliance\n\n## Capability 1: Compliance Management\n### Ensuring compliance with regulatory requirements\n\n## Capability 2: Risk Assessment\n### Identifying and assessing potential risks\n\n## Capability 3: Policy Development\n### Developing and implementing policies and procedures\n\n## Capability 4: Training and Awareness\n### Providing training and awareness programs for employees\n\n## Capability 5: Audit and Assurance\n### Conducting audits and providing assurance on compliance\n\n## Capability 6: Incident Response\n### Responding to and managing incidents and crises\n\n*** Shared Capabilities ***\n\n## Capability 1: Data Analytics\n### Analyzing and interpreting data to inform business decisions\n\n## Capability 2: Project Management\n### Managing projects and initiatives across the firm\n\n## Capability 3: Change Management\n### Managing and implementing change across the firm\n\n## Capability 4: Communication and Collaboration\n### Facilitating effective communication and collaboration across the firm\n\n## Capability 5: Innovation and Idea Generation\n### Generating and developing new ideas and innovations\n\n## Capability 6: Strategic Planning\n### Developing and implementing strategic plans and initiatives"
+                },
+                "width": 645,
+                "height": 504,
+                "selected": false,
+                "positionAbsolute": {
+                    "x": 1689.1738902085024,
+                    "y": 91.2503075851264
+                },
+                "dragging": false,
+                "resizing": false
+            },
+            {
+                "id": "definining-capabilities",
+                "type": "prompt",
+                "position": {
+                    "x": 2418.68854045697,
+                    "y": -44.688822911050465
+                },
+                "style": {
+                    "width": 785,
+                    "height": 614,
+                    "minWidth": 400
+                },
+                "data": {
+                    "systemPrompt": "YOUR ROLE: You are a business reference architect and build reference models.\n\nINSTRUCTIONS\n- For each value stream, you will generate level 1 and level 2 business capabilities. Output each value stream in a seperate message, and include verbose level 1 and level 2 descriptions for each capabilities in 2 sentences each. More detail is better.\n- For each level 1, propose 4 or 5 level 2 sub capabilities. \n- Look at shared capabilities and ensure there is no overlap with the level 2 capabilities that were created. \n- Use the FORMAT_TEMPLATE to output the results. You should continue to output data in this format for each message - consistency is key. \n\nDEFINITIONS:\n- Level 1 capabilities are business functions. \n- Level 2 capabilities are more business capabilities.\n- Both level 1 and level 2 capabilities should be in noun-verb pairs, like \"business management\" or \"market research\" or \"drone administration\".\n\nFORMAT_TEMPLATE:[\"\n*** Defining Capabilities ***\n\n*** Value Stream ***\n# Value Stream: {value stream A}\n\n## L1: *** {business capability name A1} ***: {description}\n### L2: *** {business capability name A1-1} ***: {description}\n### L2: *** {business capability name A1-2} ***: {description}\n### L2: *** {business capability name A1-3} ***: {description}\n\n## L1: *** {business capability name A2} ***: {description}\n### L2: *** {business capability name A2-1} ***: {description}\n### L2: *** {business capability name A2-2} ***: {description}\n### L2: *** {business capability name A2-3} ***: {description}\n\n*** Value Stream ***\n# Value Stream: {value stream B}\n\n## L1: *** {business capability name B1} ***: {description}\n### L2: *** {business capability name B1-1} ***: {description}\n### L2: *** {business capability name B1-2} ***: {description}\n### L2: *** {business capability name B1-3} ***: {description}\n\"]",
+                    "defaultSystemPrompt": "Do your analysis as a pirate looking for treasure.",
+                    "model": "meta.llama3-70b-instruct-v1:0",
+                    "status": "running",
+                    "collapsed": false,
+                    "result": "I'll generate level 1 and level 2 business capabilities for each value stream. I'll output each value stream in a separate message, including verbose level 1 and level 2 descriptions for each capability in 2 sentences each.\n\n**Metadata Message**\nI'll need 6 messages to output the results, and I'll define business capabilities for each value stream.\n\n**Message 1 of 6**\n*** Defining Capabilities ***\n\n*** Value Stream: Client Acquisition ***\n## L1: ***Lead Generation***: Identifying and generating new leads for potential clients through market research, referrals, and other means. This capability involves developing strategies to attract new clients and creating opportunities for the firm to grow its business.\n\n### L2: ***Market Research***: Conducting market research to identify trends and opportunities to inform lead generation strategies. This involves analyzing market data and competitor activity to stay ahead in the market.\n\n### L2: ***Event Planning***: Hosting and participating in events to attract new clients and build relationships with potential clients. This involves organizing and executing events that showcase the firm's expertise and build its reputation.\n\n### L2: ***Digital Marketing***: Leveraging digital channels to promote the firm's services and attract new clients. This involves developing and executing digital marketing campaigns to reach a wider audience.\n\n### L2: ***Referral Management***: Encouraging and incentivizing referrals from existing clients to generate new leads. This involves developing strategies to motivate existing clients to refer new business to the firm.\n\n### L2: ***Brand Management***: Developing and maintaining a strong brand identity to attract new clients and build the firm's reputation. This involves creating and executing brand strategies to differentiate the firm from competitors.\n\n## L1: ***Market Research***: Conducting market research to identify trends and opportunities to inform business strategies. This capability involves analyzing market data and competitor activity to stay ahead in the market.\n\n### L2: ***Competitor Analysis***: Analyzing competitors to identify market gaps and opportunities to differentiate the firm. This involves researching and analyzing competitors' strategies, services, and market positioning.\n\n## L1: ***Brand Management***: Developing and maintaining a strong brand identity to attract new clients and build the firm's reputation. This capability involves creating and executing brand strategies to differentiate the firm from competitors.\n\n### L2: ***Content Creation***: Creating high-quality content to promote the firm's services and build its reputation. This involves developing and publishing content that showcases the firm's expertise and provides value to clients and potential clients.\n\n*** Value Stream: Client Relationship Management ***\n\n## L1: ***Client Communication***: Maintaining regular and effective communication with clients to build trust and understand their needs. This capability involves developing and executing communication strategies to ensure clients are informed and engaged.\n\n### L2: ***Account Management***: Managing and growing existing client relationships to increase revenue and improve client satisfaction. This involves developing and executing account management strategies to identify opportunities and address client needs.\n\n### L2: ***Client Feedback and Insights***: Collecting and acting on client feedback and insights to improve client satisfaction and inform business strategies. This involves developing and executing feedback mechanisms to ensure client voices are heard.\n\n## L1: ***Client Retention***: Developing strategies to retain existing clients and improve client satisfaction. This capability involves identifying opportunities to increase revenue and improve client relationships.\n\n### L2: ***Relationship Building***: Building personal relationships with key clients and stakeholders to improve client satisfaction and increase revenue. This involves developing and executing relationship-building strategies to foster trust and loyalty.\n\n### L2: ***Cross-Selling and Upselling***: Identifying opportunities to sell additional services to existing clients to increase revenue and improve client satisfaction. This involves developing and executing cross-selling and upselling strategies to identify opportunities and address client needs.\n\n*** Value Stream: Legal Service Delivery ***\n\n## L1: ***Legal Research and Analysis***: Conducting legal research and analysis to inform client advice and ensure high-quality legal services. This capability involves developing and executing research strategies to stay up-to-date with legal developments.\n\n### L2: ***Case Management***: Managing and coordinating legal cases and matters to ensure high-quality legal services and efficient case handling. This involves developing and executing case management strategies to prioritize tasks and manage workflows.\n\n### L2: ***Document Preparation***: Preparing and reviewing legal documents and contracts to ensure high-quality legal services and accurate documentation. This involves developing and executing document preparation strategies to ensure consistency and accuracy.\n\n### L2: ***Client Advice and Counsel***: Providing expert legal advice and counsel to clients to address their legal needs and ensure high-quality legal services. This involves developing and executing advice and counsel strategies to provide timely and effective guidance.\n\n### L2: ***Litigation Support***: Providing support for litigation and dispute resolution to ensure high-quality legal services and effective case outcomes. This involves developing and executing litigation support strategies to prepare for and manage legal proceedings.\n\n### L2: ***Knowledge Management***: Developing and sharing legal knowledge and expertise to ensure high-quality legal services and improve legal skills. This involves developing and executing knowledge management strategies to capture, share, and apply legal knowledge.\n\n*** Value Stream: Talent Acquisition and Development ***\n\n## L1: ***Recruitment***: Attracting and selecting top legal talent to ensure the firm has the skills and expertise needed to deliver high-quality legal services. This capability involves developing and executing recruitment strategies to identify and attract top talent.\n\n### L2: ***Talent Sourcing***: Identifying and sourcing top legal talent to ensure the firm has a pipeline of qualified candidates. This involves developing and executing talent sourcing strategies to leverage networks, job boards, and other sources.\n\n### L2: ***Onboarding and Training***: Onboarding and training new hires to ensure they have the skills and knowledge needed to deliver high-quality legal services. This involves developing and executing onboarding and training strategies to provide a comprehensive introduction to the firm and its practices.\n\n### L2: ***Performance Management***: Managing and evaluating employee performance to ensure high-quality legal services and identify areas for improvement. This involves developing and executing performance management strategies to set goals, provide feedback, and identify development opportunities.\n\n### L2: ***Career Development***: Developing and promoting employees' careers to ensure the firm has the skills and expertise needed to deliver high-quality legal services. This involves developing and executing career development strategies to identify opportunities, provide training, and create career paths.\n\n### L2: ***Leadership Development***: Developing leadership skills and capabilities to ensure the firm has effective leaders who can drive strategy and growth. This involves developing and executing leadership development strategies to identify, develop, and promote leaders.\n\n### L2: ***Diversity and Inclusion***: Fostering a diverse and inclusive work environment to ensure the firm attracts and retains top legal talent. This involves developing and executing diversity and inclusion strategies to promote equal opportunities, challenge bias, and create a culture of respect.\n\n*** Value Stream: Operational Efficiency ***\n\n## L1: ***Process Improvement***: Identifying and implementing process improvements to increase efficiency, reduce costs, and enhance client satisfaction. This capability involves developing and executing process improvement strategies to streamline workflows and eliminate waste.\n\n### L2: ***Process Mapping***: Mapping and analyzing business processes to identify opportunities for improvement and optimize workflows. This involves developing and executing process mapping strategies to visualize, analyze, and redesign processes.\n\n\nassistant<|end_header_id|>\n\nAssistant: \n\n### L2: ***Technology Management***: Managing and leveraging technology to improve operational efficiency, reduce costs, and enhance client satisfaction. This involves developing and executing technology management strategies to select, implement, and maintain technology solutions.\n\n### L2: ***Financial Management***: Managing the firm's financial resources and budgets to ensure operational efficiency and profitability. This involves developing and executing financial management strategies to allocate resources, track expenses, and optimize financial performance.\n\n### L2: ***Vendor Management***: Managing relationships with external vendors and suppliers to ensure operational efficiency, quality, and cost-effectiveness. This involves developing and executing vendor management strategies to select, contract, and monitor vendors.\n\n### L2: ***Facilities Management***: Managing the firm's physical facilities and infrastructure to ensure operational efficiency, comfort, and safety. This involves developing and executing facilities management strategies to maintain, upgrade, and optimize facilities.\n\n### L2: ***Risk Management***: Identifying and mitigating operational risks to ensure business continuity, compliance, and client satisfaction. This involves developing and executing risk management strategies to identify, assess, and mitigate risks.\n\n*** Value Stream: Risk Management and Compliance ***\n\n## L1: ***Compliance***: Ensuring compliance with regulatory requirements, industry standards, and internal policies to minimize risk and ensure business continuity. This capability involves developing and executing compliance strategies to identify, assess, and mitigate compliance risks.\n\n### L2: ***Risk Assessment***: Identifying and assessing potential risks to ensure compliance, business continuity, and client satisfaction. This involves developing and executing risk assessment strategies to identify, analyze, and prioritize risks.\n\n[]\n\n### L2: ***Policy Development***: Developing and implementing policies and procedures to ensure compliance, business continuity, and client satisfaction. This involves developing and executing policy development strategies to create, review, and update policies.\n\n### L2: ***Training and Awareness***: Providing training and awareness programs to ensure employees understand compliance requirements, risks, and policies. This involves developing and executing training and awareness strategies to educate employees on compliance matters.\n\n### L2: ***Audit and Assurance***: Conducting audits and providing assurance on compliance, risk management, and internal controls to ensure business continuity and client satisfaction. This involves developing and executing audit and assurance strategies to identify, assess, and mitigate risks.\n\n### L2: ***Incident Response***: Responding to and managing incidents and crises to ensure business continuity, compliance, and client satisfaction. This involves developing and executing incident response strategies to respond, contain, and recover from incidents.\n\n### L2: ***Regulatory Engagement***: Engaging with regulators, industry bodies, and stakeholders to ensure compliance, influence regulatory developments, and promote the firm's interests. This involves developing and executing regulatory engagement strategies to build relationships, provide input, and stay informed.\n\n*** Shared Capabilities ***\n\n## L1: ***Data Analytics***: Analyzing and interpreting data to inform business decisions, identify opportunities, and drive growth. This capability involves developing and executing data analytics strategies to collect, analyze, and report data.\n\n### L2: ***Data Management***: Managing data to ensure quality, integrity, and availability to support business decisions and analytics. This involves developing and executing data management strategies to collect, store, and maintain data.\n\n### L2: ***Reporting and Visualization***: Creating reports and visualizations to communicate insights and trends to stakeholders and support business decisions. This involves developing and executing reporting and visualization strategies to create, distribute, and maintain reports.\n\n### L2: ***Predictive Modeling***: Developing and applying predictive models to forecast outcomes, identify opportunities, and drive growth. This involves developing and executing predictive modeling strategies to build, test, and deploy models.\n\n## L1: ***Project Management***: Managing projects and initiatives to deliver business outcomes, ensure quality, and optimize resources. This capability involves developing and executing project management strategies to plan, execute, and monitor projects.\n\n### L2: ***Project Planning***: Planning projects to ensure alignment with business objectives, define scope, and establish timelines. This involves developing and executing project planning strategies to create, review, and update project plans.\n\n### L2: ***Project Execution***: Executing projects to deliver business outcomes, ensure quality, and optimize resources. This involves developing and executing project execution strategies to manage tasks, allocate resources, and track progress.\n\n### L2: ***Project Monitoring and Control***: Monitoring and controlling projects to ensure they are on track, identify and mitigate risks, and take corrective action. This involves developing and executing project monitoring and control strategies to track progress, identify deviations, and take corrective action.\n\n### L2: ***Change Management***: Managing changes to projects to ensure they are properly assessed, approved, and implemented. This involves developing and executing change management strategies to assess, approve, and implement changes.\n\n## L1: ***Communication and Collaboration***: Facilitating effective communication and collaboration across the firm to ensure alignment, engagement, and productivity. This capability involves developing and executing communication and collaboration strategies to facilitate information sharing, coordination, and teamwork.\n\n### L2: ***Internal Communication***: Communicating effectively with employees to ensure they are informed, engaged, and aligned with the firm's goals and objectives. This involves developing and executing internal communication strategies to create, distribute, and maintain internal communications.\n\n### L2: ***External Communication***: Communicating effectively with clients, stakeholders, and partners to ensure they are informed, engaged, and aligned with the firm's goals and objectives. This involves developing and executing external communication strategies to create, distribute, and maintain external communications.\n\n### L2: ***Collaboration and Knowledge Sharing***: Facilitating collaboration and knowledge sharing across the firm to ensure that employees can share expertise, leverage best practices, and innovate. This involves developing and executing collaboration and knowledge sharing strategies to facilitate teamwork, share knowledge, and promote innovation.\n\n## L1: ***Innovation and Idea Generation***: Generating and developing new ideas and innovations to drive growth, improve efficiency, and enhance client satisfaction. This capability involves developing and executing innovation and idea generation strategies to encourage creativity, develop prototypes, and test new ideas.\n\n### L2: ***Idea Generation***: Generating new ideas and concepts to drive growth, improve efficiency, and enhance client satisfaction. This involves developing and executing idea generation strategies to encourage creativity, brainstorm, and develop new ideas.\n\n### L2: ***Prototyping and Testing***: Developing and testing prototypes to validate new ideas and concepts. This involves developing and executing prototyping and testing strategies to create, test, and refine prototypes.\n\n### L2: ***Implementation and Scaling***: Implementing and scaling new ideas and innovations to drive growth, improve efficiency, and enhance client satisfaction. This involves developing and executing implementation and scaling strategies to deploy, monitor, and refine new solutions.\n\n## L1: ***Strategic Planning***: Developing and executing strategic plans to drive growth, improve efficiency, and enhance client satisfaction. This capability involves developing and executing strategic planning strategies to set goals, allocate resources, and prioritize initiatives.\n\n### L2: ***Strategy Development***: Developing strategic plans to drive growth, improve efficiency, and enhance client satisfaction. This involves developing and executing strategy development strategies to analyze markets, identify opportunities, and create strategic plans.\n\n### L2: ***Goal Setting***: Setting goals and objectives to drive growth, improve efficiency, and enhance client satisfaction. This involves developing and executing goal setting strategies to establish, track, and achieve goals."
+                },
+                "width": 785,
+                "height": 614,
+                "selected": false,
+                "positionAbsolute": {
+                    "x": 2418.68854045697,
+                    "y": -44.688822911050465
+                },
+                "dragging": false,
+                "resizing": false
+            },
+            {
+                "id": "level1-level2-definining",
+                "type": "output",
+                "position": {
+                    "x": 3311.1746125556338,
+                    "y": -79.9576410913603
+                },
+                "style": {
+                    "width": 707,
+                    "height": 681
+                },
+                "data": {
+                    "result": "I'll generate level 1 and level 2 business capabilities for each value stream. I'll output each value stream in a separate message, including verbose level 1 and level 2 descriptions for each capability in 2 sentences each.\n\n**Metadata Message**\nI'll need 6 messages to output the results, and I'll define business capabilities for each value stream.\n\n**Message 1 of 6**\n*** Defining Capabilities ***\n\n*** Value Stream: Client Acquisition ***\n## L1: ***Lead Generation***: Identifying and generating new leads for potential clients through market research, referrals, and other means. This capability involves developing strategies to attract new clients and creating opportunities for the firm to grow its business.\n\n### L2: ***Market Research***: Conducting market research to identify trends and opportunities to inform lead generation strategies. This involves analyzing market data and competitor activity to stay ahead in the market.\n\n### L2: ***Event Planning***: Hosting and participating in events to attract new clients and build relationships with potential clients. This involves organizing and executing events that showcase the firm's expertise and build its reputation.\n\n### L2: ***Digital Marketing***: Leveraging digital channels to promote the firm's services and attract new clients. This involves developing and executing digital marketing campaigns to reach a wider audience.\n\n### L2: ***Referral Management***: Encouraging and incentivizing referrals from existing clients to generate new leads. This involves developing strategies to motivate existing clients to refer new business to the firm.\n\n### L2: ***Brand Management***: Developing and maintaining a strong brand identity to attract new clients and build the firm's reputation. This involves creating and executing brand strategies to differentiate the firm from competitors.\n\n## L1: ***Market Research***: Conducting market research to identify trends and opportunities to inform business strategies. This capability involves analyzing market data and competitor activity to stay ahead in the market.\n\n### L2: ***Competitor Analysis***: Analyzing competitors to identify market gaps and opportunities to differentiate the firm. This involves researching and analyzing competitors' strategies, services, and market positioning.\n\n## L1: ***Brand Management***: Developing and maintaining a strong brand identity to attract new clients and build the firm's reputation. This capability involves creating and executing brand strategies to differentiate the firm from competitors.\n\n### L2: ***Content Creation***: Creating high-quality content to promote the firm's services and build its reputation. This involves developing and publishing content that showcases the firm's expertise and provides value to clients and potential clients.\n\n*** Value Stream: Client Relationship Management ***\n\n## L1: ***Client Communication***: Maintaining regular and effective communication with clients to build trust and understand their needs. This capability involves developing and executing communication strategies to ensure clients are informed and engaged.\n\n### L2: ***Account Management***: Managing and growing existing client relationships to increase revenue and improve client satisfaction. This involves developing and executing account management strategies to identify opportunities and address client needs.\n\n### L2: ***Client Feedback and Insights***: Collecting and acting on client feedback and insights to improve client satisfaction and inform business strategies. This involves developing and executing feedback mechanisms to ensure client voices are heard.\n\n## L1: ***Client Retention***: Developing strategies to retain existing clients and improve client satisfaction. This capability involves identifying opportunities to increase revenue and improve client relationships.\n\n### L2: ***Relationship Building***: Building personal relationships with key clients and stakeholders to improve client satisfaction and increase revenue. This involves developing and executing relationship-building strategies to foster trust and loyalty.\n\n### L2: ***Cross-Selling and Upselling***: Identifying opportunities to sell additional services to existing clients to increase revenue and improve client satisfaction. This involves developing and executing cross-selling and upselling strategies to identify opportunities and address client needs.\n\n*** Value Stream: Legal Service Delivery ***\n\n## L1: ***Legal Research and Analysis***: Conducting legal research and analysis to inform client advice and ensure high-quality legal services. This capability involves developing and executing research strategies to stay up-to-date with legal developments.\n\n### L2: ***Case Management***: Managing and coordinating legal cases and matters to ensure high-quality legal services and efficient case handling. This involves developing and executing case management strategies to prioritize tasks and manage workflows.\n\n### L2: ***Document Preparation***: Preparing and reviewing legal documents and contracts to ensure high-quality legal services and accurate documentation. This involves developing and executing document preparation strategies to ensure consistency and accuracy.\n\n### L2: ***Client Advice and Counsel***: Providing expert legal advice and counsel to clients to address their legal needs and ensure high-quality legal services. This involves developing and executing advice and counsel strategies to provide timely and effective guidance.\n\n### L2: ***Litigation Support***: Providing support for litigation and dispute resolution to ensure high-quality legal services and effective case outcomes. This involves developing and executing litigation support strategies to prepare for and manage legal proceedings.\n\n### L2: ***Knowledge Management***: Developing and sharing legal knowledge and expertise to ensure high-quality legal services and improve legal skills. This involves developing and executing knowledge management strategies to capture, share, and apply legal knowledge.\n\n*** Value Stream: Talent Acquisition and Development ***\n\n## L1: ***Recruitment***: Attracting and selecting top legal talent to ensure the firm has the skills and expertise needed to deliver high-quality legal services. This capability involves developing and executing recruitment strategies to identify and attract top talent.\n\n### L2: ***Talent Sourcing***: Identifying and sourcing top legal talent to ensure the firm has a pipeline of qualified candidates. This involves developing and executing talent sourcing strategies to leverage networks, job boards, and other sources.\n\n### L2: ***Onboarding and Training***: Onboarding and training new hires to ensure they have the skills and knowledge needed to deliver high-quality legal services. This involves developing and executing onboarding and training strategies to provide a comprehensive introduction to the firm and its practices.\n\n### L2: ***Performance Management***: Managing and evaluating employee performance to ensure high-quality legal services and identify areas for improvement. This involves developing and executing performance management strategies to set goals, provide feedback, and identify development opportunities.\n\n### L2: ***Career Development***: Developing and promoting employees' careers to ensure the firm has the skills and expertise needed to deliver high-quality legal services. This involves developing and executing career development strategies to identify opportunities, provide training, and create career paths.\n\n### L2: ***Leadership Development***: Developing leadership skills and capabilities to ensure the firm has effective leaders who can drive strategy and growth. This involves developing and executing leadership development strategies to identify, develop, and promote leaders.\n\n### L2: ***Diversity and Inclusion***: Fostering a diverse and inclusive work environment to ensure the firm attracts and retains top legal talent. This involves developing and executing diversity and inclusion strategies to promote equal opportunities, challenge bias, and create a culture of respect.\n\n*** Value Stream: Operational Efficiency ***\n\n## L1: ***Process Improvement***: Identifying and implementing process improvements to increase efficiency, reduce costs, and enhance client satisfaction. This capability involves developing and executing process improvement strategies to streamline workflows and eliminate waste.\n\n### L2: ***Process Mapping***: Mapping and analyzing business processes to identify opportunities for improvement and optimize workflows. This involves developing and executing process mapping strategies to visualize, analyze, and redesign processes.\n\n\nassistant<|end_header_id|>\n\nAssistant: \n\n### L2: ***Technology Management***: Managing and leveraging technology to improve operational efficiency, reduce costs, and enhance client satisfaction. This involves developing and executing technology management strategies to select, implement, and maintain technology solutions.\n\n### L2: ***Financial Management***: Managing the firm's financial resources and budgets to ensure operational efficiency and profitability. This involves developing and executing financial management strategies to allocate resources, track expenses, and optimize financial performance.\n\n### L2: ***Vendor Management***: Managing relationships with external vendors and suppliers to ensure operational efficiency, quality, and cost-effectiveness. This involves developing and executing vendor management strategies to select, contract, and monitor vendors.\n\n### L2: ***Facilities Management***: Managing the firm's physical facilities and infrastructure to ensure operational efficiency, comfort, and safety. This involves developing and executing facilities management strategies to maintain, upgrade, and optimize facilities.\n\n### L2: ***Risk Management***: Identifying and mitigating operational risks to ensure business continuity, compliance, and client satisfaction. This involves developing and executing risk management strategies to identify, assess, and mitigate risks.\n\n*** Value Stream: Risk Management and Compliance ***\n\n## L1: ***Compliance***: Ensuring compliance with regulatory requirements, industry standards, and internal policies to minimize risk and ensure business continuity. This capability involves developing and executing compliance strategies to identify, assess, and mitigate compliance risks.\n\n### L2: ***Risk Assessment***: Identifying and assessing potential risks to ensure compliance, business continuity, and client satisfaction. This involves developing and executing risk assessment strategies to identify, analyze, and prioritize risks.\n\n[]\n\n### L2: ***Policy Development***: Developing and implementing policies and procedures to ensure compliance, business continuity, and client satisfaction. This involves developing and executing policy development strategies to create, review, and update policies.\n\n### L2: ***Training and Awareness***: Providing training and awareness programs to ensure employees understand compliance requirements, risks, and policies. This involves developing and executing training and awareness strategies to educate employees on compliance matters.\n\n### L2: ***Audit and Assurance***: Conducting audits and providing assurance on compliance, risk management, and internal controls to ensure business continuity and client satisfaction. This involves developing and executing audit and assurance strategies to identify, assess, and mitigate risks.\n\n### L2: ***Incident Response***: Responding to and managing incidents and crises to ensure business continuity, compliance, and client satisfaction. This involves developing and executing incident response strategies to respond, contain, and recover from incidents.\n\n### L2: ***Regulatory Engagement***: Engaging with regulators, industry bodies, and stakeholders to ensure compliance, influence regulatory developments, and promote the firm's interests. This involves developing and executing regulatory engagement strategies to build relationships, provide input, and stay informed.\n\n*** Shared Capabilities ***\n\n## L1: ***Data Analytics***: Analyzing and interpreting data to inform business decisions, identify opportunities, and drive growth. This capability involves developing and executing data analytics strategies to collect, analyze, and report data.\n\n### L2: ***Data Management***: Managing data to ensure quality, integrity, and availability to support business decisions and analytics. This involves developing and executing data management strategies to collect, store, and maintain data.\n\n### L2: ***Reporting and Visualization***: Creating reports and visualizations to communicate insights and trends to stakeholders and support business decisions. This involves developing and executing reporting and visualization strategies to create, distribute, and maintain reports.\n\n### L2: ***Predictive Modeling***: Developing and applying predictive models to forecast outcomes, identify opportunities, and drive growth. This involves developing and executing predictive modeling strategies to build, test, and deploy models.\n\n## L1: ***Project Management***: Managing projects and initiatives to deliver business outcomes, ensure quality, and optimize resources. This capability involves developing and executing project management strategies to plan, execute, and monitor projects.\n\n### L2: ***Project Planning***: Planning projects to ensure alignment with business objectives, define scope, and establish timelines. This involves developing and executing project planning strategies to create, review, and update project plans.\n\n### L2: ***Project Execution***: Executing projects to deliver business outcomes, ensure quality, and optimize resources. This involves developing and executing project execution strategies to manage tasks, allocate resources, and track progress.\n\n### L2: ***Project Monitoring and Control***: Monitoring and controlling projects to ensure they are on track, identify and mitigate risks, and take corrective action. This involves developing and executing project monitoring and control strategies to track progress, identify deviations, and take corrective action.\n\n### L2: ***Change Management***: Managing changes to projects to ensure they are properly assessed, approved, and implemented. This involves developing and executing change management strategies to assess, approve, and implement changes.\n\n## L1: ***Communication and Collaboration***: Facilitating effective communication and collaboration across the firm to ensure alignment, engagement, and productivity. This capability involves developing and executing communication and collaboration strategies to facilitate information sharing, coordination, and teamwork.\n\n### L2: ***Internal Communication***: Communicating effectively with employees to ensure they are informed, engaged, and aligned with the firm's goals and objectives. This involves developing and executing internal communication strategies to create, distribute, and maintain internal communications.\n\n### L2: ***External Communication***: Communicating effectively with clients, stakeholders, and partners to ensure they are informed, engaged, and aligned with the firm's goals and objectives. This involves developing and executing external communication strategies to create, distribute, and maintain external communications.\n\n### L2: ***Collaboration and Knowledge Sharing***: Facilitating collaboration and knowledge sharing across the firm to ensure that employees can share expertise, leverage best practices, and innovate. This involves developing and executing collaboration and knowledge sharing strategies to facilitate teamwork, share knowledge, and promote innovation.\n\n## L1: ***Innovation and Idea Generation***: Generating and developing new ideas and innovations to drive growth, improve efficiency, and enhance client satisfaction. This capability involves developing and executing innovation and idea generation strategies to encourage creativity, develop prototypes, and test new ideas.\n\n### L2: ***Idea Generation***: Generating new ideas and concepts to drive growth, improve efficiency, and enhance client satisfaction. This involves developing and executing idea generation strategies to encourage creativity, brainstorm, and develop new ideas.\n\n### L2: ***Prototyping and Testing***: Developing and testing prototypes to validate new ideas and concepts. This involves developing and executing prototyping and testing strategies to create, test, and refine prototypes.\n\n### L2: ***Implementation and Scaling***: Implementing and scaling new ideas and innovations to drive growth, improve efficiency, and enhance client satisfaction. This involves developing and executing implementation and scaling strategies to deploy, monitor, and refine new solutions.\n\n## L1: ***Strategic Planning***: Developing and executing strategic plans to drive growth, improve efficiency, and enhance client satisfaction. This capability involves developing and executing strategic planning strategies to set goals, allocate resources, and prioritize initiatives.\n\n### L2: ***Strategy Development***: Developing strategic plans to drive growth, improve efficiency, and enhance client satisfaction. This involves developing and executing strategy development strategies to analyze markets, identify opportunities, and create strategic plans.\n\n### L2: ***Goal Setting***: Setting goals and objectives to drive growth, improve efficiency, and enhance client satisfaction. This involves developing and executing goal setting strategies to establish, track, and achieve goals.",
+                    "status": "complete",
+                    "collapsed": false
+                },
+                "width": 707,
+                "height": 681,
+                "selected": false,
+                "positionAbsolute": {
+                    "x": 3311.1746125556338,
+                    "y": -79.9576410913603
+                },
+                "dragging": false,
+                "resizing": false
+            },
+            {
+                "id": "shared-capabilities-prompt",
+                "type": "prompt",
+                "position": {
+                    "x": 2413.7114325397706,
+                    "y": 604.6401767010121
+                },
+                "style": {
+                    "width": 756,
+                    "height": 563,
+                    "minWidth": 400
+                },
+                "data": {
+                    "systemPrompt": "YOUR ROLE: You are a business reference architect and build reference models.\n\nINSTRUCTIONS\n- Look at the shared capabilities only - ignore the rest. \n- You will describe level 1 and level 2 business capabilities for each shared business capability. \n- For each level 1, propose 4 or 5 level 2 sub capabilities. \n- Use the FORMAT_TEMPLATE to output the results. You should continue to output data in this format for each message - consistency is key. \n\nDEFINITIONS:\n- Level 1 capabilities are business functions. \n- Level 2 capabilities are more business capabilities.\n- Both level 1 and level 2 capabilities should be in noun-verb pairs, like \"business management\" or \"market research\" or \"drone administration\".\n\nFORMAT_TEMPLATE:[\"\n*** Shared Capabilities ***\n\n*** Level 1 ***\n## L1: {business capability name A1}\n## * {description}\n### L2: {business capability name A1-1}\n### * {description}\n### L2: {business capability name A1-2}\n### * {description}\n### L2: {business capability name A1-3}\n### * {description}\n\n*** Level 1 ***\n## L1: {business capability name A2}\n## * {description}\n### L2: {business capability name A2-1}\n### * {description}\n### L2: {business capability name A2-2}\n### * {description}\n### L2: {business capability name A2-3}\n### * {description}\n\n*** Level 1 ***\n## L1: {business capability name B1}\n## * {description}\n### L2: {business capability name B1-1}\n### * {description}\n### L2: {business capability name B1-2}\n### * {description}\n### L2: {business capability name B1-3}\n### * {description}\n\"]",
+                    "defaultSystemPrompt": "Do your analysis as a pirate looking for treasure.",
+                    "model": "meta.llama3-70b-instruct-v1:0",
+                    "status": "complete",
+                    "collapsed": false,
+                    "result": "I'm happy to help you with that. \n\n**Metadata Message**\nI'll need 6 messages to complete this task. I'll be describing level 1 and level 2 business capabilities for each shared business capability.\n\n**Message 1 of 6**\n*** Shared Capabilities ***\n\n*** Level 1 ***\n## L1: Data Analytics\n## * Analyzing and interpreting data to inform business decisions\n### L2: Data Mining\n### * Extracting insights from large datasets\n### L2: Business Intelligence\n### * Developing and maintaining business intelligence tools\n### L2: Performance Metrics\n### * Defining and tracking key performance indicators\n### L2: Predictive Modeling\n### * Building predictive models to forecast business outcomes\n\n### L2: Data Visualization\n### * Creating interactive and dynamic dashboards to present data insights\n### L2: Statistical Analysis\n### * Applying statistical methods to identify trends and patterns\n### L2: Machine Learning\n### * Developing machine learning models to automate decision-making\n\n*** Level 1 ***\n## L1: Project Management\n## * Managing projects and initiatives across the firm\n### L2: Project Planning\n### * Defining project scope, timelines, and resources\n### L2: Task Management\n### * Assigning and tracking project tasks and deliverables\n### L2: Resource Allocation\n### * Allocating resources and budget to projects and initiatives\n### L2: Stakeholder Management\n### * Managing project stakeholders and their expectations\n\n*** Level 1 ***\n## L1: Change Management\n## * Managing and implementing change across the firm\n### L2: Change Planning\n### * Developing plans to implement organizational change\n### L2: Stakeholder Engagement\n### * Communicating and engaging with stakeholders on change initiatives\n### L2: Training and Development\n### * Providing training and development programs to support change\n### L2: Organizational Design\n### * Designing and implementing new organizational structures and processes\n\n*** Level 1 ***\n## L1: Communication and Collaboration\n## * Facilitating effective communication and collaboration across the firm\n### L2: Internal Communications\n### * Developing and implementing internal communication strategies\n### L2: Cross-Functional Collaboration\n### * Facilitating collaboration across departments and teams\n### L2: External Partnerships\n### * Building and maintaining partnerships with external organizations\n### L2: Content Creation\n### * Developing and disseminating content to support firm communications\n\n*** Level 1 ***\n## L1: Innovation and Idea Generation\n## * Generating and developing new ideas and innovations\n### L2: Ideation\n### * Generating and collecting new ideas and concepts\n### L2: Design Thinking\n### * Applying design thinking principles to develop innovative solutions\n### L2: Prototyping\n### * Developing and testing prototypes of new ideas and concepts\n### L2: Intellectual Property Management\n### * Protecting and managing intellectual property rights\n\n*** Level 1 ***\n## L1: Strategic Planning\n## * Developing and implementing strategic plans and initiatives\n### L2: Strategic Analysis\n### * Conducting analysis to inform strategic decisions\n### L2: Goal Setting\n### * Setting and prioritizing strategic goals and objectives\n### L2: Initiative Development\n### * Developing and implementing strategic initiatives\n### L2: Performance Monitoring\n### * Monitoring and tracking strategic performance metrics"
+                },
+                "width": 756,
+                "height": 563,
+                "selected": false,
+                "positionAbsolute": {
+                    "x": 2413.7114325397706,
+                    "y": 604.6401767010121
+                },
+                "dragging": false,
+                "resizing": false
+            },
+            {
+                "id": "output-4",
+                "type": "output",
+                "position": {
+                    "x": 3267.0974792984384,
+                    "y": 616.3014882346317
+                },
+                "style": {
+                    "width": 756,
+                    "height": 779
+                },
+                "data": {
+                    "result": "I'm happy to help you with that. \n\n**Metadata Message**\nI'll need 6 messages to complete this task. I'll be describing level 1 and level 2 business capabilities for each shared business capability.\n\n**Message 1 of 6**\n*** Shared Capabilities ***\n\n*** Level 1 ***\n## L1: Data Analytics\n## * Analyzing and interpreting data to inform business decisions\n### L2: Data Mining\n### * Extracting insights from large datasets\n### L2: Business Intelligence\n### * Developing and maintaining business intelligence tools\n### L2: Performance Metrics\n### * Defining and tracking key performance indicators\n### L2: Predictive Modeling\n### * Building predictive models to forecast business outcomes\n\n### L2: Data Visualization\n### * Creating interactive and dynamic dashboards to present data insights\n### L2: Statistical Analysis\n### * Applying statistical methods to identify trends and patterns\n### L2: Machine Learning\n### * Developing machine learning models to automate decision-making\n\n*** Level 1 ***\n## L1: Project Management\n## * Managing projects and initiatives across the firm\n### L2: Project Planning\n### * Defining project scope, timelines, and resources\n### L2: Task Management\n### * Assigning and tracking project tasks and deliverables\n### L2: Resource Allocation\n### * Allocating resources and budget to projects and initiatives\n### L2: Stakeholder Management\n### * Managing project stakeholders and their expectations\n\n*** Level 1 ***\n## L1: Change Management\n## * Managing and implementing change across the firm\n### L2: Change Planning\n### * Developing plans to implement organizational change\n### L2: Stakeholder Engagement\n### * Communicating and engaging with stakeholders on change initiatives\n### L2: Training and Development\n### * Providing training and development programs to support change\n### L2: Organizational Design\n### * Designing and implementing new organizational structures and processes\n\n*** Level 1 ***\n## L1: Communication and Collaboration\n## * Facilitating effective communication and collaboration across the firm\n### L2: Internal Communications\n### * Developing and implementing internal communication strategies\n### L2: Cross-Functional Collaboration\n### * Facilitating collaboration across departments and teams\n### L2: External Partnerships\n### * Building and maintaining partnerships with external organizations\n### L2: Content Creation\n### * Developing and disseminating content to support firm communications\n\n*** Level 1 ***\n## L1: Innovation and Idea Generation\n## * Generating and developing new ideas and innovations\n### L2: Ideation\n### * Generating and collecting new ideas and concepts\n### L2: Design Thinking\n### * Applying design thinking principles to develop innovative solutions\n### L2: Prototyping\n### * Developing and testing prototypes of new ideas and concepts\n### L2: Intellectual Property Management\n### * Protecting and managing intellectual property rights\n\n*** Level 1 ***\n## L1: Strategic Planning\n## * Developing and implementing strategic plans and initiatives\n### L2: Strategic Analysis\n### * Conducting analysis to inform strategic decisions\n### L2: Goal Setting\n### * Setting and prioritizing strategic goals and objectives\n### L2: Initiative Development\n### * Developing and implementing strategic initiatives\n### L2: Performance Monitoring\n### * Monitoring and tracking strategic performance metrics",
+                    "status": "complete",
+                    "collapsed": false
+                },
+                "width": 756,
+                "height": 779,
+                "selected": false,
+                "positionAbsolute": {
+                    "x": 3267.0974792984384,
+                    "y": 616.3014882346317
+                },
+                "dragging": false,
+                "resizing": false
+            }
+        ],
+        "edges": [
+            {
+                "style": {
+                    "strokeWidth": 2
+                },
+                "type": "default",
+                "markerEnd": {
+                    "type": "arrowclosed",
+                    "width": 10,
+                    "height": 10
+                },
+                "source": "prompt-1",
+                "sourceHandle": "output-right",
+                "target": "value-streams",
+                "targetHandle": "input-left",
+                "id": "reactflow__edge-prompt-1output-right-output-1input-left",
+                "selected": false
+            },
+            {
+                "style": {
+                    "strokeWidth": 2
+                },
+                "type": "default",
+                "markerEnd": {
+                    "type": "arrowclosed",
+                    "width": 10,
+                    "height": 10
+                },
+                "source": "value-streams",
+                "sourceHandle": "output-right",
+                "target": "prompt-2",
+                "targetHandle": "input-left",
+                "id": "reactflow__edge-output-1output-right-prompt-2input-left",
+                "selected": false
+            },
+            {
+                "style": {
+                    "strokeWidth": 2
+                },
+                "type": "default",
+                "markerEnd": {
+                    "type": "arrowclosed",
+                    "width": 10,
+                    "height": 10
+                },
+                "source": "prompt-2",
+                "sourceHandle": "output-right",
+                "target": "capability-list",
+                "targetHandle": "input-left",
+                "id": "reactflow__edge-prompt-2output-right-output-2input-left",
+                "selected": false
+            },
+            {
+                "style": {
+                    "strokeWidth": 2
+                },
+                "type": "default",
+                "markerEnd": {
+                    "type": "arrowclosed",
+                    "width": 10,
+                    "height": 10
+                },
+                "source": "capability-list",
+                "sourceHandle": "output-right",
+                "target": "definining-capabilities",
+                "targetHandle": "input-left",
+                "id": "reactflow__edge-output-2output-right-prompt-3input-left",
+                "selected": false
+            },
+            {
+                "style": {
+                    "strokeWidth": 2
+                },
+                "type": "default",
+                "markerEnd": {
+                    "type": "arrowclosed",
+                    "width": 10,
+                    "height": 10
+                },
+                "source": "definining-capabilities",
+                "sourceHandle": "output-right",
+                "target": "level1-level2-definining",
+                "targetHandle": "input-left",
+                "id": "reactflow__edge-prompt-3output-right-output-3input-left",
+                "selected": false
+            },
+            {
+                "style": {
+                    "strokeWidth": 2
+                },
+                "type": "default",
+                "markerEnd": {
+                    "type": "arrowclosed",
+                    "width": 10,
+                    "height": 10
+                },
+                "source": "capability-list",
+                "sourceHandle": "output-right",
+                "target": "shared-capabilities-prompt",
+                "targetHandle": "input-left",
+                "selected": false,
+                "id": "reactflow__edge-capability-listoutput-right-prompt-5input-left"
+            },
+            {
+                "style": {
+                    "strokeWidth": 2
+                },
+                "type": "default",
+                "markerEnd": {
+                    "type": "arrowclosed",
+                    "width": 10,
+                    "height": 10
+                },
+                "source": "shared-capabilities-prompt",
+                "sourceHandle": "output-right",
+                "target": "output-4",
+                "targetHandle": "input-left",
+                "id": "reactflow__edge-shared-capabilities-promptoutput-right-output-4input-left",
+                "selected": false
+            },
+            {
+                "style": {
+                    "strokeWidth": 2
+                },
+                "type": "default",
+                "markerEnd": {
+                    "type": "arrowclosed",
+                    "width": 10,
+                    "height": 10
+                },
+                "source": "input-1",
+                "target": "prompt-1",
+                "sourceHandle": "output-bottom",
+                "targetHandle": "input-left",
+                "selected": false,
+                "id": "reactflow__edge-input-1output-bottom-prompt-1input-left"
+            }
+        ],
+        "viewport": {
+            "x": -1846.625923075046,
+            "y": 112.53415491586804,
+            "zoom": 0.8530317746480263
+        }
+        
+      },
+      "description": "Example flow to help users get started",
+      "tags": ["example", "default"]
+    }
+  ]
+}
+

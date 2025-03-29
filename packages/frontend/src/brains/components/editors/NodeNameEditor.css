@@ -1,0 +1,80 @@
+.node-name {
+  font-size: var(--font-size-xs);
+  cursor: default;
+  padding: 4px;
+  min-width: 50px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  position: relative;
+}
+
+.node-name span {
+  cursor: text;
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Edit mode container */
+.node-name-edit {
+  position: absolute;
+  left: -8px;
+  right: -8px;
+  top: -6px;
+  bottom: -6px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--color-background);
+  padding: 0 var(--spacing-xs);
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--color-border);
+  z-index: 100;
+}
+
+.node-name-input {
+  font-size: var(--font-size-xs);
+  border: none;
+  padding: 2px 4px;
+  outline: none;
+  width: 140px;
+  min-width: 90px;
+  background: transparent;
+  color: var(--color-text);
+  height: 24px;
+}
+
+.node-name-actions {
+  display: flex;
+  gap: 4px;
+  margin-left: auto;
+}
+
+.node-name-actions button {
+  padding: 2px;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  border-radius: 3px;
+  color: var(--color-text-light);
+  transition: all 0.2s ease;
+}
+
+/* Make selectors specific to name editor buttons */
+.node-name-actions button.confirm:hover {
+  color: var(--color-status-complete) !important;
+  background: rgba(56, 161, 105, 0.1) !important;
+}
+
+.node-name-actions button.cancel:hover {
+  color: var(--color-status-error) !important;
+  background: rgba(229, 62, 62, 0.1) !important;
+} 

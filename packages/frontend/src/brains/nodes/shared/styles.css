@@ -1,0 +1,65 @@
+/* Node wrapper */
+.node-wrapper {
+  width: 100% !important;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-sizing: border-box;
+}
+
+/* Expanded state */
+.node-wrapper:not(.collapsed) {
+  height: 100%;
+  min-height: inherit;
+}
+
+/* Collapsed state */
+.node-wrapper.collapsed {
+  width: auto !important;
+  min-width: 200px !important;
+  height: auto !important;
+  min-height: unset !important;
+}
+
+.node-wrapper.collapsed .node-content {
+  display: none;
+}
+
+/* Handle styling */
+.node-wrapper .react-flow__handle {
+  width: 8px;
+  height: 8px;
+  background: #fff;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.node-wrapper .input-handle {
+  border: 2px solid #2B6CB0;
+}
+
+.node-wrapper .output-handle {
+  border: 2px solid #48BB78;
+}
+
+/* Status indicators */
+.status-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.status-idle { background-color: #ccc; }
+.status-running { background-color: #3182ce; }
+.status-complete { background-color: #48bb78; }
+.status-error { background-color: #e53e3e; }
+
+/* Drag handle */
+.custom-drag-handle {
+  cursor: move;
+  cursor: grab;
+}
+
+.custom-drag-handle:active {
+  cursor: grabbing;
+} 

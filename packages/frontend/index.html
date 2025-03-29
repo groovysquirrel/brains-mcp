@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BRAINS OS</title>
+    <script>
+      window.global = window;
+      var exports = {};
+      
+      // Inject version from environment variable
+      document.addEventListener('DOMContentLoaded', () => {
+        const version = window.VITE_BRAINSOS_VERSION;
+        if (version) {
+          document.title = `BRAINS OS v${version}`;
+        }
+      });
+    </script>
+    <link 
+      rel="preload" 
+      href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700;800&family=PT+Serif:wght@400;700&display=swap"
+      as="style"
+      onload="this.onload=null;this.rel='stylesheet'"
+    />
+    <noscript>
+      <link 
+        href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700;800&family=PT+Serif:wght@400;700&display=swap"
+        rel="stylesheet"
+      />
+    </noscript>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

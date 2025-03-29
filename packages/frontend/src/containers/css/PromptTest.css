@@ -1,0 +1,151 @@
+.program {
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    background-color: #ffffff;
+  }
+  
+  .prompt-builder-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    padding:0 !important;
+  }
+  
+  .prompt-builder {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+  }
+  
+  .mosaic-window-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+  }
+  
+  .content-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+  }
+  
+  .tab-header {
+    background-color: #6c757d;
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+    height: 40px;
+  }
+  
+  .tab-navigation {
+    height: 100%;
+  }
+  
+  .tab-content {
+    flex: 1;
+    height: calc(100% - 40px);
+    position: relative;
+  }
+  
+  .tab-pane {
+    height: 100%;
+    width: 100%;
+    position: relative;
+  }
+  
+  .flow-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+  }
+  
+  /* Name control styles */
+  .name-control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 16px;
+  }
+  
+  .name-display,
+  .version-display {
+    color: #ffffff;
+    cursor: pointer;
+    padding: 4px 8px;
+  }
+  
+  .editing {
+    max-width: 200px;
+  }
+  
+  .button-group {
+    display: flex;
+    gap: 4px;
+  }
+  
+  /* Panel styles */
+  .inputs-panel,
+  .design-panel,
+  .test-panel,
+  .deploy-panel {
+    padding: 20px;
+    height: 100%;
+    overflow: auto;
+  }
+  
+  .split-pane-container {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* Add these styles */
+  .prompts-container {
+    height: 100%;
+    width: 100%;
+  }
+  
+  /* Ensure the menu window has proper sizing */
+  .mosaic-window.menu {
+    min-width: 300px;
+    max-width: 400px;
+  }
+  
+  .prompt-chain-container {
+    width: 100%;
+    height: calc(100vh - 60px);
+    position: relative;
+  }
+  
+  /* Style for the WindowManager container */
+  .prompt-chain-container .window-manager {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    z-index: 1000;
+    transition: opacity 0.3s ease;
+    opacity: 0.3;
+  }
+  
+  .prompt-chain-container .window-manager:hover {
+    opacity: 1;
+  }
+  
+  /* Make the menu background semi-transparent */
+  .prompt-chain-container .menu-panel {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(5px);
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
