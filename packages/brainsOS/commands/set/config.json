@@ -1,0 +1,21 @@
+{
+    "action": "set",
+    "aliases": ["configure"],
+    "objects": {
+      "model": {
+        "endpoint": {
+          "path": "/brains/model",
+          "method": "POST"
+        },
+        "parameters": {
+          "required": ["modelName"],
+          "validation": {
+            "modelName": {
+              "type": "string",
+              "pattern": "^(claude-gpt-4).*$"
+            }
+          }
+        }
+      }
+    }
+  }

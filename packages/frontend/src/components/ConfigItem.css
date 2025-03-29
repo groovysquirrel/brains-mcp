@@ -1,0 +1,168 @@
+/* ==========================================================================
+   Configuration Item Component
+   ========================================================================== */
+
+/* Config Item Container */
+.config-item {
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  background: white;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+/* Config Item Header */
+.config-item-header {
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  min-width: 0;
+}
+
+/* Config Item Content */
+.config-item-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #edf2f7;
+  margin-top: 8px;
+  width: 100%;
+}
+
+/* Config Labels */
+.config-item > .config-item-header > label {
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 14px;
+  margin: 0;
+  min-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Switch Container */
+.switch-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: flex-start;
+  margin-left: 0;
+  flex: 1;
+}
+
+/* Switch Labels */
+.switch-label {
+  font-size: 12px;
+  color: #4a5568;
+  user-select: none;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 500;
+  transition: all 0.2s;
+  min-width: 50px;
+  text-align: center;
+}
+
+.switch-label.active {
+  color: #4299e1;
+  transform: scale(1.1);
+}
+
+/* Toggle Switch */
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 24px;
+  margin: 0 8px;
+}
+
+.toggle-switch label {
+  width: 50px;
+  min-width: unset;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #e2e8f0;
+  transition: 0.3s;
+  border-radius: 12px;
+  width: 50px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  transition: 0.3s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #4299e1;
+}
+
+input:checked + .slider:before {
+  transform: translateX(26px);
+}
+
+/* Form Elements */
+.config-item .form-select,
+.config-item select {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  box-sizing: border-box;
+  padding: 8px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  font-size: 13px;
+  background: white;
+  color: #2d3748;
+}
+
+.config-item .form-select option,
+.config-item select option {
+  font-size: 13px;
+  padding: 8px 12px;
+}
+
+.config-item .form-select:focus,
+.config-item select:focus {
+  outline: none;
+  border-color: #4299e1;
+  box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.2);
+}
+
+.config-item .form-select:disabled,
+.config-item select:disabled {
+  background-color: #f7fafc;
+  cursor: not-allowed;
+}

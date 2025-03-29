@@ -1,0 +1,50 @@
+.flow-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  background: #ffffff;
+  color: #333;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.flow-button:hover {
+  background: #f5f5f5;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+}
+
+.flow-button.primary {
+  background: #1a73e8;
+  color: white;
+}
+
+.flow-button.primary:hover {
+  background: #1557b0;
+}
+
+.flow-button.secondary {
+  background: #f1f3f4;
+  color: #333;
+}
+
+.flow-button.secondary:hover {
+  background: #e8eaed;
+}
+
+.flow-button-group {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* Add icon styles */
+.flow-button svg {
+  width: 16px;
+  height: 16px;
+} 

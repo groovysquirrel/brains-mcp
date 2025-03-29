@@ -1,0 +1,170 @@
+/* Base navbar styles */
+.navbar {
+  background-color: #fff;
+  padding: 1rem 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  height: 64px;
+  width: 100%;
+}
+
+.navbar-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin: 0;
+  padding: 0 2%;
+}
+
+/* Logo */
+.logo {
+  font-weight: bold;
+  font-size: 1.2rem;
+  color: #333;
+  text-decoration: none;
+  margin-right: 1rem;
+  min-width: fit-content;
+}
+
+/* Navigation sections */
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.main-links {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1.5rem;
+  flex: 1;
+}
+
+.auth-links {
+  margin-left: 1.5rem;
+  white-space: nowrap;
+}
+
+/* Dropdown menu */
+.dropdown {
+  position: relative;
+  cursor: pointer;
+}
+
+.dropdown > a {
+  display: block;
+  padding: 10px;
+  color: #666;
+}
+
+.dropdown-content {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 160px;
+  background-color: #fff;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+  border-radius: 4px;
+  border: 1px solid rgba(0,0,0,0.1);
+  opacity: 0;
+  display: none;
+  z-index: 1000;
+  animation: dropdownFade 0.2s ease;
+}
+
+.dropdown-content.show {
+  display: block;
+  opacity: 1;
+}
+
+.dropdown-content a {
+  padding: 12px 16px;
+  display: block;
+  white-space: nowrap;
+}
+
+/* Link styles */
+.nav-links a {
+  color: #666;
+  text-decoration: none;
+  padding: 0.5rem;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  position: relative;
+  outline: none;
+}
+
+.nav-links a:focus {
+  outline: none;
+}
+
+.nav-links a.active {
+  color: #92b6dc;
+  font-weight: 500;
+  border-bottom: 4px solid #92b6dc;
+}
+
+.nav-links a:hover {
+  color: #333;
+}
+
+.dropdown-content a.active {
+  color: #92b6dc;
+  background-color: #f0f7ff;
+}
+
+/* Animation */
+@keyframes dropdownFade {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Version text */
+.version {
+  font-size: 0.6em;
+  opacity: 0.7;
+}
+
+.dropdown-menu {
+  background-color: #fff;
+  border: 1px solid rgba(0,0,0,.1);
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0,0,0,.05);
+}
+
+.dropdown-item {
+  color: #666;
+  padding: 8px 16px;
+}
+
+.dropdown-item:hover {
+  background-color: #f8f9fa;
+  color: #333;
+}
+
+.dropdown-item.active,
+.dropdown-item:active {
+  background-color: #f0f7ff;
+  color: #5693d4;
+}
+
+#prompt-nav-dropdown {
+  padding: 8px;
+  color: #666;
+  text-decoration: none;
+}
+
+#prompt-nav-dropdown:hover {
+  color: #333;
+}
+
+#prompt-nav-dropdown.active {
+  color: #92b6dc;
+  border-bottom: 4px solid #92b6dc;
+}

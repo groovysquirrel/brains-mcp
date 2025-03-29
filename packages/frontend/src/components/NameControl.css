@@ -1,0 +1,110 @@
+.name-control {
+  display: flex;
+  align-items: center;
+  padding: 4px 8px;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  border-radius: 4px;
+  min-width: fit-content;
+  z-index: 1000;
+  height: 40px;
+  position: relative;
+}
+
+.drag-handle {
+  color: #ffffff;
+  cursor: move;
+  padding: 0 8px;
+  font-size: 18px;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.display-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.name-display,
+.version-display {
+  color: #ffffff;
+  padding: 4px 8px;
+  user-select: none;
+}
+
+.name-input {
+  width: 200px;
+}
+
+.version-select {
+  width: 120px;
+}
+
+.button-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 12px;
+  padding-left: 12px;
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.name-control.editing {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.content-panel {
+  position: relative;
+  height: 100%;
+}
+
+.name-control.transparent:not(.editing) {
+  opacity: 0.5;
+}
+
+.name-control.transparent:hover,
+.name-control.transparent.editing {
+  opacity: 1;
+}
+
+.edit-form {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.name-control-form-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  height: 40px;
+}
+
+.form-label {
+  color: #fff;
+  font-size: 0.85em;
+  white-space: nowrap;
+  opacity: 0.8;
+  min-width: 60px;
+  text-align: right;
+  margin: 0;
+  line-height: 1;
+}
+
+.name-input,
+.version-select {
+  height: 31px;
+  margin: 0;
+}
+
+.display-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+} 

@@ -1,0 +1,87 @@
+.flow-name-editor {
+  display: flex;
+  align-items: center;
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
+  min-width: 120px;
+}
+
+.flow-name-editor__display {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  cursor: pointer;
+  width: 100%;
+}
+
+.flow-name-editor__text {
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.flow-name-editor__edit-icon {
+  opacity: 0;
+  color: var(--color-text-light);
+  transition: opacity 0.2s ease;
+}
+
+.flow-name-editor__display:hover .flow-name-editor__edit-icon {
+  opacity: 1;
+}
+
+.flow-name-editor__edit-container {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  width: 100%;
+}
+
+.flow-name-editor__edit-container input {
+  background: transparent;
+  border: none;
+  color: var(--color-text);
+  width: 100%;
+}
+
+.flow-name-editor__edit-container input:focus {
+  outline: none;
+}
+
+.flow-name-editor__edit-container input.error {
+  color: var(--color-status-error);
+}
+
+.flow-name-editor__actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.flow-name-editor__actions button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  color: var(--color-text-light);
+  cursor: pointer;
+  transition: color 0.2s ease;
+  border-radius: 2px;
+}
+
+.flow-name-editor__actions button:hover {
+  background: var(--color-hover);
+}
+
+.flow-name-editor__actions button.confirm:hover {
+  color: var(--color-status-complete);
+}
+
+.flow-name-editor__actions button.cancel:hover {
+  color: var(--color-status-error);
+}

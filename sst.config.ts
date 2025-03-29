@@ -1,16 +1,40 @@
-// eslint-disable-next-line @typescript-eslint/triple-slash-reference
 /// <reference path="./.sst/platform/config.d.ts" />
 
+
 export default $config({
+  
+  // Base sst app settings
   app(input) {
     return {
-      name: "serverless-mcp",
+      name: "brains-mcp",
       removal: input?.stage === "production" ? "retain" : "remove",
-      protect: ["production"].includes(input?.stage),
       home: "aws",
+      providers: {        
+        aws: { region: "us-east-1" }      
+      } 
+
     };
   },
+
+  // Run the app
   async run() {
-    new sst.aws.Nextjs("MyWeb");
+
+
+    // Import the stacks
+    const auth = await import("./infra/stacks/auth");
+    const email = await import("./infra/stacks/email");
+    const api = await import("./infra/stacks/api");
+    const frontend = await import("./infra/stacks/frontends");
+    
+    return {
+      userPool: auth.userPool.id,
+      Region: aws.getRegionOutput().name,
+      identityPool: auth.identityPool.id,
+      userPoolClient: auth.userPoolClient.id,
+      app: api.brainsOS_API.url,
+      frontend: frontend.latest_brains.url,
+    };
+   
+    
   },
 });

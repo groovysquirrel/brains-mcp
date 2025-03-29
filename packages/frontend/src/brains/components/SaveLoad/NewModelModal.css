@@ -1,0 +1,121 @@
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  padding: 24px;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.modal-content h2 {
+  margin: 0 0 20px 0;
+  font-size: 20px;
+  color: #1a1a1a;
+}
+
+.input-group {
+  margin-bottom: 20px;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.input-group input:focus {
+  outline: none;
+  border-color: #2d78f2;
+  box-shadow: 0 0 0 2px rgba(45, 120, 242, 0.2);
+}
+
+.input-group input:disabled {
+  background-color: #f8f9fa;
+  cursor: not-allowed;
+}
+
+.help-text {
+  font-size: 12px;
+  color: #6c757d;
+  margin-top: 4px;
+}
+
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #dc3545;
+  font-size: 14px;
+  margin-top: 4px;
+}
+
+.error-message .bp4-icon {
+  color: #dc3545;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.modal-actions button {
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.modal-actions button:first-child {
+  background: #6c757d;
+  color: white;
+}
+
+.modal-actions button:first-child:hover:not(:disabled) {
+  background: #5a6268;
+}
+
+.modal-actions button:last-child {
+  background: #2d78f2;
+  color: white;
+}
+
+.modal-actions button:last-child:hover:not(:disabled) {
+  background: #1b62d4;
+}
+
+.modal-actions button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.modal-actions button.submitting {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bp4-spinner {
+  margin-right: 4px;
+}

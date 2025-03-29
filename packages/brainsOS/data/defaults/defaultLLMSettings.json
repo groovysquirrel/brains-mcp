@@ -1,0 +1,64 @@
+{
+  "llms": [
+    {
+      "id": "default-claude",
+      "type": "llm",
+      "name": "Claude 2",
+      "description": "Anthropic's Claude 2 model",
+      "friendlyName": "Claude",
+      "provider": "anthropic",
+      "capabilities": ["chat", "completion"],
+      "status": "inactive",
+      "created": "2024-01-01T00:00:00Z",
+      "modified": "2024-01-01T00:00:00Z",
+      "metadata": {},
+      "configuration": {
+        "parameters": {
+          "modelId": "claude-v2",
+          "maxTokens": 1024,
+          "temperature": 0.7
+        }
+      }
+    },
+    {
+      "id": "default-gpt4",
+      "type": "llm",
+      "name": "GPT-4 Turbo",
+      "description": "OpenAI's GPT-4 Turbo model",
+      "friendlyName": "GPT-4",
+      "provider": "openai",
+      "capabilities": ["chat", "completion", "function-calling"],
+      "status": "inactive",
+      "created": "2024-01-01T00:00:00Z",
+      "modified": "2024-01-01T00:00:00Z",
+      "metadata": {},
+      "configuration": {
+        "parameters": {
+          "modelId": "gpt-4-turbo-preview",
+          "maxTokens": 2048,
+          "temperature": 0.7
+        }
+      }
+    },
+    {
+      "id": "default-mistral",
+      "type": "llm",
+      "name": "Mistral Medium",
+      "description": "Mistral's Medium model",
+      "friendlyName": "Mistral",
+      "provider": "mistral",
+      "capabilities": ["chat", "completion"],
+      "status": "inactive",
+      "created": "2024-01-01T00:00:00Z",
+      "modified": "2024-01-01T00:00:00Z",
+      "metadata": {},
+      "configuration": {
+        "parameters": {
+          "modelId": "mistral-medium",
+          "maxTokens": 1024,
+          "temperature": 0.7
+        }
+      }
+    }
+  ]
+}

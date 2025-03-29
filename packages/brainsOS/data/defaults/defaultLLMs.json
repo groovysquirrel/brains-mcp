@@ -1,0 +1,41 @@
+{
+    "llms":
+    [
+        {
+            "modelId": "meta.llama3-70b-instruct-v1:0",
+            "name" : "Llama 3 - 70B Instruct",
+            "vendor": "meta",
+            "maxTokens": 128000,
+            "source": "bedrock",
+            "status": "active"
+        },
+        {
+            "modelId": "meta.llama3-2-1b-instruct-v1:0",
+            "name" : "Llama 3.2 1B Instruct",
+            "vendor": "meta",
+            "maxTokens":131000,
+            "source": "bedrock",
+            "status": "active"
+        },
+        {
+            "modelId": "anthropic.claude-3-5-sonnet-20240620-v1:0",
+            "name" : "Anthropic Claude 3.5 Sonnet v1",
+            "vendor": "anthropic",
+            "maxTokens":200000,
+            "source": "bedrock",
+            "status": "active"
+        
+        },
+
+        {
+            "modelId": "anthropic.claude-3-5-haiku-20241022-v1:0",
+            "name" : "Claude 3.5 Haiku",
+            "vendor": "anthropic",
+            "maxTokens":200000,
+            "source": "bedrock",
+            "status": "active"
+        }
+
+
+    ]
+}

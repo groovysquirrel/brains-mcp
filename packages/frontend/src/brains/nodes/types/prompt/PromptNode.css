@@ -1,0 +1,101 @@
+/* Model selector specific styles */
+.prompt-node__model-select {
+  width: auto;
+  min-width: 120px;
+  max-width: 250px;
+  text-overflow: ellipsis;
+  padding: 0 20px 0 8px;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23718096' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 4px center;
+  background-size: 16px;
+}
+
+.prompt-node__model-select:focus {
+  outline: none;
+  border-color: var(--color-border);
+}
+
+.prompt-node__model-select:hover {
+  background-color: var(--color-hover);
+}
+
+.prompt-node__model-select option {
+  padding: 8px;
+  font-size: var(--font-size-xs);
+}
+
+/* Header actions container */
+.prompt-node__header-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* Execute button specific styles */
+.prompt-node__execute-button {
+  display: flex;
+  align-items: center;
+  padding: 2px 8px;
+  gap: 4px;
+  border-radius: 4px;
+  font-size: var(--font-size-xs);
+  transition: all 0.2s ease;
+}
+
+.prompt-node__execute-button:hover:not(:disabled) {
+  background: var(--color-hover);
+}
+
+.prompt-node__execute-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Editor container */
+.prompt-node__editor {
+  flex: 1 1 auto;
+  min-height: 0;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: var(--spacing-sm);
+}
+
+/* Stats panel */
+.prompt-node__stats {
+  flex-shrink: 0;
+  background: var(--color-background-light);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  padding: var(--spacing-sm);
+  font-size: var(--font-size-sm);
+}
+
+.prompt-node__stats-header {
+  font-weight: 600;
+  margin-bottom: var(--spacing-xs);
+  color: var(--color-text-secondary);
+}
+
+.prompt-node__stats-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2px 0;
+}
+
+.prompt-node__stats-value {
+  font-family: var(--font-mono);
+  color: var(--color-text-secondary);
+}
+
+/* Content container */
+.prompt-node__content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}

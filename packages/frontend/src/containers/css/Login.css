@@ -1,0 +1,65 @@
+.Login {
+  position: absolute;
+  width: 400px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  padding: 2.5rem;
+}
+
+.Login form {
+  margin: 0 auto;
+  width: 100%;
+}
+
+.title {
+  margin-bottom: 1.5rem;
+  text-align: center;
+  color: #333;
+  font-size: 1.5rem;
+  font-weight: 500;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #495057;
+  font-size: 0.9rem;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+button[type="submit"] {
+  width: 100%;
+  padding: 0.75rem;
+  margin-top: 1rem;
+  background-color: #5c7cfa;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+button[type="submit"]:hover {
+  background-color: #4c6ef5;
+}
+
+button[type="submit"]:disabled {
+  background-color: #adb5bd;
+  cursor: not-allowed;
+}
+  

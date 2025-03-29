@@ -1,0 +1,37 @@
+.configure-container {
+  padding: 20px;
+}
+
+.configs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.add-config-button {
+  padding: 15px 20px;
+  background-color: #f5f5f5;
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  color: #666;
+  font-size: 16px;
+  cursor: pointer;
+  width: 100%;
+  transition: all 0.2s ease;
+}
+
+.add-config-button:hover {
+  background-color: #eee;
+  border-color: #999;
+  color: #333;
+}
+
+.error-message {
+  color: #dc3545;
+  padding: 10px;
+  margin-bottom: 20px;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 4px;
+}
+  

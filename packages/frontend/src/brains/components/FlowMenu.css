@@ -1,0 +1,159 @@
+/* Flow menu container - positioned in top right */
+.flow-menu {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: var(--spacing-sm);
+  background: var(--color-background);
+  border-bottom-left-radius: 8px;
+  box-shadow: -2px 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.flow-menu__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.flow-menu__buttons {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+/* Flow identifier section */
+.flow-identifier {
+  display: flex;
+  align-items: center;
+  height: 24px;
+  background: var(--color-background-light);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  padding: 0;
+  overflow: hidden;
+}
+
+/* Override flow name editor styles */
+.flow-identifier .flow-name-editor {
+  height: 24px;
+  padding: 0 var(--spacing-sm);
+  min-width: 120px;
+}
+
+.flow-identifier .flow-name-editor__display {
+  height: 24px;
+  padding: 0;
+}
+
+.flow-identifier .flow-name-editor__edit-container {
+  height: 24px;
+}
+
+.flow-identifier .flow-name-editor__edit-container input {
+  height: 24px;
+}
+
+/* Override version editor styles */
+.flow-identifier .version-editor {
+  height: 24px;
+  padding: 0 var(--spacing-sm);
+  border-left: 1px solid var(--color-border);
+  color: var(--color-text-light);
+  font-size: var(--font-size-xs);
+  display: flex;
+  align-items: center;
+}
+
+.flow-identifier .version-editor select,
+.flow-identifier .version-editor .version-numbers {
+  height: 24px;
+  padding: 0;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-light);
+  display: flex;
+  align-items: center;
+}
+
+.flow-identifier .version-editor .version-number {
+  height: 24px;
+  display: flex;
+  align-items: center;
+}
+
+/* Button styles */
+.flow-button {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  height: 24px;
+  padding: 0 var(--spacing-sm);
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  color: var(--color-text);
+  font-size: var(--font-size-xs);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.flow-button:hover {
+  background: var(--color-hover);
+  border-color: var(--color-text-light);
+}
+
+.flow-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Status message styles */
+.status-message {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: var(--spacing-xs);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: 4px;
+  font-size: var(--font-size-xs);
+  background: var(--color-background);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  animation: slideIn 0.2s ease;
+}
+
+.status-message.success {
+  color: var(--color-status-complete);
+  background: rgba(56, 161, 105, 0.1);
+}
+
+.status-message.error {
+  color: var(--color-status-error);
+  background: rgba(229, 62, 62, 0.1);
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.spin-animation {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+ 

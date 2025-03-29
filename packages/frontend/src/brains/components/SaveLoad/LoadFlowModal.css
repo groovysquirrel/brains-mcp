@@ -1,0 +1,384 @@
+@import '../../shared/modal.css';
+
+/* Additional LoadFlowModal specific styles */
+.modal-content select {
+  margin-bottom: 16px;
+}
+
+.modal-content select:last-of-type {
+  margin-bottom: 0;
+}
+
+.loading-state {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  color: #666;
+}
+
+.loading-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #3498db;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.error-state {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  color: #e53e3e;
+}
+
+.error-state button {
+  padding: 4px 8px;
+  background: #fff;
+  border: 1px solid #e53e3e;
+  color: #e53e3e;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.error-state button:hover {
+  background: #fff5f5;
+}
+
+.available-flows {
+  margin-top: 24px;
+}
+
+.available-flows h3 {
+  margin-bottom: 16px;
+  color: #333;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+} 
+
+.empty-state {
+  padding: 16px;
+  text-align: center;
+  background: #f8f9fa;
+  border-radius: 6px;
+  color: #666;
+}
+
+.empty-state span {
+  font-weight: 500;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.empty-state-message {
+  font-size: 0.9em;
+  color: #888;
+  margin: 0;
+}
+
+.recent-flows {
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #eee;
+}
+
+.recent-flows h3 {
+  margin-bottom: 16px;
+  color: #333;
+} 
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5) !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  height: 100vh;
+}
+
+.modal-content {
+  background: #ffffff !important;
+  padding: 24px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  width: 90%;
+  max-width: 500px;
+  max-height: 80vh;
+  overflow-y: auto;
+  position: relative;
+  z-index: 10000;
+} 
+
+.loading-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.9) !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10001;
+}
+
+.loading-overlay .loading-spinner {
+  width: 40px;
+  height: 40px;
+  margin-bottom: 16px;
+} 
+
+.load-flow-modal {
+  width: 600px;
+  max-width: 90vw;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 0;
+  background: #ffffff !important;
+}
+
+.load-flow-modal header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid #e0e0e0;
+  background: #ffffff !important;
+}
+
+.load-flow-modal header h2 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.load-flow-modal .close-button {
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  color: #666;
+}
+
+.load-flow-modal .close-button:hover {
+  color: #333;
+}
+
+.load-flow-modal .modal-body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-height: 60vh;
+  overflow-y: auto;
+  background: #ffffff !important;
+}
+
+/* Section Styles */
+.load-flow-modal section h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 12px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.load-flow-modal section h3 .bp4-icon {
+  color: #666;
+}
+
+/* Recent Flows Grid */
+.recent-flow-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 8px;
+}
+
+.recent-flow-item {
+  background: #f8f9fa !important;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  text-align: left;
+  width: 100%;
+}
+
+.recent-flow-item:hover {
+  background: #ffffff !important;
+  border-color: #4299e1;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.recent-flow-item .flow-name {
+  font-weight: 500;
+  color: #333;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.recent-flow-item .flow-version {
+  font-size: 11px;
+  color: #666;
+  flex-shrink: 0;
+}
+
+/* Flow Selector */
+.flow-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.select-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+  position: relative;
+}
+
+.select-group label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #666;
+}
+
+.select-group select {
+  width: 100%;
+  min-width: 200px;
+  padding: 8px 36px 8px 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  background: white;
+  font-size: 14px;
+  color: #333;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 16px;
+}
+
+.select-group select option {
+  padding: 8px 12px;
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.select-group select:focus {
+  border-color: #4299e1;
+  outline: none;
+}
+
+/* States */
+.loading-state,
+.error-state,
+.empty-state {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px;
+  background: #f8f9fa;
+  border-radius: 4px;
+  color: #666;
+}
+
+.error-state {
+  color: #e53e3e;
+  background: #fff5f5;
+}
+
+.error-state button {
+  margin-left: auto;
+  padding: 4px 8px;
+  background: white;
+  border: 1px solid #e53e3e;
+  color: #e53e3e;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* Footer */
+.load-flow-modal footer {
+  padding: 16px 20px;
+  border-top: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.load-flow-modal footer button {
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.load-flow-modal footer button.secondary {
+  background: white;
+  border: 1px solid #e0e0e0;
+  color: #666;
+}
+
+.load-flow-modal footer button.primary {
+  background: #4299e1;
+  border: 1px solid #3182ce;
+  color: white;
+}
+
+.load-flow-modal footer button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Loading Overlay */
+.loading-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.9) !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+/* Animations */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+} 
+
+/* Add specific styles for the flow name select */
+.select-group select[value=""] {
+  color: #666;
+}

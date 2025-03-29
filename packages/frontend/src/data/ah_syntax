@@ -1,0 +1,99 @@
+model AbstractionHierarchy
+title="Abstraction Hierarchy for a Law Firm (Expanded Value Streams)"
+subcomponent "Functional Purpose"[color="lightyellow"] {
+    "BO1: Profitability"[detail="Business objective focused on financial success"]
+    "BO2: Client Satisfaction"[detail="Business objective focused on client experience"]
+    "BO3: Compliance and Risk Management"[detail="Business objective focused on regulatory compliance"]
+}
+
+subcomponent "Values and Tradeoffs"[color="lightblue"] {
+    "T1: Quality vs. Efficiency"[detail="Trade-off between service quality and operational efficiency"]
+    "T2: Personalized Service vs. Standardization"[detail="Trade-off between customization and scalability"]
+    "T3: Risk Mitigation vs. Innovation"[detail="Trade-off between safety and advancement"]
+}
+
+subcomponent "Value Streams"[color="lightgray"] {
+    "VS1: Client Acquisition and Marketing"
+    "VS2: Client Intake and Assessment"
+    "VS3: Case Management"
+    "VS4: Legal Research"
+    "VS5: Document Preparation and Review"
+    "VS6: Litigation and Court Proceedings"
+    "VS7: Billing and Invoicing"
+    "VS8: Compliance Monitoring"
+    "VS9: Technology Implementation"
+}
+
+subcomponent "Business Systems"[color="lightpink"] {
+    "IS1: CRM System"
+    "IS2: Client Onboarding Portal"
+    "IS3: Case Management System"
+    "IS4: Document Management System"
+    "IS5: Billing and Accounting System"
+    "IS6: Compliance Tracking System"
+    "IS7: Marketing Automation Tools"
+    "IS8: Legal Research Databases"
+    "IS9: Litigation Support Tools"
+    "IS10: Legal Tech Innovations"
+}
+
+subcomponent "Data Sources"[color="lightsalmon"] {
+    "D1: Client Data"
+    "D2: Case Data"
+    "D3: Document Data"
+    "D4: Compliance Data"
+    "D5: Financial Data"
+    "D6: Marketing Data"
+    "D7: Research Data"
+    "D8: Litigation Data"
+    "D9: Innovation Data"
+}
+edges {
+    // Business Objectives to Tradeoffs
+    BO1--T1
+    BO2--T1
+    BO2--T2
+    BO3--T3
+
+    // Tradeoffs to Value Streams
+    T1--VS1
+    T1--VS2
+    T1--VS3
+    T1--VS4
+    
+    T2--VS2
+    T2--VS5
+    T2--VS6
+    
+    T3--VS7
+    T3--VS8
+    T3--VS9
+
+    // Value Streams to Information Systems
+    VS1--IS1
+    VS1--IS7
+    VS2--IS1
+    VS2--IS2
+    VS3--IS3
+    VS4--IS8
+    VS5--IS4
+    VS6--IS9
+
+    // Information Systems to Data
+    IS1--D1
+    IS2--D1
+    IS3--D2
+    IS4--D3
+    IS5--D5
+    IS6--D4
+    IS7--D6
+    IS8--D7
+    IS9--D8
+    IS10--D9
+
+    // Value Stream Workflow Connections
+    VS1--VS2
+    VS2--VS3
+    VS3--VS4
+    VS4--VS5
+}

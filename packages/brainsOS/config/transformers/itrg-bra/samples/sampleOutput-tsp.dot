@@ -1,0 +1,385 @@
+digraph TSPrefArchitecture {
+    
+    subgraph cluster_defining {
+    bgcolor="lightsteelblue2" 
+    label="Defining Capabilities" 
+    labeljust=r
+    fontcolor="black"
+    style=solid
+    fontname="Helvetica,Arial,sans-serif"
+    ranksep=0.2
+    fontsize=12
+    
+    node [fontname="Helvetica,Arial,sans-serif" width=2 height=0.8]
+    edge [fontname="Helvetica,Arial,sans-serif"]
+
+        // Value Stream 1
+        subgraph cluster_vs1 {
+            fillcolor="white" 
+            fontcolor="black" 
+            style="filled" 
+            label="Manage Service Catalogue" 
+            labeljust=c
+            fontsize=16
+            node [shape=box fillcolor="red" style="filled"]
+            // Level 1 Capability A
+            subgraph cluster_vs1a {
+                fillcolor="skyblue3" 
+                label="Market Research\n& Innovation" 
+                fontcolor="black" 
+                style="filled" 
+                node [shape=box fillcolor="lightskyblue" style="filled"]
+                
+                n1A1 [label="Market Trend\nAnalysis"];
+                n1A2 [label="Vendor\nReview"];
+                n1A3 [label="PoC\nAssessment"];
+                n1A4 [label="Best Practice\nReview"];
+                n1A5 [label="Insight\nGeneration"];
+                n1A6 [label="Differention\nDefinition"];
+                
+            }
+            n1A1 -> n1A2 [style=invis]
+            n1A2 -> n1A3 [style=invis]
+            n1A3 -> n1A4 [style=invis]
+            n1A4 -> n1A5 [style=invis]
+            n1A5 -> n1A6 [style=invis]
+            
+            // Level 1 Capability B
+            subgraph cluster_vs1b {
+                fillcolor="skyblue3" 
+                label="Team\nAssembly" 
+                fontcolor="black" 
+                style="filled"
+                labeljust=c
+                node [shape=box fillcolor="lightskyblue" style="filled"]
+                
+                n1B1 [label="Talent Profile\nDevelopment"];
+                n1B2 [label="Compensation\nPlanning"];
+                n1B3 [label="Subspeciality\nCoordination"];
+                n1B4 [label="Staff Retention\n& Upskilling"];
+                n1B5 [label="Subcontrator\nEngagement"];
+                
+            }
+            n1B1 -> n1B2 [style=invis]
+            n1B2 -> n1B3 [style=invis]
+            n1B3 -> n1B4 [style=invis]
+            n1B4 -> n1B5 [style=invis]
+            
+            // Level 1 Capability B
+            subgraph cluster_vs1c {
+                fillcolor="skyblue3" 
+                label="Service Product \nPlanning" 
+                fontcolor="black" 
+                style="filled" 
+                
+                node [shape=box fillcolor="lightskyblue" style="filled"]
+                
+                n1C1 [label="Compeetitor Price\nCanvassing"];
+                n1C2 [label="Go-to-Market\nPlanning"];
+                n1C3 [label="Pricing Strategy\nDevelopment"];
+                n1C4 [label="Infrastructure\nProvisioning"];
+                n1C5 [label="Platform\nConfiguration"];
+                n1C6 [label="Service Product\nBranding"];
+                
+            }
+            n1C1 -> n1C2 [style=invis]
+            n1C2 -> n1C3 [style=invis]
+            n1C3 -> n1C4 [style=invis]
+            n1C4 -> n1C5 [style=invis]
+            n1C5 -> n1C6 [style=invis]
+            
+        }
+        
+        // Value Stream 2
+        subgraph cluster_vs2 {
+            fillcolor="white" 
+            fontcolor="black" 
+            style="filled" 
+            label="Acquire and Engage Accounts" 
+            labeljust=c
+            fontsize=16
+            
+            // Level 1 Capability A
+            subgraph cluster_vs2a {
+                fillcolor="skyblue3" 
+                label="Sales Funnel\nManagement" 
+                fontcolor="black" 
+                style="filled" 
+                node [shape=box fillcolor="lightskyblue" style="filled"]
+                
+                n2A1 [label="Brand\nEngagement"];
+                n2A2 [label="Product\nMarketing"];
+                n2A3 [label="Customer\nTargeting"];
+                n2A4 [label="Prospect\nEngagement"];
+                n2A5 [label="Proof of Concept\nExecution"];
+                n2A6 [label="Funnel Tracking\n& Optimization"];
+            }
+            
+            n2A1 -> n2A2 [style=invis]
+            n2A2 -> n2A3 [style=invis]
+            n2A3 -> n2A4 [style=invis]
+            n2A4 -> n2A5 [style=invis]
+            n2A5 -> n2A6 [style=invis]
+            
+            // Level 1 Capability B
+            subgraph cluster_vs2b {
+                fillcolor="skyblue3" 
+                label="Business\nDevelopment" 
+                fontcolor="black" 
+                style="filled" 
+                node [shape=box fillcolor="lightskyblue" style="filled"]
+                
+                n2B1 [label="Service Use\nPlanning"];
+                n2B2 [label="Account\nEngagement"];
+                n2B3 [label="Customer Value\nAssessment"];
+                n2B4 [label="Issue\nHandling"];
+                n2B5 [label="New Opportunity\nProspecting"];
+            }
+            
+            n2B1 -> n2B2 [style=invis]
+            n2B2 -> n2B3 [style=invis]
+            n2B3 -> n2B4 [style=invis]
+            n2B4 -> n2B5 [style=invis]
+            
+            
+            // Level 1 Capability B
+            subgraph cluster_vs2c {
+                fillcolor="skyblue3" 
+                label="Business\nDevelopment" 
+                fontcolor="black" 
+                style="filled" 
+                node [shape=box fillcolor="lightskyblue" style="filled"]
+                
+                n2C1 [label="Renewal\nManaagement"];
+                n2C2 [label="License\nManagement"];
+                n2C3 [label="Profile\nMaintenance"];
+                n2C4 [label="Contact\nMaintenance"];
+                n2C5 [label="KPI\nTracking"];
+                n2C6 [label="Profitability\nAssessment"];
+                
+            }
+            
+            n2C1 -> n2C2 [style=invis]
+            n2C2 -> n2C3 [style=invis]
+            n2C3 -> n2C4 [style=invis]
+            n2C4 -> n2C5 [style=invis]
+            n2C5 -> n2C6 [style=invis]
+        }
+        
+        // Value Stream 3
+        subgraph cluster_vs3 {
+            fillcolor="white" 
+            fontcolor="black" 
+            style="filled" 
+            label="Deliver Service Products"
+            labeljust=c
+            fontsize=16
+            
+            // Level 1 Capability A
+            subgraph cluster_vs3a {
+                fillcolor="skyblue3" 
+                label="Service Delivery\nManagement" 
+                fontcolor="black" 
+                style="filled" 
+                node [shape=box fillcolor="lightskyblue" style="filled"]
+                
+                n3A1 [label="Client Maturity\nAssessment"];
+                n3A2 [label="Environment\nDocumentation"];
+                n3A3 [label="Process\nIntegration"];
+                n3A4 [label="Service Model\nDeployment"];
+                n3A5 [label="Service-User\nTraining"];
+                n3A6 [label="Partner\nManagement"];
+            }
+            
+            n3A1 -> n3A2 [style=invis]
+            n3A2 -> n3A3 [style=invis]
+            n3A3 -> n3A4 [style=invis]
+            n3A4 -> n3A5 [style=invis]
+            n3A5 -> n3A6 [style=invis]
+            
+            
+            // Level 1 Capability B
+            subgraph cluster_vs3b {
+                fillcolor="skyblue3" 
+                label="Product Delivery\nManagement" 
+                fontcolor="black" 
+                style="filled" 
+                node [shape=box fillcolor="lightskyblue" style="filled"]
+                
+                n3B1 [label="Product\nManagement"];
+                n3B2 [label="Product\nDevelopment"];
+                n3B3 [label="Quality Assurance\n& Testing"];
+                n3B4 [label="DevOps\nManagement"];
+                n3B5 [label="Training &\nDocumentation"];
+                n3B6 [label="Product\nSupport"];
+            }
+            
+            n3B1 -> n3B2 [style=invis]
+            n3B2 -> n3B3 [style=invis]
+            n3B3 -> n3B4 [style=invis]
+            n3B4 -> n3B5 [style=invis]
+            n3B5 -> n3B6 [style=invis]
+            
+            
+            // Level 1 Capability C
+            subgraph cluster_vs3c {
+                fillcolor="skyblue3" 
+                label="Quality\nManagement" 
+                fontcolor="black" 
+                style="filled" 
+                node [shape=box fillcolor="lightskyblue" style="filled"]
+                
+                n3C1 [label="Root Cause\nAnalysis"];
+                n3C2 [label="Process\nImprovement"];
+                n3C3 [label="Service Model\nAdaptation"];
+                n3C4 [label="Contingency\nManagement"];
+                n3C5 [label="Feedback\nCollection"];
+                n3C6 [label="Performance\nManagement"];
+            }
+            
+            n3C1 -> n3C2 [style=invis]
+            n3C2 -> n3C3 [style=invis]
+            n3C3 -> n3C4 [style=invis]
+            n3C4 -> n3C5 [style=invis]
+            n3C5 -> n3C6 [style=invis]
+            
+        }
+        
+        }
+
+    subgraph cluster_shared {
+        bgcolor="grey86" 
+        label="  Shared Capabilities" 
+        fontcolor="black"
+        style=solid
+        fontname="Helvetica,Arial,sans-serif"
+        fontsize=12
+        ranksep=0.2
+        rankdir=TB
+        labeljust=r
+    
+        //adjust the width here to make shared almost the same size at the defining capabilities
+        node [fontname="Helvetica,Arial,sans-serif" width=1.85 height=0.8]
+        edge [fontname="Helvetica,Arial,sans-serif"]
+        
+        subgraph cluster_shared1 {
+            fillcolor="skyblue3" 
+            label="Risk Management" 
+            fontcolor="black" 
+            style="filled" 
+            labeljust=c
+            fontsize=16
+            node [shape=box fillcolor="lightskyblue" style="filled"]
+            
+            ns1A [label="Policy\nDevelopment"];
+            ns1B [label="Risk Assessment\n& Analysis"];
+            ns1C [label="Audit & Assessment\nManagement"];
+            ns1D [label="Business Continuity\nPlanning"];
+            ns1E [label="Threat & Vulnerability\nManagement"];
+            ns1F [label="Insurance Policy\nManagement"];
+            ns1G [label="Privacy Compliance\nManagement"];
+            ns1H [label="Regulatory\nReporting"];
+            ns1I [label="Endpoint\nConfiguration\nManagement"];
+            ns1J [label="Incident Detection\nand Response"];
+        }
+        
+        subgraph cluster_shared2 {
+            
+            fillcolor="skyblue3" 
+            label="Information Management" 
+            fontcolor="black" 
+            style="filled" 
+            labeljust=c
+            fontsize=16
+            
+            node [shape=box fillcolor="lightskyblue" style="filled"]
+            
+            ns2A [label="Client History\nMaintenance"];
+            ns2B [label="Data Retention\n Management"];
+            ns2C [label="Knowledge\nManagement"];
+            ns2D [label="Data\nWarehousing"];
+            ns2E [label="Insight\nDiscovery"];
+        }
+        
+        subgraph cluster_shared3 {
+            
+            fillcolor="skyblue3" 
+            label="Business Process Automation" 
+            fontsize=16
+            fontcolor="black" 
+            style="filled" 
+            labeljust=c
+            
+            node [shape=box fillcolor="lightskyblue" style="filled"]
+            
+            ns3A [label="Use Case\nIdentification"];
+            ns3B [label="Tool and Model\nTraining"];
+            ns3C [label="Cost Benefit\nAnalysis"];
+            ns3D [label="Solution\nIteration"];
+            ns3E [label="System\nOrchestration"];
+        }
+        
+        //this is hacky but sets up the shared capabilities on top of each other
+        ns1A -> ns2A  [style=invis]
+        ns1E -> ns3A  [style=invis]
+            
+    }
+    
+    subgraph cluster_enabling {
+        bgcolor="lightsteelblue2" 
+        label="  Enabling Capabilities"
+        fontsize=12
+        fontcolor="black"
+        style=solid
+        fontname="Helvetica,Arial,sans-serif"
+        ranksep=0.2
+        rankdir=TB
+        labeljust=r
+    
+        //adjust the width here to make shared almost the same size at the defining capabilities
+        node [fontname="Helvetica,Arial,sans-serif" width=2.75 height=0.8 fontsize=16]
+        edge [fontname="Helvetica,Arial,sans-serif"]
+        
+        node [shape=box fillcolor="skyblue3" style="filled"]
+            
+            en1 [label="Organizational\nGovernance"];
+            en2 [label="Enterprise\nArchitecture"];
+            en3 [label="Strategic\nPlanning"];
+            en4 [label="Finance\nManagement"];
+            en5 [label="Legal Service\nManagement"];
+            en6 [label="Human Resources\nManagement"];
+            en7 [label="Data\nGovernance"];
+            en8 [label="Technology\nInfrastructure\nManagement"];
+            en9 [label="Project\nManagement"];
+            en10 [label="Change\nManagement"];
+            en11 [label="Office\nManagement"];
+            en12 [label="Facilities\nManagement"];
+            en13 [label="Learning\n& Development"];
+            en14 [label="Data Analysis\n& Reporting"];
+            
+            //stack the capabilities in groups of 2
+            en1 -> en2  [style=invis]
+            en3 -> en4  [style=invis]
+            en5 -> en6  [style=invis]
+            en7 -> en8  [style=invis]
+            en9 -> en10  [style=invis]
+            en11 -> en12  [style=invis]
+            en13 -> en14  [style=invis]
+    
+    }
+    //this is hacky but it puts the defining capabilities above the shared capabilities
+    n1A6 -> ns1A  [style=invis]
+    
+    //and shared above enabling
+    ns2A -> en1  [style=invis]
+    
+    //this centers enabling capbilities below shared capabilities
+    ns3E -> en13  [style=invis]
+    
+    
+    
+    
+    
+}
+
+//color names @ https://graphviz.org/doc/info/colors.html

@@ -23,6 +23,11 @@
 # misc
 .DS_Store
 *.pem
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
 
 # debug
 npm-debug.log*
@@ -32,6 +37,8 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
+!.env.test.example
 
 # vercel
 .vercel
@@ -45,3 +52,15 @@ next-env.d.ts
 
 # open-next
 .open-next
+
+# logs
+logs
+*.log
+
+# cache
+.cache/
+.temp/
+.tmp/
+
+# local development
+*.local

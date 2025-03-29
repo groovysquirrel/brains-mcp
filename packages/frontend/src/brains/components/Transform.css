@@ -1,0 +1,140 @@
+/* ==========================================================================
+   Base Layout
+   ========================================================================== */
+
+   .build-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  
+  /* ==========================================================================
+     Editor Styles
+     ========================================================================== */
+  
+  .editor-container {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  
+  .editor-container.dark {
+    background-color: #1e1e1e;
+    color: #d4d4d4;
+  }
+  
+  .editor-wrapper {
+    flex: 1;
+    min-height: 0; /* Important for flex child scrolling */
+  }
+  
+  .status-bar {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    height: auto;
+    min-height: 40px;
+    padding: 12px 16px;
+    background-color: rgba(245, 245, 245, 0.9);
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+  }
+  
+  .status-bar-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: auto;
+  }
+  
+  .button-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  /* Common button styles */
+  .live-update-toggle,
+  .download-csv-button {
+    font-size: 12px !important;
+    padding: 4px 8px !important;
+    height: 24px !important;
+    min-width: 110px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  
+  /* Status message alignment */
+  .status-message {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #000000;
+    font-size: 12px;
+    height: 24px;
+    margin-top: 0; /* Remove top margin since we're using flex gap */
+  }
+  
+  .status-message .spinner-border {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .status-message.error {
+    color: #dc3545;
+  }
+  
+  /* Monaco Editor Styles */
+  .monaco-editor {
+    height: 100% !important;
+    width: 100% !important;
+  }
+  
+  /* ==========================================================================
+     Window Styles
+     ========================================================================== */
+  
+  /* Graph Container */
+  .mosaic-window .graph-container {
+    background: white !important;
+    height: 100%;
+    width: 100%;
+    position: relative;
+  }
+  
+  /* Window Titles */
+  .mosaic-window-title {
+    background: #007bff !important;
+    color: white !important;
+  }
+  
+  /* ==========================================================================
+     Button Styles
+     ========================================================================== */
+  
+  .transparent-button {
+    background-color: rgba(59, 139, 219, 0.1) !important;
+    border: none !important;
+    color: #ffffff !important;
+    transition: background-color 0.3s, color 0.3s;
+    margin: 8px !important;
+    padding: 8px 16px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+  }
+  
+  .transparent-button .spinner-border {
+    margin-right: 8px !important;
+  }
+  
+  .transparent-button:disabled {
+    opacity: 1 !important;
+    cursor: default;
+  }
+  
