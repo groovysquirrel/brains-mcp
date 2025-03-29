@@ -288,13 +288,13 @@ TESTS
 # 1. Create a new prompt
 npx aws-api-gateway-cli-test \
 --user-pool-id='us-east-1_ILoc6G1pf' \
---app-client-id='17h3pq2ua0p28akm05sde9ttnt' \
+--app-client-id='xxxx' \
 --cognito-region='us-east-1' \
---identity-pool-id='us-east-1:ab1ed509-bcc9-486d-9d7a-52f8be8c87d1' \
---invoke-url='https://dev-api.brains.patternsatscale.com' \
+--identity-pool-id='us-east-1:xxxxx' \
+--invoke-url='https://dev-api.yoururl-in-aws-route53.com' \
 --api-gateway-region='us-east-1' \
---username='justin_dev@patternsatscale.com' \
---password='gr00vyT@STE' \
+--username='xxxx' \
+--password='xxxx' \
 --path-template='/latest/resources/user/prompts' \
 --method='POST' \
 --body='{

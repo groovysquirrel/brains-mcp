@@ -1,4 +1,4 @@
-# Brains MCP
+# BRAINS OS - version MCP
 
 A modern, serverless operating system for AI systems and agents, built with SST, React, and TypeScript. This project provides a robust framework for managing Large Language Models (LLMs) and specialized AI agents through the MCP (Model Control Protocol) with a unified command system and shared operating template.
 
