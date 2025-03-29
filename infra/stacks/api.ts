@@ -97,3 +97,8 @@ brainsOS_API.route("POST /latest/resources/{dataStore}/{object}", {
   handler: "packages/brainsOS/functions/api/resources/resourcesHandler.handler",
 });
 
+// MCP Endpoint
+brainsOS_API.route("POST /latest/mcp/{type}/{name}", {
+  handler: "packages/brainsOS/mcp/mcpHandler.handler",
+  link: [systemData],
+});
