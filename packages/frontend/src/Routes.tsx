@@ -11,6 +11,7 @@ import config from "./config";
 import Prompt from "./containers/PromptTest";
 import VisualizeContainer from "./brains/containers/VisualizeContainer";
 import FlowContainer from "./brains/containers/FlowContainer";
+import MCPContainer from "./mcp/client/containers/MCPContainer";
 
 export default function Links() {
   const filterRoute = (path: string) => {
@@ -27,6 +28,7 @@ export default function Links() {
     { path: "/operate", element: <AuthenticatedRoute><Operate /></AuthenticatedRoute> },
     { path: "/help", element: <AuthenticatedRoute><Help /></AuthenticatedRoute> },
     { path: "/floweditor", element: <AuthenticatedRoute><FlowContainer /></AuthenticatedRoute> },
+    { path: "/mcp", element: <AuthenticatedRoute><MCPContainer /></AuthenticatedRoute> },
     { path: "*", element: <NotFound /> }
   ].filter(route => filterRoute(route.path));
 

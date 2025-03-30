@@ -18,11 +18,11 @@ const config = {
   },
   isDemo: isDemoMode,
   allowedRoutes: isDemoMode 
-    ? ['/', '/prompt', '/visualize', '/operate', '/help', '/login', '/test', '/floweditor', '/signup']
-    : ['/', '/prompt', '/visualize', '/operate', '/help', '/login', '/signup', '/test', '/floweditor'],
+    ? ['/', '/prompt', '/visualize', '/operate', '/help', '/login', '/test', '/floweditor', '/signup', '/mcp']
+    : ['/', '/prompt', '/visualize', '/operate', '/help', '/login', '/signup', '/test', '/floweditor', '/mcp'],
   allowedMenuItems: isDemoMode
-    ? ['Prompt', 'Visualize', 'Console', 'Help', 'Editor']
-    : ['Prompt', 'Visualize', 'Console', 'Help', 'Editor']
+    ? ['Prompt', 'Visualize', 'Console', 'Help', 'Editor', 'MCP']
+    : ['Prompt', 'Visualize', 'Console', 'Help', 'Editor', 'MCP']
 };
 
 export default config;

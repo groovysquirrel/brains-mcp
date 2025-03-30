@@ -11,6 +11,13 @@ interface DomainConfig {
     };
 
   };
+  websocket: {
+    latest: {
+      prod: string;
+      demo: string;
+      dev: string;
+    }
+  };
   frontend: {
     latest: {
       prod: string;
@@ -61,6 +68,13 @@ export const domains: DomainConfig = {
       dev: `dev-api.${baseDomain}`
     },
   },
+  websocket: {
+    latest: {
+      prod: `io.${baseDomain}`,
+      demo: `demo-io.${baseDomain}`,
+      dev: `dev-io.${baseDomain}`
+    },
+  },
   frontend: {
     latest: {
       prod: `live.${baseDomain}`,
@@ -79,7 +93,7 @@ export function getVersion(versionKey: 'latest' | 'v1' | 'v2', stage: string): s
 }
 
 export function getDomainName(
-  type: 'api' | 'frontend',
+  type: 'api' | 'frontend' | 'websocket',
   version: 'latest' | 'v1' | 'v2',
   stage: string
 ): string {

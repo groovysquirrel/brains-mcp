@@ -80,13 +80,12 @@ class ConversationRepository extends baseRepository<ConversationData> {
   }
 
   /**
-   * Adds a user message and AI response to the conversation history
+   * Adds messages to the conversation history
    */
   async addToConversation(
     userId: string, 
     conversationId: string, 
-    userMessage: string, 
-    assistantMessage: string
+    messages: Message[]
   ): Promise<void> {
     // Get existing messages or initialize empty array
     const data = await this.get(userId, conversationId) || { 
@@ -97,19 +96,13 @@ class ConversationRepository extends baseRepository<ConversationData> {
       }
     };
     
-    // Add both messages with timestamps
+    // Add messages with timestamps
     const now = new Date().toISOString();
     data.messages.push(
-      {
-        role: 'user',
-        content: userMessage,
+      ...messages.map(msg => ({
+        ...msg,
         timestamp: now
-      },
-      {
-        role: 'assistant',
-        content: assistantMessage,
-        timestamp: now
-      }
+      }))
     );
 
     // Update the conversation
@@ -125,8 +118,7 @@ export interface IConversationRepository {
   addToConversation(
     userId: string, 
     conversationId: string, 
-    userMessage: string, 
-    assistantMessage: string
+    messages: Message[]
   ): Promise<void>;
 }
 

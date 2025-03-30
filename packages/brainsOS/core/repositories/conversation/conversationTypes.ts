@@ -1,25 +1,37 @@
 import { z } from 'zod';
 
-export interface Message {
-  role: 'user' | 'assistant';
-  content: string;
-  timestamp: string;
+export type MessageRole = 'system' | 'user' | 'assistant';
+
+export interface MessageContent {
+  type: 'text';
+  text: string;
 }
 
-export interface conversationState {
+export interface Message {
+  role: MessageRole;
+  content: string | MessageContent[];
+  timestamp?: string;
+}
+
+export interface ConversationState {
   conversations: Record<string, Message[]>;
 }
 
 export const MessageSchema = z.object({
-  role: z.enum(['user', 'assistant']),
-  content: z.string(),
-  timestamp: z.string()
+  role: z.enum(['user', 'assistant', 'system']),
+  content: z.union([
+    z.string(),
+    z.array(z.object({
+      type: z.literal('text'),
+      text: z.string()
+    }))
+  ]),
+  timestamp: z.string().optional()
 });
 
-export type MessageRole = 'user' | 'assistant';
-
-export interface Message {
-  role: MessageRole;
-  content: string;
-  timestamp: string;
+export interface ConversationMetadata {
+  createdAt: string;
+  updatedAt: string;
+  systemPrompt?: string;
+  [key: string]: any;
 }

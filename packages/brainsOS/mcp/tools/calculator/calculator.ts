@@ -42,7 +42,10 @@ export class CalculatorHandler implements MCPHandler<CalculatorTool, number> {
     // Return the result
     return {
       success: true,
-      data: result,
+      content: [{
+        text: `Result of ${a} ${operation} ${b} = ${result}`,
+        data: result
+      }],
       metadata: {
         requestId: '',  // Will be set by the main handler
         processingTimeMs: 0,

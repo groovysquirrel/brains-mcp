@@ -7,7 +7,7 @@ import {
   conversationRepository, 
   IConversationRepository 
 } from '../../../../../core/repositories/conversation/conversationRepository';
-import { Message, MessageRole } from '../../../../../core/repositories/conversation/conversationTypes';
+import { Message, MessageRole, MessageContent } from '../../../../../core/repositories/conversation/conversationTypes';
 
 // Initialize logger for this module
 const logger = new Logger('ConversationHandler');
@@ -77,39 +77,42 @@ export const conversationHandler: APIGatewayProxyHandlerV2WithIAMAuthorizer = as
       });
     }
 
+    // Parse the vendor from the model ID
+    const vendor = modelId.split('.')[0];
+    const isClaudeThree = modelId.includes('claude-3');
+
     // Retrieve previous messages in this conversation
     const history = await userConversationRepository.getConversationHistory(
       userId,
       conversationId
     );
 
-    // Format the entire prompt including system prompt and history
-    const formattedPrompt = formatConversationPrompt(systemPrompt, history, userPrompt);
-
-    // Parse the vendor from the model ID
-    const vendor = modelId.split('.')[0];
-
-    // Call the AI model with the consolidated prompt
+    // Call the AI model with the message history
     const modelResponse = await invokeModel({
-      prompt: formattedPrompt,
+      prompt: userPrompt,
       modelId,
       vendor,
       source: modelSource,
+      systemPrompt,
       temperature: 0.7,
-      maxTokens: 1000
+      maxTokens: 4000,
+      messageHistory: history.map(msg => ({
+        role: msg.role,
+        content: typeof msg.content === 'string' ? msg.content : msg.content.map(c => c.text).join(' ')
+      }))
     });
 
-    // Extract the response text, handling both string and object responses
-    const responseText = typeof modelResponse === 'string' 
-      ? modelResponse 
-      : (modelResponse as InvocationResponse).content;
+    // Extract the response text
+    const responseText = (modelResponse as InvocationResponse).content;
 
     // Save both the user's message and the AI's response
     await userConversationRepository.addToConversation(
       userId,
       conversationId,
-      userPrompt,
-      responseText
+      [
+        { role: 'user', content: userPrompt },
+        { role: 'assistant', content: responseText }
+      ]
     );
 
     // Log completion time
@@ -131,8 +134,30 @@ export const conversationHandler: APIGatewayProxyHandlerV2WithIAMAuthorizer = as
     });
 
   } catch (error) {
-    // Log the error
-    logger.error('Error in conversation handler:', error);
+    // Log the error with more context
+    logger.error('Error in conversation handler:', {
+      error,
+      requestId,
+      userId,
+      ...(error.details && { details: error.details })
+    });
+
+    // If it's a throttling error, add retry information
+    if (error.code === 'ThrottlingException' || error.message?.includes('Too many requests')) {
+      const retryAfter = 15 + Math.floor(Math.random() * 5); // 15-20 seconds
+      return createResponse(429, {
+        success: false,
+        error: {
+          code: ErrorCodes.INVOCATION_ERROR,
+          message: 'Rate limit exceeded. Please try again later.',
+          
+        },
+        metadata: {
+          requestId,
+          timestamp: new Date().toISOString()
+        }
+      });
+    }
 
     // If it's already a PromptServiceError, rethrow it
     if (error instanceof PromptServiceError) {
@@ -140,7 +165,7 @@ export const conversationHandler: APIGatewayProxyHandlerV2WithIAMAuthorizer = as
     }
 
     // Otherwise, wrap it in a PromptServiceError
-    throw new PromptServiceError(error.message, {
+    throw new PromptServiceError(error.message || 'Internal server error', {
       code: ErrorCodes.INVOCATION_ERROR,
       service: 'conversation',
       statusCode: 500,

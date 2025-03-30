@@ -38,17 +38,23 @@ export class LLMRepository extends StorageRepository<StoredLLM> {
    * Get all LLMs, loading defaults if empty
    */
   async getLLMs(userId: string): Promise<StoredLLM[]> {
-    const llms = await super.queryItems(userId, `${this.typeName}#`);
+    // Query with the correct prefix pattern
+    const llms = await super.queryItems(userId, 'llm#');
     
     console.log(`[DEBUG] Found ${llms.length} LLMs for ${userId}`);
     
+    // Filter the results to only include active LLMs
+    const validLLMs = llms.filter(llm => llm.status === 'active');
+
+    console.log(`[DEBUG] Found ${validLLMs.length} valid LLMs for ${userId}`);
+    
     // If no LLMs found, try loading defaults
-    if (llms.length === 0) {
+    if (validLLMs.length === 0) {
       console.log(`No LLMs found for ${userId}, loading defaults...`);
       return this.loadDefaults(userId);
     }
 
-    return llms;
+    return validLLMs;
   }
 
   /**
@@ -59,7 +65,8 @@ export class LLMRepository extends StorageRepository<StoredLLM> {
       ...llm,
       userId
     });
-    await super.putItem(userId, storedLLM.name, storedLLM);
+    // Use the correct typeName pattern: llm#${name}
+    await super.putItem(userId, `llm#${storedLLM.name}`, storedLLM);
   }
 
   /**
@@ -68,7 +75,7 @@ export class LLMRepository extends StorageRepository<StoredLLM> {
   async deleteLLMs(userId: string): Promise<void> {
     const llms = await this.getLLMs(userId);
     await Promise.all(
-      llms.map(llm => super.deleteItem(userId, llm.name))
+      llms.map(llm => super.deleteItem(userId, `llm#${llm.name}`))
     );
   }
 

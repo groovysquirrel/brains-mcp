@@ -23,8 +23,11 @@ export default $config({
     // Import the stacks
     const auth = await import("./infra/stacks/auth");
     const email = await import("./infra/stacks/email");
-    const api = await import("./infra/stacks/api");
+    
     const frontend = await import("./infra/stacks/frontends");
+    const api = await import("./infra/stacks/api");
+
+    const websocket = await import("./infra/stacks/websocket");
     
     return {
       userPool: auth.userPool.id,
@@ -33,6 +36,7 @@ export default $config({
       userPoolClient: auth.userPoolClient.id,
       app: api.brainsOS_API.url,
       frontend: frontend.latest_brains.url,
+      websocket: websocket.brainsOS_websocket_API.url,
     };
    
     

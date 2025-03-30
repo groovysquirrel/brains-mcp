@@ -32,6 +32,13 @@ declare module "sst" {
               "prod": string
             }
           }
+          "websocket": {
+            "latest": {
+              "demo": string
+              "dev": string
+              "prod": string
+            }
+          }
         }
         "emails": {
           "demo": string
@@ -81,6 +88,11 @@ declare module "sst" {
     }
     "brains_latest": {
       "type": "sst.aws.StaticSite"
+      "url": string
+    }
+    "brains_websocket_api_latest": {
+      "managementEndpoint": string
+      "type": "sst.aws.ApiGatewayWebSocket"
       "url": string
     }
     "systemData": {

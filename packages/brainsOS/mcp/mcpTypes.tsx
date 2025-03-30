@@ -1,178 +1,179 @@
 /**
  * MCP (Modular Component Pattern) Types
- * This file defines all the types and interfaces used in the MCP system.
- * It provides type safety and validation for requests and responses.
+ * 
+ * This file defines the core types used in the MCP system.
+ * Think of MCP as a way to organize different types of AI-powered services:
+ * - Tools: Services that do specific tasks (like calculating or generating random numbers)
+ * - Resources: Services that provide data (like dog names or random facts)
+ * - Prompts: Services that generate text based on prompts (like creating jokes or summaries)
  */
 
-import { z } from 'zod';  // Zod is used for runtime type validation
+import { z } from 'zod';  // Used for validating data at runtime
 
 /**
- * Base Types
- * These are the foundation types that all MCP components build upon
+ * Core Types
+ * These are the basic building blocks that all MCP services use
  */
 
-// The base interface that all MCP components must implement
+// Every MCP service needs a type to identify what it does
 export interface MCPBase {
-  type: string;  // Identifies what kind of component this is (e.g., 'calculator', 'joke')
+  type: string;  // e.g., 'calculator', 'dog-names', 'joke-generator'
 }
 
-// Used for tools that perform specific operations (e.g., calculator, random number generator)
+// Tools are services that do specific tasks
 export interface MCPTool extends MCPBase {
-  params: Record<string, any>;  // Parameters needed for the tool to work
+  params: Record<string, any>;  // Parameters needed for the tool
 }
 
-// Used for data retrieval operations (e.g., getting dog names, random facts)
+// Resources are services that provide data
 export interface MCPData extends MCPBase {
-  query?: Record<string, any>;  // Optional query parameters for filtering data
+  query?: Record<string, any>;  // Optional filters for the data
 }
 
-// Used for prompt-based operations (e.g., generating jokes, rap lyrics)
+// Prompts are services that generate text
 export interface MCPPrompt extends MCPBase {
-  params: Record<string, any>;  // Parameters needed for the prompt (e.g., topic, style)
+  params: Record<string, any>;  // Parameters that guide the text generation
 }
 
 /**
- * Response Types
- * Defines how all responses from MCP components should be structured
+ * Response Format
+ * All MCP services return responses in this standard format
  */
-
-// The standard response format for all MCP operations
 export interface MCPResponse<T = any> {
-  success: boolean;  // Whether the operation was successful
-  content?: {       // The actual result content (if successful)
-    text: string;    // Text content of the response
-    data?: T;        // Optional structured data
+  success: boolean;  // Did the operation succeed?
+  
+  // If successful, the response includes content
+  content?: {
+    text: string;    // Human-readable text
+    data?: T;        // Structured data (if any)
   }[];
-  data?: T;         // Legacy data field (for backward compatibility)
-  error?: {         // Error information (if unsuccessful)
-    code: string;    // Error code for client handling
+  
+  // If unsuccessful, the response includes error details
+  error?: {
+    code: string;    // Error code (e.g., 'NOT_FOUND')
     message: string; // Human-readable error message
-    details: {      // Additional error details
+    details: {
       code: string;      // Error code
-      service: string;   // Which service generated the error
+      service: string;   // Which service had the error
       statusCode: number; // HTTP status code
     };
   };
-  metadata: {       // Information about the request/response
+  
+  // Metadata about the request/response
+  metadata: {
     requestId: string;      // Unique ID for this request
-    processingTimeMs: number; // How long the request took
-    timestamp: string;      // When the response was generated
+    processingTimeMs: number; // How long it took
+    timestamp: string;      // When it happened
   };
 }
 
 /**
- * Request Schemas
- * These Zod schemas validate incoming requests at runtime
- * They ensure that all requests have the correct structure
+ * Request Validation
+ * These schemas ensure that incoming requests have the correct structure
  */
-
-// Validates tool requests (e.g., calculator operations)
 export const MCPToolSchema = z.object({
   type: z.string(),
   params: z.record(z.any())
 });
 
-// Validates data requests (e.g., getting dog names)
 export const MCPDataSchema = z.object({
   type: z.string(),
   query: z.record(z.any()).optional()
 });
 
-// Validates prompt requests (e.g., generating jokes)
 export const MCPPromptSchema = z.object({
   type: z.string(),
   params: z.record(z.any())
 });
 
 /**
- * Handler Types
- * Defines how MCP handlers should be implemented
+ * Service Definitions
+ * These interfaces define what information we need about each type of service
  */
 
-// The interface that all MCP handlers must implement
+// Common schema structure for all services
+export interface ServiceSchema {
+  type: 'function';
+  function: {
+    name: string;
+    description: string;
+    parameters: Record<string, any>;
+  };
+}
+
+// Tool definition
+export interface MCPToolDefinition<T extends MCPTool, R = any> {
+  name: string;           // What the tool is called
+  description: string;    // What the tool does
+  schema: ServiceSchema;  // What parameters it needs
+  handler: MCPHandler<T, R>;  // How to use it
+}
+
+// Resource definition
+export interface MCPDataDefinition<T extends MCPData, R = any> {
+  name: string;           // What the resource is called
+  description: string;    // What data it provides
+  schema: ServiceSchema;  // What filters it accepts
+  handler: MCPHandler<T, R>;  // How to get the data
+}
+
+// Prompt definition
+export interface MCPPromptDefinition<T extends MCPPrompt, R = any> {
+  name: string;           // What the prompt is called
+  description: string;    // What it generates
+  schema: ServiceSchema;  // What parameters it needs
+  handler: MCPHandler<T, R>;  // How to use it
+}
+
+/**
+ * Service Handlers
+ * Every service needs a handler that processes requests
+ */
 export interface MCPHandler<T extends MCPBase, R = any> {
-  handle(input: T): Promise<MCPResponse<R>>;  // Process the input and return a response
+  handle(input: T): Promise<MCPResponse<R>>;
 }
 
 /**
- * Schema Types
- * Defines the structure of tool schemas and parameters
+ * Service Registries
+ * These interfaces define how we manage our services
  */
 
-// Schema for tool parameters
-export interface MCPToolSchema {
-  type: 'function';
-  function: {
-    name: string;
-    description: string;
-    parameters: Record<string, any>;
-  };
+// Common registry methods
+export interface Registry<T> {
+  register(item: T): void;
+  get(name: string): T | undefined;
+  list(): T[];
+  getSchema(name: string): ServiceSchema | undefined;
 }
 
-// Schema for data parameters
-export interface MCPDataSchema {
-  type: 'function';
-  function: {
-    name: string;
-    description: string;
-    parameters: Record<string, any>;
-  };
-}
-
-// Tool definition with schema and handler
-export interface MCPToolDefinition<T extends MCPBase, R = any> {
-  name: string;
-  description: string;
-  schema: MCPToolSchema;
-  handler: MCPHandler<T, R>;
-}
-
-// Data provider definition with schema and handler
-export interface MCPDataDefinition<T extends MCPBase, R = any> {
-  name: string;
-  description: string;
-  schema: MCPDataSchema;
-  handler: MCPHandler<T, R>;
-}
-
-/**
- * Registry Types
- * Defines how MCP handlers are registered and retrieved
- */
-
-// The interface for managing MCP handlers
-export interface MCPRegistry<T extends MCPBase> {
-  // Register a new tool with its schema and handler
+// Tool registry
+export interface MCPToolRegistry<T extends MCPTool> extends Registry<MCPToolDefinition<T>> {
   registerTool(tool: MCPToolDefinition<T>): void;
-  
-  // Register a new data provider with its schema and handler
-  registerResource(resource: MCPDataDefinition<T>): void;
-  
-  // Get a tool by its name
   getTool(name: string): MCPToolDefinition<T> | undefined;
-  
-  // Get a data provider by its name
-  getResource(name: string): MCPDataDefinition<T> | undefined;
-  
-  // List all available tools
   listTools(): MCPToolDefinition<T>[];
-  
-  // List all available data providers
+  getToolSchema(name: string): ServiceSchema | undefined;
+}
+
+// Resource registry
+export interface MCPResourceRegistry<T extends MCPData> extends Registry<MCPDataDefinition<T>> {
+  registerResource(resource: MCPDataDefinition<T>): void;
+  getResource(name: string): MCPDataDefinition<T> | undefined;
   listResources(): MCPDataDefinition<T>[];
-  
-  // Get the schema for a specific tool
-  getToolSchema(name: string): MCPToolSchema | undefined;
-  
-  // Get the schema for a specific data provider
-  getResourceSchema(name: string): MCPDataSchema | undefined;
+  getResourceSchema(name: string): ServiceSchema | undefined;
+}
+
+// Prompt registry
+export interface MCPPromptRegistry<T extends MCPPrompt> extends Registry<MCPPromptDefinition<T>> {
+  registerPrompt(prompt: MCPPromptDefinition<T>): void;
+  getPrompt(name: string): MCPPromptDefinition<T> | undefined;
+  listPrompts(): MCPPromptDefinition<T>[];
+  getPromptSchema(name: string): ServiceSchema | undefined;
 }
 
 /**
  * Request Context
- * Contains information about the current request
- * This is used throughout the MCP system for logging, tracking, and security
+ * Information about the current request that's useful throughout the system
  */
-
 export interface RequestContext {
   userId: string;    // Who made the request
   userArn: string;   // AWS ARN of the user
@@ -180,4 +181,5 @@ export interface RequestContext {
   startTime: number; // When the request started
   type: string;      // Type of MCP operation
   name: string;      // Name of the specific operation
+  flattenResponse?: boolean; // Whether to flatten the response
 } 

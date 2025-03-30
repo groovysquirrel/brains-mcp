@@ -1,19 +1,25 @@
-# Modular Component Pattern (MCP)
+# Model Context Protocol (MCP) Pattern
 
-The Modular Component Pattern (MCP) is a simple, consistent way to implement modular functions in our system. Each component (tool, data source, prompt) follows the same pattern, making it easy to add new functionality.
+The Model Context Protocol (MCP) is a simple, consistent way to implement modular functions in our system. Each component (tool, resource, prompt) follows the same pattern, making it easy to add new functionality.
 
 ## Directory Structure
 
 ```
 mcp/
 ├── tools/                    # All tool implementations
-│   ├── mcpToolHandler.ts    # Main handler for all tool requests
-│   ├── mcpToolIndex.ts      # Registry for all tools
+│   ├── mcpToolHandler.tsx   # Main handler for all tool requests
+│   ├── mcpToolIndex.tsx     # Registry for all tools
 │   └── calculator/          # Example tool implementation
 │       ├── types.ts         # Tool-specific types and schema
 │       └── calculator.ts    # Tool implementation
-├── data/                    # Data source implementations
+├── resources/               # Resource implementations
+│   ├── mcpResourceHandler.tsx
+│   ├── mcpResourceIndex.tsx
+│   └── dogNames/           # Example resource
 └── prompts/                 # Prompt implementations
+    ├── mcpPromptHandler.tsx
+    ├── mcpPromptIndex.tsx
+    └── oneSentence/        # Example prompt
 ```
 
 ## Implementing a New Tool
@@ -23,7 +29,7 @@ mcp/
 Define your tool's types and schema in a `types.ts` file:
 
 ```typescript
-import { MCPTool, MCPResponse, MCPToolSchema } from '../../mcpTypes';
+import { MCPTool, MCPResponse, ServiceSchema } from '../../mcpTypes';
 
 // Define your tool's parameters
 export interface MyToolParams {
@@ -40,7 +46,7 @@ export interface MyTool extends MCPTool {
 export type MyToolResponse = MCPResponse<YourReturnType>;
 
 // Define your tool's schema
-export const myToolSchema: MCPToolSchema = {
+export const myToolSchema: ServiceSchema = {
   type: 'function',
   function: {
     name: 'my-tool',
@@ -89,7 +95,10 @@ export class MyToolHandler implements MCPHandler<MyTool, YourReturnType> {
     // Return result
     return {
       success: true,
-      data: result,
+      content: [{
+        text: `Result of operation: ${result}`,
+        data: result
+      }],
       metadata: {
         requestId: '',  // Will be set by main handler
         processingTimeMs: 0,
@@ -110,17 +119,57 @@ export const myTool: MCPToolDefinition<MyTool, YourReturnType> = {
 
 ### 3. Register Your Tool
 
-Add your tool to the registry in `mcpToolIndex.ts`:
+Add your tool to the registry in `mcpToolIndex.tsx`:
 
 ```typescript
 import { myTool } from './my-tool/myTool';
 
-export class ToolsRegistry implements MCPRegistry<MCPTool> {
+export class ToolsRegistry implements MCPToolRegistry<MCPTool> {
+  private tools: Map<string, MCPToolDefinition<MCPTool>> = new Map();
+
   constructor() {
+    // Register all tools
     this.registerTool(myTool);
+    // TODO: Auto-scan for other tools in the directory
   }
-  // ... rest of registry implementation
+
+  // Required by Registry interface
+  register(tool: MCPToolDefinition<MCPTool>): void {
+    this.registerTool(tool);
+  }
+
+  get(name: string): MCPToolDefinition<MCPTool> | undefined {
+    return this.getTool(name);
+  }
+
+  list(): MCPToolDefinition<MCPTool>[] {
+    return this.listTools();
+  }
+
+  getSchema(name: string): ServiceSchema | undefined {
+    return this.getToolSchema(name);
+  }
+
+  // Required by MCPToolRegistry interface
+  registerTool(tool: MCPToolDefinition<MCPTool>): void {
+    this.tools.set(tool.name, tool);
+  }
+
+  getTool(name: string): MCPToolDefinition<MCPTool> | undefined {
+    return this.tools.get(name);
+  }
+
+  listTools(): MCPToolDefinition<MCPTool>[] {
+    return Array.from(this.tools.values());
+  }
+
+  getToolSchema(name: string): ServiceSchema | undefined {
+    return this.tools.get(name)?.schema;
+  }
 }
+
+// Create and export a singleton instance
+export const toolsRegistry = new ToolsRegistry();
 ```
 
 ## Best Practices
@@ -145,11 +194,15 @@ export class ToolsRegistry implements MCPRegistry<MCPTool> {
    - Document parameters and return values
    - Include examples in the schema
 
+5. **File Extensions**
+   - Use `.tsx` for files that might contain JSX or are part of the MCP system
+   - Use `.ts` for pure TypeScript files (like types and utilities)
+
 ## Example Usage
 
 ```typescript
 // Request
-POST /tools/calculator
+POST /latest/mcp/tools/calculator
 {
   "type": "calculator",
   "params": {
@@ -162,7 +215,10 @@ POST /tools/calculator
 // Response
 {
   "success": true,
-  "data": 8,
+  "content": [{
+    "text": "Result of 5 add 3 = 8",
+    "data": 8
+  }],
   "metadata": {
     "requestId": "uuid",
     "processingTimeMs": 0,
@@ -191,7 +247,10 @@ POST /tools/calculator
    ```typescript
    return {
      success: true,
-     data: result,
+     content: [{
+       text: `Result of operation: ${result}`,
+       data: result
+     }],
      metadata: {
        requestId: '',  // Set by main handler
        processingTimeMs: 0,

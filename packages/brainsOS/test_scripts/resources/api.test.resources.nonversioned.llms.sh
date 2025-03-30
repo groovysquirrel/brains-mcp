@@ -1,12 +1,18 @@
 #!/bin/bash
 
-# Source test utilities
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/mcp/test_utils.sh"
+# Load environment variables
+source ../.env.test
 
-# usage
-#./test-resources-api.sh        # Run all steps
-#./test-resources-api.sh -5     # Start from step 5
+# Common parameters for all requests
+BASE_CMD="npx aws-api-gateway-cli-test \
+--username=\"$COGNITO_USERNAME\" \
+--password=\"$COGNITO_PASSWORD\" \
+--user-pool-id=\"$USER_POOL_ID\" \
+--app-client-id=\"$APP_CLIENT_ID\" \
+--cognito-region=\"$COGNITO_REGION\" \
+--identity-pool-id=\"$IDENTITY_POOL_ID\" \
+--invoke-url=\"$API_BASE_URL\" \
+--api-gateway-region=\"$API_GATEWAY_REGION\""
 
 # Parse starting step argument
 START_STEP=1
@@ -14,12 +20,6 @@ if [[ $1 =~ ^-([0-9]+)$ ]]; then
     START_STEP=${BASH_REMATCH[1]}
     echo "Starting from step $START_STEP"
 fi
-
-# Validate environment variables
-validate_env
-
-# Get base command
-BASE_CMD=$(get_base_cmd)
 
 # Store the last command
 LAST_COMMAND=""

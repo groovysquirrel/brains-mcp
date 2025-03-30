@@ -87,7 +87,23 @@ The system is built on modern cloud-native technologies:
    API_GATEWAY_REGION=us-east-1
    ```
 
-3. Verify your test setup:
+3. Create a test user in Cognito:
+   ```bash
+   # Sign up a new user
+   aws cognito-idp sign-up \
+     --region <COGNITO_REGION> \
+     --client-id <APP_CLIENT_ID> \
+     --username <COGNITO_USERNAME> \
+     --password <COGNITO_PASSWORD>
+
+   # Verify the user's email (requires admin privileges)
+   aws cognito-idp admin-confirm-sign-up \
+     --region <COGNITO_REGION> \
+     --user-pool-id <USER_POOL_ID> \
+     --username <COGNITO_USERNAME>
+   ```
+
+4. Verify your test setup:
    ```bash
    # Run a basic test to verify configuration
    ./packages/brainsOS/test_scripts/mcp/test_tools.sh
