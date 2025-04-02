@@ -1,4 +1,4 @@
-import { MCPHandler, MCPDataDefinition } from '../../mcpTypes';
+import { MCPHandler, MCPDataDefinition } from '../../../handlers/api/mcp/mcpTypes';
 import {
   DogNamesData,
   DogNamesResponse,

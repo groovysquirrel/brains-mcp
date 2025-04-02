@@ -1,8 +1,8 @@
 import { userData, systemData, loadDefaultData } from "./database";
 import { getDomainName, getCorsOrigins } from "../config";
-import { Bedrock } from "aws-sdk";
+//import { bedrockPermissions } from "./auth";  
 
-const bedrockPermissions = {
+export const bedrockPermissions = {
   actions: [
     'bedrock:ListFoundationModels',
     'bedrock:InvokeModel',

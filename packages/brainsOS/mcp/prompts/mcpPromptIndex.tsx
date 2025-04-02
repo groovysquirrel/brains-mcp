@@ -1,4 +1,4 @@
-import { MCPPromptRegistry, MCPPrompt, MCPToolDefinition } from '../mcpTypes';
+import { MCPPromptRegistry, MCPPrompt, MCPToolDefinition } from '../../handlers/api/mcp/mcpTypes';
 import { oneSentencePrompt } from './oneSentence/oneSentence';
 
 export class PromptRegistry implements MCPPromptRegistry<MCPPrompt> {

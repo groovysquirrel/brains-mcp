@@ -1,4 +1,4 @@
-import { MCPPrompt, MCPResponse, MCPToolSchema } from '../../mcpTypes';
+import { MCPPrompt, MCPResponse, MCPToolSchema } from '../../../handlers/api/mcp/mcpTypes';
 
 // What parameters do we need for one sentence summary?
 export interface OneSentenceParams {

@@ -1,4 +1,4 @@
-import { MCPData, MCPDataDefinition, MCPResourceRegistry, ServiceSchema } from '../mcpTypes';
+import { MCPData, MCPDataDefinition, MCPResourceRegistry, ServiceSchema } from '../../handlers/api/mcp/mcpTypes';
 import { dogNamesData } from './dogNames/dogNames';
 import { randomFactsData } from './randomFacts/randomFacts';
 

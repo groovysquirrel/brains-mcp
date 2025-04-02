@@ -1,4 +1,4 @@
-import { MCPHandler, MCPToolDefinition } from '../../mcpTypes';
+import { MCPHandler, MCPToolDefinition } from '../../../handlers/api/mcp/mcpTypes';
 import {
   CalculatorTool,
   CalculatorResponse,

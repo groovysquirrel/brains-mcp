@@ -11,6 +11,7 @@ export const userPoolClient = userPool.addClient("brainsOS_userPoolClient");
 export const identityPool = new sst.aws.CognitoIdentityPool("brainsOS_identityPool", {
   userPools: [
     {
+      
       userPool: userPool.id,
       client: userPoolClient.id,
     },

@@ -1,4 +1,4 @@
-import { MCPData, MCPResponse } from '../mcpTypes';
+import { MCPData, MCPResponse } from '../../handlers/api/mcp/mcpTypes';
 import { resourceRegistry } from './mcpResourceIndex';
 import { v4 as uuidv4 } from 'uuid';
 

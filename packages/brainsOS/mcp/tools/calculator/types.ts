@@ -1,4 +1,4 @@
-import { MCPTool, MCPResponse, MCPToolSchema } from '../../mcpTypes';
+import { MCPTool, MCPResponse, MCPToolSchema } from '../../../handlers/api/mcp/mcpTypes';
 
 // What operations can our calculator do?
 export type CalculatorOperation = 'add' | 'subtract' | 'multiply' | 'divide';

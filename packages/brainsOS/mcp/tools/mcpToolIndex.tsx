@@ -1,4 +1,4 @@
-import { MCPTool, MCPToolDefinition, MCPToolRegistry, ServiceSchema } from '../mcpTypes';
+import { MCPTool, MCPToolDefinition, MCPToolRegistry, ServiceSchema } from '../../handlers/api/mcp/mcpTypes';
 import { calculatorTool } from './calculator/calculator';
 import { randomNumberTool } from './randomNumber/randomNumber';
 import { tableConverterTool } from './tableConverter/tableConverter';

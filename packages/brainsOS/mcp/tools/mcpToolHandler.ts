@@ -1,4 +1,4 @@
-import { MCPTool, MCPResponse } from '../mcpTypes';
+import { MCPTool, MCPResponse } from '../../handlers/api/mcp/mcpTypes';
 import { toolsRegistry } from './mcpToolIndex';
 import { v4 as uuidv4 } from 'uuid';
 

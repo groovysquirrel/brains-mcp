@@ -70,8 +70,8 @@ export const domains: DomainConfig = {
   },
   websocket: {
     latest: {
-      prod: `io.${baseDomain}`,
-      demo: `demo-io.${baseDomain}`,
+      prod: `wss.${baseDomain}`,
+      demo: `demo-wss.${baseDomain}`,
       dev: `dev-io.${baseDomain}`
     },
   },

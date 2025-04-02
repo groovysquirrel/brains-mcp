@@ -1,4 +1,4 @@
-import { AwsApiResponse, CommandResultResponse } from '../../core/types/api/baseTypes';
+import { AwsApiResponse, CommandResultResponse } from '../../system/types/api/baseTypes';
 import { flatten } from 'flat';
 
 export function createResponse(

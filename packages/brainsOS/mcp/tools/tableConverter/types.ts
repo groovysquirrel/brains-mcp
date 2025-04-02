@@ -1,4 +1,4 @@
-import { MCPTool, MCPResponse, MCPToolSchema } from '../../mcpTypes';
+import { MCPTool, MCPResponse, MCPToolSchema } from '../../../handlers/api/mcp/mcpTypes';
 
 // What formats can we convert between?
 export type TableFormat = 'markdown' | 'csv';

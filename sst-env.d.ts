@@ -69,6 +69,10 @@ declare module "sst" {
       "sender": string
       "type": "sst.aws.Email"
     }
+    "authFunction": {
+      "name": string
+      "type": "sst.aws.Function"
+    }
     "brainsOS_identityPool": {
       "id": string
       "type": "sst.aws.CognitoIdentityPool"
@@ -94,6 +98,34 @@ declare module "sst" {
       "managementEndpoint": string
       "type": "sst.aws.ApiGatewayWebSocket"
       "url": string
+    }
+    "connectHandlerFunction": {
+      "name": string
+      "type": "sst.aws.Function"
+    }
+    "controllerMcpFunction": {
+      "name": string
+      "type": "sst.aws.Function"
+    }
+    "controllerPromptFunction": {
+      "name": string
+      "type": "sst.aws.Function"
+    }
+    "defaultHandlerFunction": {
+      "name": string
+      "type": "sst.aws.Function"
+    }
+    "disconnectHandlerFunction": {
+      "name": string
+      "type": "sst.aws.Function"
+    }
+    "gwchatFunction": {
+      "name": string
+      "type": "sst.aws.Function"
+    }
+    "gwstreamFunction": {
+      "name": string
+      "type": "sst.aws.Function"
     }
     "systemData": {
       "name": string

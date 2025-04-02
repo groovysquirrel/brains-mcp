@@ -1,4 +1,4 @@
-import { MCPData, MCPResponse, MCPDataSchema } from '../../mcpTypes';
+import { MCPData, MCPResponse, MCPDataSchema } from '../../../handlers/api/mcp/mcpTypes';
 
 // What parameters do we need for random facts?
 export interface RandomFactParams {

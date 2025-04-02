@@ -1,4 +1,4 @@
-import { MCPPrompt, MCPResponse } from '../mcpTypes';
+import { MCPPrompt, MCPResponse } from '../../handlers/api/mcp/mcpTypes';
 import { promptRegistry } from './mcpPromptIndex';
 import { v4 as uuidv4 } from 'uuid';
 
