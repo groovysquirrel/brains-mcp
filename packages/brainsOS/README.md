@@ -1,5 +1,5 @@
 # BRAINS (Broad-Range Artificial Intelligence Node System)
-![BRAINS MCP - Page 3 (1)](https://github.com/user-attachments/assets/8e3a0cf1-c99f-4b5c-ad4f-cc50ad991e01)
+![brains-architecture-april-2025](https://github.com/user-attachments/assets/6a084219-405c-44bc-b0f6-cab45d055c20)
 
 ## Overview
 
