@@ -1,0 +1,14 @@
+{
+  "modelId": "amazon.nova-reel-v1:0",
+  "provider": "bedrock",
+  "vendor": "amazon",
+  "modality": "unknown",
+  "capabilities": {
+    "streaming": false,
+    "inferenceTypes": {
+      "onDemand": true,
+      "provisioned": false,
+      "streaming": false
+    }
+  }
+}

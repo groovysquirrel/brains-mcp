@@ -93,15 +93,15 @@ const generatePolicy = (principalId: string, effect: string, resource: string, e
           Effect: effect,
           Resource: resource
         },
-        {
-          Action: [
-            'bedrock:ListFoundationModels',
-            'bedrock:InvokeModel',
-            'bedrock:GetFoundationModel'
-          ],
-          Effect: effect,
-          Resource: '*'
-        },
+        // {
+        //   Action: [
+        //     'bedrock:ListFoundationModels',
+        //     'bedrock:InvokeModel',
+        //     'bedrock:GetFoundationModel'
+        //   ],
+        //   Effect: effect,
+        //   Resource: '*'
+        // },
         {
           Action: [
             'execute-api:*'

@@ -1,4 +1,4 @@
-import { LLMGateway } from '../system/services/llm-gateway/llmGateway';
+import { LLMGateway } from '../llm-gateway/llmGateway';
 import { conversationRepository } from '../system/repositories/conversation/conversationRepository';
 
 interface MCPCommand {

@@ -1,0 +1,14 @@
+{
+  "modelId": "anthropic.claude-3-5-sonnet-20241022-v2:0",
+  "provider": "bedrock",
+  "vendor": "anthropic",
+  "modality": "text-to-text",
+  "capabilities": {
+    "streaming": false,
+    "inferenceTypes": {
+      "onDemand": false,
+      "provisioned": false,
+      "streaming": false
+    }
+  }
+}

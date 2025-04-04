@@ -1,0 +1,14 @@
+{
+  "modelId": "cohere.command-light-text-v14:7:4k",
+  "provider": "bedrock",
+  "vendor": "cohere",
+  "modality": "text-to-text",
+  "capabilities": {
+    "streaming": false,
+    "inferenceTypes": {
+      "onDemand": false,
+      "provisioned": true,
+      "streaming": false
+    }
+  }
+}

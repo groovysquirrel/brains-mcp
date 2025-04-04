@@ -1,0 +1,9 @@
+{
+  "name": "mistral ai",
+  "models": [
+    "mistral-7b-instruct-v0:2",
+    "mixtral-8x7b-instruct-v0:1",
+    "mistral-large-2402-v1:0",
+    "mistral-small-2402-v1:0"
+  ]
+} 

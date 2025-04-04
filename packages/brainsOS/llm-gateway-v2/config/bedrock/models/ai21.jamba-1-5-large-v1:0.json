@@ -1,0 +1,14 @@
+{
+  "modelId": "ai21.jamba-1-5-large-v1:0",
+  "provider": "bedrock",
+  "vendor": "ai21 labs",
+  "modality": "text-to-text",
+  "capabilities": {
+    "streaming": false,
+    "inferenceTypes": {
+      "onDemand": true,
+      "provisioned": false,
+      "streaming": false
+    }
+  }
+}

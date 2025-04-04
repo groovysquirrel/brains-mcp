@@ -1,0 +1,14 @@
+{
+  "modelId": "meta.llama3-2-3b-instruct-v1:0",
+  "provider": "bedrock",
+  "vendor": "meta",
+  "modality": "text-to-text",
+  "capabilities": {
+    "streaming": false,
+    "inferenceTypes": {
+      "onDemand": false,
+      "provisioned": false,
+      "streaming": false
+    }
+  }
+}

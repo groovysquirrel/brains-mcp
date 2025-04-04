@@ -1,0 +1,14 @@
+{
+  "modelId": "amazon.titan-image-generator-v1",
+  "provider": "bedrock",
+  "vendor": "amazon",
+  "modality": "text-to-image",
+  "capabilities": {
+    "streaming": false,
+    "inferenceTypes": {
+      "onDemand": true,
+      "provisioned": false,
+      "streaming": false
+    }
+  }
+}

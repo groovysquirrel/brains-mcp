@@ -1,0 +1,30 @@
+{
+  "openai": {
+    "apiVersion": "v1",
+    "defaultMaxTokens": 4000,
+    "defaultTemperature": 0.7
+  },
+  "anthropic": {
+    "apiVersion": "v1",
+    "defaultMaxTokens": 4000,
+    "defaultTemperature": 0.7
+  },
+  "meta": {
+    "apiVersion": "bedrock-2023-05-31",
+    "defaultMaxTokens": 2048,
+    "defaultTemperature": 0.7,
+    "supportedMessageTypes": [
+      "text"
+    ],
+    "supportsStreaming": true
+  },
+  "mistral": {
+    "apiVersion": "bedrock-2023-05-31",
+    "defaultMaxTokens": 2048,
+    "defaultTemperature": 0.7,
+    "supportedMessageTypes": [
+      "text"
+    ],
+    "supportsStreaming": true
+  }
+}

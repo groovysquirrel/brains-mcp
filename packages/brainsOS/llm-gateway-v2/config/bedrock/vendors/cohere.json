@@ -1,0 +1,11 @@
+{
+  "name": "cohere",
+  "models": [
+    "command-text-v14",
+    "command-r-v1:0",
+    "command-r-plus-v1:0",
+    "command-light-text-v14",
+    "embed-english-v3",
+    "embed-multilingual-v3"
+  ]
+} 

@@ -1,0 +1,14 @@
+{
+  "modelId": "anthropic.claude-v2",
+  "provider": "bedrock",
+  "vendor": "anthropic",
+  "modality": "text-to-text",
+  "capabilities": {
+    "streaming": false,
+    "inferenceTypes": {
+      "onDemand": true,
+      "provisioned": false,
+      "streaming": false
+    }
+  }
+}

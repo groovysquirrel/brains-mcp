@@ -38,7 +38,7 @@ const disconnectHandlerFunction = new sst.aws.Function("disconnectHandlerFunctio
 
 const gwchatFunction = new sst.aws.Function("gwchatFunction", {
     handler: "packages/brainsOS/handlers/websocket/llm-gateway/chat.handler",
-    link: [brainsOS_websocket_API],
+    link: [brainsOS_websocket_API, systemData],
     permissions: [bedrockPermissions],
     environment: {
       WEBSOCKET_API_ENDPOINT: brainsOS_websocket_API.url

@@ -1,0 +1,14 @@
+{
+  "modelId": "deepseek.r1-v1:0",
+  "provider": "bedrock",
+  "vendor": "deepseek",
+  "modality": "text-to-text",
+  "capabilities": {
+    "streaming": false,
+    "inferenceTypes": {
+      "onDemand": false,
+      "provisioned": false,
+      "streaming": false
+    }
+  }
+}

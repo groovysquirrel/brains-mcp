@@ -1,117 +1,212 @@
 import { Logger } from '../../shared/logging/logger';
-import { LLMGateway } from '../../../system/services/llm-gateway/llmGateway';
-import { ChatRequest, ModelConfig } from '../../../system/services/llm-gateway/types';
-import { HumanMessage, AIMessage } from "@langchain/core/messages";
-import * as AWS from 'aws-sdk';
+import { LLMGateway } from '../../../llm-gateway/llmGateway';
+import { ChatRequest, ModelConfig, Message, ModelId, WebSocketMessage } from '../../../llm-gateway/types';
 import { WebSocketEvent } from '../types/websocketTypes';
-import { Resource } from 'sst';
+import { conversationRepository } from '../../../system/repositories/conversation/conversationRepository';
+import { ConfigLoader } from '../../../llm-gateway/config/configLoader';
+import { ChatRequestSchema } from '../../../llm-gateway/config/schemas';
+import { ConnectionManager } from './connectionManager';
+import { StreamHandler } from './streamHandler';
+import { BedrockModelValidator } from '../../../llm-gateway/providers/bedrock/modelValidator';
 
 const logger = new Logger('LLMGatewayChat');
+const connectionManager = ConnectionManager.getInstance();
+const streamHandler = new StreamHandler();
+
+// Global state for LLM Gateway
+let llmGateway: LLMGateway;
 
 /**
- * TODO: Support both streaming and message APIs:
- * - Currently using Messages API for Claude 3
- * - Need to add support for streaming API for other models
- * - Consider adding a configuration option to choose between APIs
- * - Update model configurations to specify which API to use
- * - Add streaming support in the WebSocket handler for models that support it
+ * Initializes the LLM Gateway with provider configurations.
+ * This function sets up the gateway with the necessary configurations
+ * and ensures it's ready to handle requests.
+ * 
+ * @throws {Error} If initialization fails
  */
+const initializeGateway = async () => {
+  try {
+    const configLoader = ConfigLoader.getInstance();
+    const config = configLoader.getLLMGatewayConfig();
 
-// Initialize the LLM Gateway with provider configs
-// Using IAM credentials from Lambda execution role
-const llmGateway = new LLMGateway({
-  bedrock: {}
+    llmGateway = new LLMGateway(config);
+    await llmGateway.initialize();
+
+    logger.info('Successfully initialized LLM Gateway', {
+      region: process.env.AWS_REGION || 'us-east-1',
+      hasLLMGateway: !!llmGateway
+    });
+  } catch (error) {
+    logger.error('Failed to initialize LLM Gateway:', {
+      error,
+      stack: error.stack,
+      region: process.env.AWS_REGION || 'us-east-1'
+    });
+    throw error;
+  }
+};
+
+// Initialize gateway immediately and ensure it's ready before handling requests
+let initializationPromise: Promise<void>;
+
+/**
+ * Ensures the LLM Gateway is initialized before handling any requests.
+ * Uses a singleton pattern to prevent multiple initializations.
+ */
+const ensureInitialized = async () => {
+  if (!initializationPromise) {
+    initializationPromise = initializeGateway();
+  }
+  return initializationPromise;
+};
+
+// Initialize gateway immediately
+initializationPromise = initializeGateway().catch(error => {
+  logger.error('Failed to initialize gateway:', error);
+  throw error;
 });
 
+/**
+ * Main handler for LLM chat requests.
+ * This function processes incoming WebSocket messages for chat functionality,
+ * supporting both streaming and non-streaming responses.
+ * 
+ * Key responsibilities:
+ * 1. Validates incoming requests
+ * 2. Initializes the LLM Gateway if needed
+ * 3. Processes chat requests (streaming and non-streaming)
+ * 4. Handles errors and connection management
+ * 5. Manages conversation history
+ * 
+ * @param event - WebSocket event containing the chat request
+ * @returns Response object with appropriate status code and body
+ */
 export const handler = async (event: WebSocketEvent) => {
   const connectionId = event.requestContext.connectionId;
   const userId = event.requestContext.authorizer?.userId;
-  const routeKey = event.requestContext.routeKey;
 
-  logger.info('Processing chat request', {
+  connectionManager.addConnection(connectionId);
+
+  logger.info('Processing LLM request', {
     connectionId,
     userId,
-    routeKey,
     body: event.body
   });
 
   try {
-    // Parse the message body
-    const body = JSON.parse(event.body || '{}');
-    const { data } = body;
-    const { messages, modelId, systemPrompt, metadata } = data || {};
+    await ensureInitialized();
 
-    // Validate required fields
-    if (!messages) {
-      logger.error('Missing required field: messages', { body });
-      return {
-        statusCode: 400,
-        body: JSON.stringify({
-          success: false,
-          error: {
-            code: 'INVALID_REQUEST',
-            message: 'Missing required field: messages'
-          },
-          metadata: {
-            connectionId,
-            userId,
-            timestamp: new Date().toISOString()
-          }
-        })
-      };
+    // Parse and validate the incoming request
+    const body = JSON.parse(event.body || '{}');
+    const validatedRequest = ChatRequestSchema.parse(body);
+    const { data } = validatedRequest;
+    
+    // Extract request parameters with defaults
+    const {
+      messages,
+      modelId = 'anthropic.claude-3-sonnet-20240229-v1:0',
+      stream = false,
+      systemPrompt,
+      metadata,
+      maxTokens,
+      temperature,
+      conversationId
+    } = data;
+
+    // Validate model capabilities before proceeding
+    try {
+      BedrockModelValidator.validateModelCapabilities(modelId, {
+        supportsStreaming: stream,
+        inputModalities: ['text'],
+        outputModalities: ['text']
+      });
+      logger.info('Model capabilities validated', { modelId, stream });
+    } catch (error) {
+      logger.error('Model validation failed:', { error, modelId, stream });
+      throw error;
     }
 
-    // Convert messages to LangChain format
-    const langChainMessages = messages.map((msg: any) => 
-      msg.role === 'user' 
-        ? new HumanMessage(msg.content)
-        : new AIMessage(msg.content)
-    );
-
-    logger.info('Converted messages to LangChain format', {
-      messageCount: langChainMessages.length
-    });
-
-    // Prepare model config with default model if not specified
+    // Determine provider and create model configuration
     const modelConfig: ModelConfig = {
-      provider: 'bedrock',
-      modelId: modelId || 'anthropic.claude-3-sonnet-20240229-v1:0',
-      maxTokens: 4000,
-      temperature: 0.7
+      provider: modelId.startsWith('anthropic.') || modelId.startsWith('meta.') || modelId.startsWith('mistral.') ? 'bedrock' :
+                modelId.startsWith('gpt-') ? 'openai' :
+                modelId.startsWith('claude-') ? 'anthropic' :
+                'bedrock',
+      modelId,
+      maxTokens,
+      temperature
     };
 
-    logger.info('Using model config', { modelConfig });
-
-    // Prepare chat request with user ID
+    // Prepare chat request with metadata
     const chatRequest: ChatRequest = {
-      messages: langChainMessages,
+      messages: messages.map(msg => ({
+        role: msg.role,
+        content: msg.content
+      })),
       modelConfig,
       systemPrompt,
       metadata: {
         ...metadata,
         userId,
         connectionId,
-        routeKey,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        conversationId
       }
     };
 
-    logger.info('Starting chat request', { chatRequest });
+    logger.info('Starting LLM request', {
+      modelId,
+      stream,
+      userId,
+      connectionId,
+      conversationId
+    });
 
-    // Get the response
+    // Handle streaming response
+    if (stream) {
+      if (!connectionManager.isConnectionActive(connectionId)) {
+        logger.warn('Connection closed before stream started', { connectionId });
+        return {
+          statusCode: 410,
+          body: JSON.stringify({
+            success: false,
+            error: {
+              code: 'CONNECTION_CLOSED',
+              message: 'Connection was closed before stream could start'
+            }
+          })
+        };
+      }
+
+      const stream = llmGateway.streamChat(chatRequest);
+      await streamHandler.handleStream(stream, connectionId, userId, conversationId, metadata);
+
+      return {
+        statusCode: 200,
+        body: 'Stream completed'
+      };
+    } 
+    
+    // Handle non-streaming response
     const response = await llmGateway.chat(chatRequest);
     
-    logger.info('Received response from LLM', { response });
+    const message: Message = {
+      role: 'assistant',
+      content: response.content
+    };
 
-    // Send the response to the client
-    await sendToClient(connectionId, {
-      success: true,
-      data: response,
-      metadata: {
-        connectionId,
-        userId,
-        timestamp: new Date().toISOString()
-      }
+    // Store conversation history if conversationId is provided
+    if (conversationId) {
+      const repo = conversationRepository.getInstance();
+      await repo.addToConversation(userId, conversationId, [message]);
+    }
+
+    // Send response to client
+    await connectionManager.sendToClient(connectionId, {
+      type: 'chat',
+      content: response.content,
+      usage: response.usage,
+      metadata: response.metadata,
+      timestamp: new Date().toISOString()
     });
 
     return {
@@ -127,35 +222,29 @@ export const handler = async (event: WebSocketEvent) => {
     };
 
   } catch (error) {
-    logger.error('Error in WebSocket chat handler:', {
+    // Handle errors and send error response to client
+    logger.error('Error in LLM handler:', {
       error,
       connectionId,
       userId,
-      routeKey,
       stack: error.stack
     });
 
-    // Send error to client
-    await sendToClient(connectionId, {
-      success: false,
-      error: {
-        code: 'CHAT_ERROR',
-        message: error.message || 'Failed to process chat request'
-      },
-      metadata: {
-        connectionId,
-        userId,
+    if (connectionManager.isConnectionActive(connectionId)) {
+      await connectionManager.sendToClient(connectionId, {
+        type: 'error',
+        message: error.message || 'Failed to process LLM request',
         timestamp: new Date().toISOString()
-      }
-    });
+      });
+    }
 
     return {
       statusCode: 500,
       body: JSON.stringify({
         success: false,
         error: {
-          code: 'CHAT_ERROR',
-          message: error.message || 'Failed to process chat request'
+          code: 'LLM_ERROR',
+          message: error.message || 'Failed to process LLM request'
         },
         metadata: {
           connectionId,
@@ -166,41 +255,3 @@ export const handler = async (event: WebSocketEvent) => {
     };
   }
 };
-
-// Helper function to send messages to the WebSocket client
-async function sendToClient(connectionId: string, data: any) {
-  const endpoint = Resource.brains_websocket_api_latest.url;
-  if (!endpoint) {
-    throw new Error('WEBSOCKET_API_ENDPOINT environment variable is not set');
-  }
-
-  // Construct the WebSocket API endpoint URL
-  const apiEndpoint = endpoint.replace('wss://', 'https://');
-  
-  logger.info('Initializing ApiGatewayManagementApi', { apiEndpoint });
-
-  const apiGatewayManagementApi = new AWS.ApiGatewayManagementApi({
-    endpoint: apiEndpoint
-  });
-
-  try {
-    logger.info('Sending message to client', { connectionId, data });
-    await apiGatewayManagementApi.postToConnection({
-      ConnectionId: connectionId,
-      Data: JSON.stringify(data)
-    }).promise();
-    logger.info('Message sent successfully', { connectionId });
-  } catch (error) {
-    if (error.statusCode === 410) {
-      // Connection is stale, remove it
-      logger.warn('Stale connection removed', { connectionId });
-    } else {
-      logger.error('Error sending message to client', {
-        error,
-        connectionId,
-        endpoint: apiEndpoint
-      });
-      throw error;
-    }
-  }
-} 

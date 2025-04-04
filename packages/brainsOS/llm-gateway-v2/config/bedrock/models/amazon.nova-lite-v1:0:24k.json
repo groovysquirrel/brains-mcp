@@ -1,0 +1,14 @@
+{
+  "modelId": "amazon.nova-lite-v1:0:24k",
+  "provider": "bedrock",
+  "vendor": "amazon",
+  "modality": "text-to-text",
+  "capabilities": {
+    "streaming": false,
+    "inferenceTypes": {
+      "onDemand": false,
+      "provisioned": true,
+      "streaming": false
+    }
+  }
+}

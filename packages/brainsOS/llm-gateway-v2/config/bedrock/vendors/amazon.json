@@ -1,0 +1,34 @@
+{
+  "name": "amazon",
+  "displayName": "Amazon",
+  "models": {
+    "text": [
+      "titan-tg1-large",
+      "titan-text-lite-v1",
+      "titan-text-express-v1",
+      "titan-text-premier-v1:0",
+      "nova-pro-v1:0",
+      "nova-lite-v1:0",
+      "nova-micro-v1:0"
+    ],
+    "image": [
+      "titan-image-generator-v1",
+      "titan-image-generator-v2:0",
+      "nova-canvas-v1:0"
+    ],
+    "embedding": [
+      "titan-embed-text-v1",
+      "titan-embed-text-v2:0",
+      "titan-embed-image-v1",
+      "titan-embed-g1-text-02"
+    ]
+  },
+  "capabilities": {
+    "modalities": ["text-to-text", "text-to-image", "embedding"],
+    "streaming": true,
+    "provisioning": {
+      "onDemand": true,
+      "provisioned": true
+    }
+  }
+} 

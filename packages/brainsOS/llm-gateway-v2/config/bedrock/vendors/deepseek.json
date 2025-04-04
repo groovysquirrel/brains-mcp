@@ -1,0 +1,6 @@
+{
+  "name": "deepseek",
+  "models": [
+    "r1-v1:0"
+  ]
+} 

@@ -1,0 +1,14 @@
+{
+  "modelId": "mistral.mistral-7b-instruct-v0:2",
+  "provider": "bedrock",
+  "vendor": "mistral ai",
+  "modality": "text-to-text",
+  "capabilities": {
+    "streaming": false,
+    "inferenceTypes": {
+      "onDemand": true,
+      "provisioned": false,
+      "streaming": false
+    }
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "name": "ai21 labs",
+  "models": [
+    "jamba-instruct-v1:0",
+    "jamba-1-5-large-v1:0",
+    "jamba-1-5-mini-v1:0"
+  ]
+} 

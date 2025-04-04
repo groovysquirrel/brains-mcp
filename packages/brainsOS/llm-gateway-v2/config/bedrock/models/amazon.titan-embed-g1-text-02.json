@@ -1,0 +1,14 @@
+{
+  "modelId": "amazon.titan-embed-g1-text-02",
+  "provider": "bedrock",
+  "vendor": "amazon",
+  "modality": "unknown",
+  "capabilities": {
+    "streaming": false,
+    "inferenceTypes": {
+      "onDemand": true,
+      "provisioned": false,
+      "streaming": false
+    }
+  }
+}

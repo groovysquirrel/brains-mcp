@@ -1,0 +1,17 @@
+{
+  "anthropic": {
+    "apiVersion": "bedrock-2023-05-31",
+    "defaultMaxTokens": 4000,
+    "defaultTemperature": 0.7
+  },
+  "meta": {
+    "apiVersion": "bedrock-2023-05-31",
+    "defaultMaxTokens": 4000,
+    "defaultTemperature": 0.7
+  },
+  "mistral": {
+    "apiVersion": "bedrock-2023-05-31",
+    "defaultMaxTokens": 4000,
+    "defaultTemperature": 0.7
+  }
+} 

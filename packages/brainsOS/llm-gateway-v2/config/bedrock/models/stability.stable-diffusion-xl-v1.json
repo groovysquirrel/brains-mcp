@@ -1,0 +1,14 @@
+{
+  "modelId": "stability.stable-diffusion-xl-v1",
+  "provider": "bedrock",
+  "vendor": "stability ai",
+  "modality": "text-to-image",
+  "capabilities": {
+    "streaming": false,
+    "inferenceTypes": {
+      "onDemand": true,
+      "provisioned": false,
+      "streaming": false
+    }
+  }
+}
