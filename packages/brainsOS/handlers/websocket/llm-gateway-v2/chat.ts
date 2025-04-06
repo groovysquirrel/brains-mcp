@@ -14,11 +14,10 @@
 
 import { Logger } from '../../shared/logging/logger';
 import { Gateway } from '../../../llm-gateway-v2/src/Gateway';
-import { GatewayRequest, Message } from '../../../llm-gateway-v2/src/types/Request';
+import { GatewayRequest } from '../../../llm-gateway-v2/src/types/Request';
 import { ConnectionManager } from './connectionManager';
 import { StreamHandler } from './streamHandler';
-import path from 'path';
-
+import { Resource } from 'sst';
 // Define the structure of a WebSocket event
 // This matches the format provided by AWS API Gateway WebSocket events
 interface WebSocketEvent {
@@ -51,23 +50,20 @@ let gateway: Gateway;
  */
 const initializeGateway = async () => {
   try {
-    // Create new gateway instance and initialize with config
-    gateway = new Gateway();
-    await gateway.initialize(path.join(__dirname, '../../../llm-gateway-v2/config'));
+    logger.info('Initializing Gateway', {
+      websocketEndpoint: Resource.brains_websocket_api_latest.url
+    });
 
-    // Log successful initialization
-    logger.info('Successfully initialized LLM Gateway V2', {
-      region: process.env.AWS_REGION || 'us-east-1',
-      hasGateway: !!gateway
-    });
+    gateway = new Gateway();
+    await gateway.initialize('local');
+
+    logger.info('Gateway initialized successfully');
   } catch (error) {
-    // Log detailed error information
-    logger.error('Failed to initialize LLM Gateway V2:', {
-      error,
-      stack: error.stack,
-      region: process.env.AWS_REGION || 'us-east-1'
+    const err = error as Error;
+    logger.error('Failed to initialize gateway:', {
+      error: err
     });
-    throw error;
+    throw err;
   }
 };
 
@@ -128,18 +124,71 @@ export const handler = async (event: WebSocketEvent) => {
     // Parse the incoming request
     const body = JSON.parse(event.body || '{}');
     
+    // Validate action format
+    if (body.action !== 'llm/chat') {
+      logger.error('Invalid action type', { action: body.action });
+      await connectionManager.sendMessage(connectionId, {
+        type: 'error',
+        data: {
+          message: 'Invalid action type',
+          code: 'INVALID_ACTION'
+        }
+      });
+      return { statusCode: 400 };
+    }
+
+    // Extract the data payload
+    const data = body.data;
+    if (!data) {
+      logger.error('Missing data payload', { body });
+      await connectionManager.sendMessage(connectionId, {
+        type: 'error',
+        data: {
+          message: 'Missing data payload',
+          code: 'INVALID_REQUEST'
+        }
+      });
+      return { statusCode: 400 };
+    }
+
+    // Validate required fields
+    if (!data.messages?.length && !data.prompt) {
+      logger.error('Invalid request: missing messages or prompt', { data });
+      await connectionManager.sendMessage(connectionId, {
+        type: 'error',
+        data: {
+          message: 'Either messages or prompt must be provided',
+          code: 'INVALID_REQUEST'
+        }
+      });
+      return { statusCode: 400 };
+    }
+
     // Create a GatewayRequest object with default values
     const request: GatewayRequest = {
-      provider: 'bedrock',  // Default to Bedrock provider
-      modelId: body.modelId || 'anthropic.claude-3-sonnet-20240229-v1:0',  // Default model
-      messages: body.messages,
-      prompt: body.prompt,
-      modality: 'text',     // Default to text modality
-      streaming: body.stream || false,  // Whether to stream the response
-      maxTokens: body.maxTokens,
-      temperature: body.temperature,
-      metadata: body.metadata
+      provider: data.provider || 'bedrock',  // Default to Bedrock provider
+      modelId: data.modelId || 'anthropic.claude-3-sonnet-20240229-v1:0',  // Default model
+      messages: data.messages || [],
+      prompt: data.prompt,
+      modality: 'text-to-text',     // Always use text-to-text regardless of input modality
+      streaming: data.stream || false,  // Whether to stream the response
+      maxTokens: data.maxTokens,
+      temperature: data.temperature,
+      metadata: {
+        ...data.metadata,
+        userId,
+        connectionId,
+        timestamp: new Date().toISOString()
+      }
     };
+
+    logger.info('Prepared request:', {
+      modelId: request.modelId,
+      provider: request.provider,
+      hasMessages: request.messages?.length > 0,
+      hasPrompt: !!request.prompt,
+      streaming: request.streaming
+    });
 
     // Handle streaming request
     if (request.streaming) {
@@ -151,8 +200,8 @@ export const handler = async (event: WebSocketEvent) => {
         stream,
         connectionId,
         userId,
-        body.conversationId,
-        body.metadata
+        data.conversationId,
+        data.metadata
       );
       return { statusCode: 200 };
     }
@@ -160,10 +209,18 @@ export const handler = async (event: WebSocketEvent) => {
     // Handle non-streaming request
     const response = await gateway.chat(request);
     
+    logger.debug('Received response from gateway:', {
+      response,
+      modelId: request.modelId
+    });
+    
     // Send the response back to the client
     await connectionManager.sendMessage(connectionId, {
       type: 'chat',
-      data: response
+      data: {
+        content: response.content,
+        metadata: response.metadata
+      }
     });
 
     return { statusCode: 200 };

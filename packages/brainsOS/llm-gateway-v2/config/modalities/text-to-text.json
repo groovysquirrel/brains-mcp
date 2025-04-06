@@ -1,0 +1,23 @@
+{
+  "name": "text-to-text",
+  "displayName": "Text Generation",
+  "description": "Generate text responses from text input",
+  "capabilities": {
+    "inputTypes": ["text"],
+    "outputTypes": ["text"],
+    "streaming": true,
+    "maxInputTokens": 8192,
+    "maxOutputTokens": 4096
+  },
+  "defaultSettings": {
+    "temperature": 0.7,
+    "topP": 1.0,
+    "maxTokens": 1024,
+    "stopSequences": []
+  },
+  "validation": {
+    "requiresMessages": true,
+    "requiresSystemPrompt": false,
+    "maxMessagesLength": 50
+  }
+} 

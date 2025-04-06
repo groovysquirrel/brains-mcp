@@ -1,53 +1,73 @@
 # LLM Gateway V2 Configuration
 
-This directory contains all configuration files for the LLM Gateway. The configuration is organized in a provider-centric way, with each provider having its own directory structure.
+This directory contains all configuration files for the LLM Gateway. The configuration is organized hierarchically with clear separation between providers, vendors, and models.
 
 ## Current Structure
 
 ```
 config/
-├── bedrock/                    # Bedrock-specific configurations
-│   ├── models.json            # All Bedrock model configurations
-│   ├── vendors/               # Vendor-specific configurations
-│   │   ├── anthropic.json
-│   │   ├── amazon.json
-│   │   ├── meta.json
-│   │   ├── cohere.json
-│   │   ├── mistral.json
-│   │   └── ...
-│   └── provider.json          # Bedrock provider configuration
+├── providers.json             # Index of enabled providers
+├── providers/                 # Provider-specific configurations
+│   └── bedrock/             # Example provider (Bedrock)
+│       ├── models.json      # All models grouped by vendor
+│       └── settings.json    # Provider settings and capabilities
+├── vendors/                  # Vendor-specific configurations
+│   ├── anthropic.json
+│   ├── amazon.json
+│   ├── meta.json
+│   └── ...
+└── modalities/              # Modality-specific configurations
+    ├── text-to-text.json
+    ├── text-to-image.json
+    └── ...
 ```
 
 ## File Types
 
-1. **Provider Configuration** (`bedrock/provider.json`)
+1. **Provider Settings** (`providers/bedrock/settings.json`)
    - Contains provider-wide settings
-   - Lists available vendors
+   - Authentication and region configuration
+   - Lists supported vendors
    - Defines provider-specific capabilities
+   - Default parameters and limits
 
-2. **Models Configuration** (`bedrock/models.json`)
-   - Complete list of models from the provider
-   - Individual model capabilities and limitations
+2. **Models Configuration** (`providers/bedrock/models.json`)
+   - Complete list of models organized by vendor
+   - Model capabilities and limitations
    - Inference type support
-   - Modality information
+   - Gateway status information
+   - Billing and provisioning status
 
-3. **Vendor Configuration** (`bedrock/vendors/*.json`)
+3. **Vendor Configuration** (`vendors/*.json`)
    - Vendor-specific settings and capabilities
-   - Organized list of supported models
-   - Model grouping by modality/type
-   - Vendor-specific capabilities and limitations
+   - API formats and requirements
+   - Authentication methods
+   - Response handling configuration
 
 ## Configuration Format
 
-### Provider Configuration
+### Provider Settings
 ```json
 {
   "name": "bedrock",
   "type": "bedrock",
+  "displayName": "AWS Bedrock",
   "region": "us-east-1",
   "capabilities": {
     "streaming": true,
-    "provisioning": true
+    "inferenceTypes": {
+      "onDemand": true,
+      "provisioned": false
+    },
+    "modalities": [
+      "text-to-text",
+      "text-to-image",
+      "embedding"
+    ]
+  },
+  "defaultSettings": {
+    "maxTokens": 1024,
+    "temperature": 0.7
   }
 }
 ```
@@ -55,20 +75,29 @@ config/
 ### Models Configuration
 ```json
 {
-  "models": [
+  "vendors": [
     {
-      "modelId": "anthropic.claude-3-sonnet-20240229-v1:0",
-      "provider": "bedrock",
-      "vendor": "anthropic",
-      "modality": "text-to-text",
-      "capabilities": {
-        "streaming": true,
-        "inferenceTypes": {
-          "onDemand": true,
-          "provisioned": false,
-          "streaming": true
+      "name": "anthropic",
+      "models": [
+        {
+          "modelId": "anthropic.claude-3-sonnet-20240229-v1:0",
+          "provider": "bedrock",
+          "vendor": "anthropic",
+          "modality": "text-to-text",
+          "capabilities": {
+            "streaming": true,
+            "inferenceTypes": {
+              "onDemand": true,
+              "provisioned": false
+            }
+          },
+          "llmgateway": {
+            "status": "READY",
+            "billing": "ONDEMAND",
+            "provisioned": false
+          }
         }
-      }
+      ]
     }
   ],
   "lastUpdated": "2024-04-04T15:42:11.304Z"
@@ -78,52 +107,62 @@ config/
 ### Vendor Configuration
 ```json
 {
-  "name": "amazon",
-  "displayName": "Amazon",
-  "models": {
-    "text": [
-      "titan-tg1-large",
-      "titan-text-express-v1"
-    ],
-    "image": [
-      "titan-image-generator-v1"
-    ],
-    "embedding": [
-      "titan-embed-text-v1"
-    ]
+  "name": "anthropic",
+  "displayName": "Anthropic",
+  "apiFormats": {
+    "messages": true,
+    "prompt": false
   },
   "capabilities": {
-    "modalities": ["text-to-text", "text-to-image", "embedding"],
     "streaming": true,
-    "provisioning": {
-      "onDemand": true,
-      "provisioned": true
-    }
+    "systemPrompts": true,
+    "tools": true
+  },
+  "responseFormat": {
+    "type": "messages",
+    "contentField": "content"
   }
 }
 ```
 
+## Model Status and Availability
+
+Models in the gateway have explicit status tracking:
+
+```json
+"llmgateway": {
+  "status": "READY" | "NOT READY",
+  "billing": "ONDEMAND" | "provisioned",
+  "provisioned": false
+}
+```
+
+- `status`: Indicates if the model is ready for use
+- `billing`: Specifies the billing mode
+- `provisioned`: Tracks provisioning status
+
 ## Maintenance
 
-1. **Discovering Models**
+1. **Model Discovery**
    - Run the discovery script: `npm run discover`
-   - This updates `models.json` with latest model information
-   - Reviews and updates vendor configurations
+   - Updates `models.json` with latest model information
+   - Sets appropriate gateway status for each model
 
 2. **Updating Configurations**
-   - Provider changes go in `provider.json`
-   - Model updates are reflected in `models.json`
-   - Vendor-specific changes in `vendors/*.json`
+   - Provider settings in `providers/*/settings.json`
+   - Model configurations in `providers/*/models.json`
+   - Vendor-specific settings in `vendors/*.json`
 
 3. **Adding New Providers**
-   - Create new provider directory
-   - Add provider configuration
-   - Add vendor configurations
+   - Create new provider directory in `providers/`
+   - Add provider settings
    - Run discovery for model configurations
+   - Configure vendor settings if needed
 
 ## Notes
 
-- All provider-specific model information is in `bedrock/models.json`
-- Vendor configurations provide a more organized view of available models
-- Vendor files can group models by type/modality for easier access
-- Provider configuration contains provider-wide settings and capabilities 
+- All model configurations are consolidated in `models.json` per provider
+- Models are organized by vendor for better structure
+- Gateway status tracking helps prevent usage of unavailable models
+- Clear separation between provider settings and model configurations
+- Vendor configurations focus on API and response handling 

@@ -15,6 +15,7 @@
 
 import { Logger } from '../../shared/logging/logger';
 import { ApiGatewayManagementApi } from 'aws-sdk';
+import { Resource } from 'sst';
 
 const logger = new Logger('ConnectionManager');
 
@@ -32,7 +33,7 @@ export class ConnectionManager {
   private connections: Set<string>;
   
   // AWS API Gateway client for WebSocket communication
-  private apiGateway: ApiGatewayManagementApi;
+  private apiGatewayManagementApi: ApiGatewayManagementApi | null;
 
   /**
    * Private constructor for singleton pattern.
@@ -41,10 +42,9 @@ export class ConnectionManager {
    * 2. API Gateway client with endpoint from environment
    */
   private constructor() {
-    this.connections = new Set();
-    this.apiGateway = new ApiGatewayManagementApi({
-      endpoint: process.env.WEBSOCKET_API_ENDPOINT
-    });
+    this.connections = new Set<string>();
+    this.apiGatewayManagementApi = null;
+    logger.info('ConnectionManager initialized');
   }
 
   /**
@@ -60,6 +60,31 @@ export class ConnectionManager {
     return ConnectionManager.instance;
   }
 
+  private initializeApiGateway(): void {
+    try {
+      const endpoint = Resource.brains_websocket_api_latest.url;
+      logger.info('Initializing API Gateway with endpoint:', { endpoint });
+
+      if (!endpoint) {
+        throw new Error('WEBSOCKET_API_ENDPOINT environment variable is not set');
+      }
+
+      // Remove the wss:// prefix if present and ensure https:// prefix
+      const apiEndpoint = endpoint.replace('wss://', '').replace('https://', '');
+      const finalEndpoint = `https://${apiEndpoint}`;
+      
+      logger.info('Using API Gateway endpoint:', { finalEndpoint });
+      
+      this.apiGatewayManagementApi = new ApiGatewayManagementApi({ 
+        endpoint: finalEndpoint,
+        region: process.env.AWS_REGION || 'us-east-1'
+      });
+    } catch (error) {
+      logger.error('Failed to initialize API Gateway:', { error });
+      throw error;
+    }
+  }
+
   /**
    * Adds a new connection to the active connections set.
    * This is called when a new WebSocket connection is established.
@@ -68,7 +93,7 @@ export class ConnectionManager {
    */
   public addConnection(connectionId: string): void {
     this.connections.add(connectionId);
-    logger.info('Added connection', { 
+    logger.info('Added new connection', { 
       connectionId, 
       totalConnections: this.connections.size 
     });
@@ -88,6 +113,10 @@ export class ConnectionManager {
     });
   }
 
+  public isConnectionActive(connectionId: string): boolean {
+    return this.connections.has(connectionId);
+  }
+
   /**
    * Sends a message to a specific WebSocket connection.
    * This method:
@@ -101,20 +130,40 @@ export class ConnectionManager {
    */
   public async sendMessage(connectionId: string, message: Message): Promise<void> {
     try {
-      // Send message via API Gateway
-      await this.apiGateway.postToConnection({
+      if (!this.apiGatewayManagementApi) {
+        logger.info('API Gateway not initialized, initializing now...');
+        this.initializeApiGateway();
+      }
+
+      if (!this.isConnectionActive(connectionId)) {
+        logger.warn('Attempted to send message to inactive connection', { connectionId });
+        return;
+      }
+
+      logger.info('Sending message to connection', { 
+        connectionId, 
+        messageType: message.type,
+        endpoint: this.apiGatewayManagementApi?.config.endpoint
+      });
+
+      await this.apiGatewayManagementApi!.postToConnection({
         ConnectionId: connectionId,
         Data: JSON.stringify(message)
       }).promise();
+
+      logger.info('Successfully sent message', { connectionId });
     } catch (error) {
-      // Handle connection errors
       if (error.statusCode === 410) {
-        // Connection no longer exists
-        logger.warn('Connection no longer exists', { connectionId });
+        logger.info('Connection stale, removing', { connectionId });
         this.removeConnection(connectionId);
       } else {
-        // Other errors
-        logger.error('Failed to send message', { error, connectionId });
+        logger.error('Failed to send message', { 
+          error,
+          connectionId,
+          errorName: error.name,
+          errorMessage: error.message,
+          errorStack: error.stack
+        });
         throw error;
       }
     }

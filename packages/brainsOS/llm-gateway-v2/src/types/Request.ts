@@ -16,4 +16,7 @@ export interface GatewayRequest {
   temperature?: number;
   maxTokens?: number;
   metadata?: Record<string, unknown>;
+  topP?: number;
+  stopSequences?: string[];
+  model?: string;
 } 

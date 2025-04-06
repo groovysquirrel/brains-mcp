@@ -9,8 +9,24 @@ export class Logger {
     console.log(`[${this.context}] ${message}`, metadata || '');
   }
 
-  error(message: string, error?: Error | unknown): void {
-    console.error(`[${this.context}] ${message}`, error || '');
+  warn(message: string, metadata?: Record<string, unknown>): void {
+    console.warn(`[${this.context}] ${message}`, metadata || '');
+  }
+
+  error(message: string, metadata?: Record<string, unknown>): void {
+    if (metadata && metadata.error) {
+      const error = metadata.error as Error;
+      console.error(`[${this.context}] ${message}`, {
+        ...metadata,
+        error: {
+          name: error.name,
+          message: error.message,
+          stack: error.stack
+        }
+      });
+    } else {
+      console.error(`[${this.context}] ${message}`, metadata || '');
+    }
   }
 
   debug(message: string, metadata?: Record<string, unknown>): void {

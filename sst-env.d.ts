@@ -123,10 +123,6 @@ declare module "sst" {
       "name": string
       "type": "sst.aws.Function"
     }
-    "gwstreamFunction": {
-      "name": string
-      "type": "sst.aws.Function"
-    }
     "systemData": {
       "name": string
       "type": "sst.aws.Dynamo"

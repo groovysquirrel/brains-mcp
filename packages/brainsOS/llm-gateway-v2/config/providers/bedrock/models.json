@@ -1,0 +1,2058 @@
+{
+  "vendors": [
+    {
+      "name": "amazon",
+      "models": [
+        {
+          "modelId": "amazon.titan-tg1-large",
+          "provider": "bedrock",
+          "vendor": "amazon",
+          "capabilities": {
+            "streaming": true,
+            "modalities": {
+              "input": [
+                "TEXT"
+              ],
+              "output": [
+                "TEXT"
+              ]
+            },
+            "lifecycle": "ACTIVE",
+            "customization": {
+              "supported": false,
+              "types": []
+            }
+          },
+          "access": {
+            "onDemand": true,
+            "provisionable": false
+          }
+        },
+        {
+          "modelId": "amazon.titan-image-generator-v1:0",
+          "provider": "bedrock",
+          "vendor": "amazon",
+          "capabilities": {
+            "streaming": false,
+            "modalities": {
+              "input": [
+                "TEXT",
+                "IMAGE"
+              ],
+              "output": [
+                "IMAGE"
+              ]
+            },
+            "lifecycle": "ACTIVE",
+            "customization": {
+              "supported": true,
+              "types": [
+                "FINE_TUNING"
+              ]
+            }
+          },
+          "access": {
+            "onDemand": false,
+            "provisionable": true
+          }
+        },
+        {
+          "modelId": "amazon.titan-image-generator-v1",
+          "provider": "bedrock",
+          "vendor": "amazon",
+          "capabilities": {
+            "streaming": false,
+            "modalities": {
+              "input": [
+                "TEXT",
+                "IMAGE"
+              ],
+              "output": [
+                "IMAGE"
+              ]
+            },
+            "lifecycle": "ACTIVE",
+            "customization": {
+              "supported": false,
+              "types": []
+            }
+          },
+          "access": {
+            "onDemand": true,
+            "provisionable": false
+          }
+        },
+        {
+          "modelId": "amazon.titan-image-generator-v2:0",
+          "provider": "bedrock",
+          "vendor": "amazon",
+          "capabilities": {
+            "streaming": false,
+            "modalities": {
+              "input": [
+                "TEXT",
+                "IMAGE"
+              ],
+              "output": [
+                "IMAGE"
+              ]
+            },
+            "lifecycle": "ACTIVE",
+            "customization": {
+              "supported": true,
+              "types": [
+                "FINE_TUNING"
+              ]
+            }
+          },
+          "access": {
+            "onDemand": true,
+            "provisionable": true
+          }
+        },
+        {
+          "modelId": "amazon.titan-text-premier-v1:0",
+          "provider": "bedrock",
+          "vendor": "amazon",
+          "capabilities": {
+            "streaming": true,
+            "modalities": {
+              "input": [
+                "TEXT"
+              ],
+              "output": [
+                "TEXT"
+              ]
+            },
+            "lifecycle": "ACTIVE",
+            "customization": {
+              "supported": false,
+              "types": []
+            }
+          },
+          "access": {
+            "onDemand": true,
+            "provisionable": false
+          }
+        },
+        {
+          "modelId": "amazon.nova-pro-v1:0:24k",
+          "provider": "bedrock",
+          "vendor": "amazon",
+          "capabilities": {
+            "streaming": true,
+            "modalities": {
+              "input": [
+                "TEXT",
+                "IMAGE",
+                "VIDEO"
+              ],
+              "output": [
+                "TEXT"
+              ]
+            },
+            "lifecycle": "ACTIVE",
+            "customization": {
+              "supported": false,
+              "types": []
+            }
+          },
+          "access": {
+            "onDemand": false,
+            "provisionable": true
+          }
+        },
+        {
+          "modelId": "amazon.nova-pro-v1:0:300k",
+          "provider": "bedrock",
+          "vendor": "amazon",
+          "capabilities": {
+            "streaming": true,
+            "modalities": {
+              "input": [
+                "TEXT",
+                "IMAGE",
+                "VIDEO"
+              ],
+              "output": [
+                "TEXT"
+              ]
+            },
+            "lifecycle": "ACTIVE",
+            "customization": {
+              "supported": true,
+              "types": [
+                "FINE_TUNING"
+              ]
+            }
+          },
+          "access": {
+            "onDemand": false,
+            "provisionable": true
+          }
+        },
+        {
+          "modelId": "amazon.nova-pro-v1:0",
+          "provider": "bedrock",
+          "vendor": "amazon",
+          "capabilities": {
+            "streaming": true,
+            "modalities": {
+              "input": [
+                "TEXT",
+                "IMAGE",
+                "VIDEO"
+              ],
+              "output": [
+                "TEXT"
+              ]
+            },
+            "lifecycle": "ACTIVE",
+            "customization": {
+              "supported": false,
+              "types": []
+            }
+          },
+          "access": {
+            "onDemand": true,
+            "provisionable": false
+          }
+        },
+        {
+          "modelId": "amazon.nova-lite-v1:0:24k",
+          "provider": "bedrock",
+          "vendor": "amazon",
+          "capabilities": {
+            "streaming": true,
+            "modalities": {
+              "input": [
+                "TEXT",
+                "IMAGE",
+                "VIDEO"
+              ],
+              "output": [
+                "TEXT"
+              ]
+            },
+            "lifecycle": "ACTIVE",
+            "customization": {
+              "supported": false,
+              "types": []
+            }
+          },
+          "access": {
+            "onDemand": false,
+            "provisionable": true
+          }
+        },
+        {
+          "modelId": "amazon.nova-lite-v1:0:300k",
+          "provider": "bedrock",
+          "vendor": "amazon",
+          "capabilities": {
+            "streaming": true,
+            "modalities": {
+              "input": [
+                "TEXT",
+                "IMAGE",
+                "VIDEO"
+              ],
+              "output": [
+                "TEXT"
+              ]
+            },
+            "lifecycle": "ACTIVE",
+            "customization": {
+              "supported": true,
+              "types": [
+                "FINE_TUNING",
+                "DISTILLATION"
+              ]
+            }
+          },
+          "access": {
+            "onDemand": false,
+            "provisionable": true
+          }
+        },
+        {
+          "modelId": "amazon.nova-lite-v1:0",
+          "provider": "bedrock",
+          "vendor": "amazon",
+          "capabilities": {
+            "streaming": true,
+            "modalities": {
+              "input": [
+                "TEXT",
+                "IMAGE",
+                "VIDEO"
+              ],
+              "output": [
+                "TEXT"
+              ]
+            },
+            "lifecycle": "ACTIVE",
+            "customization": {
+              "supported": false,
+              "types": []
+            }
+          },
+          "access": {
+            "onDemand": true,
+            "provisionable": false
+          }
+        },
+        {
+          "modelId": "amazon.nova-canvas-v1:0",
+          "provider": "bedrock",
+          "vendor": "amazon",
+          "capabilities": {
+            "streaming": false,
+            "modalities": {
+              "input": [
+                "TEXT",
+                "IMAGE"
+              ],
+              "output": [
+                "IMAGE"
+              ]
+            },
+            "lifecycle": "ACTIVE",
+            "customization": {
+              "supported": true,
+              "types": [
+                "FINE_TUNING"
+              ]
+            }
+          },
+          "access": {
+            "onDemand": true,
+            "provisionable": true
+          }
+        },
+        {
+          "modelId": "amazon.nova-reel-v1:0",
+          "provider": "bedrock",
+          "vendor": "amazon",
+          "capabilities": {
+            "streaming": false,
+            "modalities": {
+              "input": [
+                "TEXT",
+                "IMAGE"
+              ],
+              "output": [
+                "VIDEO"
+              ]
+            },
+            "lifecycle": "ACTIVE",
+            "customization": {
+              "supported": false,
+              "types": []
+            }
+          },
+          "access": {
+            "onDemand": true,
+            "provisionable": false
+          }
+        },
+        {
+          "modelId": "amazon.nova-micro-v1:0:24k",
+          "provider": "bedrock",
+          "vendor": "amazon",
+          "capabilities": {
+            "streaming": true,
+            "modalities": {
+              "input": [
+                "TEXT"
+              ],
+              "output": [
+                "TEXT"
+              ]
+            },
+            "lifecycle": "ACTIVE",
+            "customization": {
+              "supported": false,
+              "types": []
+            }
+          },
+          "access": {
+            "onDemand": false,
+            "provisionable": true
+          }
+        },
+        {
+          "modelId": "amazon.nova-micro-v1:0:128k",
+          "provider": "bedrock",
+          "vendor": "amazon",
+          "capabilities": {
+            "streaming": true,
+            "modalities": {
+              "input": [
+                "TEXT"
+              ],
+              "output": [
+                "TEXT"
+              ]
+            },
+            "lifecycle": "ACTIVE",
+            "customization": {
+              "supported": true,
+              "types": [
+                "FINE_TUNING",
+                "DISTILLATION"
+              ]
+            }
+          },
+          "access": {
+            "onDemand": false,
+            "provisionable": true
+          }
+        },
+        {
+          "modelId": "amazon.nova-micro-v1:0",
+          "provider": "bedrock",
+          "vendor": "amazon",
+          "capabilities": {
+            "streaming": true,
+            "modalities": {
+              "input": [
+                "TEXT"
+              ],
+              "output": [
+                "TEXT"
+              ]
+            },
+            "lifecycle": "ACTIVE",
+            "customization": {
+              "supported": false,
+              "types": []
+            }
+          },
+          "access": {
+            "onDemand": true,
+            "provisionable": false
+          }
+        },
+        {
+          "modelId": "amazon.titan-embed-g1-text-02",
+          "provider": "bedrock",
+          "vendor": "amazon",
+          "capabilities": {
+            "streaming": false,
+            "modalities": {
+              "input": [
+                "TEXT"
+              ],
+              "output": [
+                "EMBEDDING"
+              ]
+            },
+            "lifecycle": "ACTIVE",
+            "customization": {
+              "supported": false,
+              "types": []
+            }
+          },
+          "access": {
+            "onDemand": true,
+            "provisionable": false
+          }
+        },
+        {
+          "modelId": "amazon.titan-text-lite-v1:0:4k",
+          "provider": "bedrock",
+          "vendor": "amazon",
+          "capabilities": {
+            "streaming": true,
+            "modalities": {
+              "input": [
+                "TEXT"
+              ],
+              "output": [
+                "TEXT"
+              ]
+            },
+            "lifecycle": "ACTIVE",
+            "customization": {
+              "supported": true,
+              "types": [
+                "FINE_TUNING",
+                "CONTINUED_PRE_TRAINING"
+              ]
+            }
+          },
+          "access": {
+            "onDemand": false,
+            "provisionable": true
+          }
+        },
+        {
+          "modelId": "amazon.titan-text-lite-v1",
+          "provider": "bedrock",
+          "vendor": "amazon",
+          "capabilities": {
+            "streaming": true,
+            "modalities": {
+              "input": [
+                "TEXT"
+              ],
+              "output": [
+                "TEXT"
+              ]
+            },
+            "lifecycle": "ACTIVE",
+            "customization": {
+              "supported": false,
+              "types": []
+            }
+          },
+          "access": {
+            "onDemand": true,
+            "provisionable": false
+          }
+        },
+        {
+          "modelId": "amazon.titan-text-express-v1:0:8k",
+          "provider": "bedrock",
+          "vendor": "amazon",
+          "capabilities": {
+            "streaming": true,
+            "modalities": {
+              "input": [
+                "TEXT"
+              ],
+              "output": [
+                "TEXT"
+              ]
+            },
+            "lifecycle": "ACTIVE",
+            "customization": {
+              "supported": true,
+              "types": [
+                "FINE_TUNING",
+                "CONTINUED_PRE_TRAINING"
+              ]
+            }
+          },
+          "access": {
+            "onDemand": false,
+            "provisionable": true
+          }
+        },
+        {
+          "modelId": "amazon.titan-text-express-v1",
+          "provider": "bedrock",
+          "vendor": "amazon",
+          "capabilities": {
+            "streaming": true,
+            "modalities": {
+              "input": [
+                "TEXT"
+              ],
+              "output": [
+                "TEXT"
+              ]
+            },
+            "lifecycle": "ACTIVE",
+            "customization": {
+              "supported": false,
+              "types": []
+            }
+          },
+          "access": {
+            "onDemand": true,
+            "provisionable": false
+          }
+        },
+        {
+          "modelId": "amazon.titan-embed-text-v1:2:8k",
+          "provider": "bedrock",
+          "vendor": "amazon",
+          "capabilities": {
+            "streaming": false,
+            "modalities": {
+              "input": [
+                "TEXT"
+              ],
+              "output": [
+                "EMBEDDING"
+              ]
+            },
+            "lifecycle": "ACTIVE",
+            "customization": {
+              "supported": false,
+              "types": []
+            }
+          },
+          "access": {
+            "onDemand": false,
+            "provisionable": true
+          }
+        },
+        {
+          "modelId": "amazon.titan-embed-text-v1",
+          "provider": "bedrock",
+          "vendor": "amazon",
+          "capabilities": {
+            "streaming": false,
+            "modalities": {
+              "input": [
+                "TEXT"
+              ],
+              "output": [
+                "EMBEDDING"
+              ]
+            },
+            "lifecycle": "ACTIVE",
+            "customization": {
+              "supported": false,
+              "types": []
+            }
+          },
+          "access": {
+            "onDemand": true,
+            "provisionable": false
+          }
+        },
+        {
+          "modelId": "amazon.titan-embed-text-v2:0:8k",
+          "provider": "bedrock",
+          "vendor": "amazon",
+          "capabilities": {
+            "streaming": false,
+            "modalities": {
+              "input": [
+                "TEXT"
+              ],
+              "output": [
+                "EMBEDDING"
+              ]
+            },
+            "lifecycle": "ACTIVE",
+            "customization": {
+              "supported": false,
+              "types": []
+            }
+          },
+          "access": {
+            "onDemand": false,
+            "provisionable": false
+          }
+        },
+        {
+          "modelId": "amazon.titan-embed-text-v2:0",
+          "provider": "bedrock",
+          "vendor": "amazon",
+          "capabilities": {
+            "streaming": false,
+            "modalities": {
+              "input": [
+                "TEXT"
+              ],
+              "output": [
+                "EMBEDDING"
+              ]
+            },
+            "lifecycle": "ACTIVE",
+            "customization": {
+              "supported": false,
+              "types": []
+            }
+          },
+          "access": {
+            "onDemand": true,
+            "provisionable": false
+          }
+        },
+        {
+          "modelId": "amazon.titan-embed-image-v1:0",
+          "provider": "bedrock",
+          "vendor": "amazon",
+          "capabilities": {
+            "streaming": false,
+            "modalities": {
+              "input": [
+                "TEXT",
+                "IMAGE"
+              ],
+              "output": [
+                "EMBEDDING"
+              ]
+            },
+            "lifecycle": "ACTIVE",
+            "customization": {
+              "supported": true,
+              "types": [
+                "FINE_TUNING"
+              ]
+            }
+          },
+          "access": {
+            "onDemand": false,
+            "provisionable": true
+          }
+        },
+        {
+          "modelId": "amazon.titan-embed-image-v1",
+          "provider": "bedrock",
+          "vendor": "amazon",
+          "capabilities": {
+            "streaming": false,
+            "modalities": {
+              "input": [
+                "TEXT",
+                "IMAGE"
+              ],
+              "output": [
+                "EMBEDDING"
+              ]
+            },
+            "lifecycle": "ACTIVE",
+            "customization": {
+              "supported": false,
+              "types": []
+            }
+          },
+          "access": {
+            "onDemand": true,
+            "provisionable": false
+          }
+        }
+      ]
+    },
+    {
+      "name": "stability ai",
+      "models": [
+        {
+          "modelId": "stability.stable-diffusion-xl-v1:0",
+          "provider": "bedrock",
+          "vendor": "stability ai",
+          "capabilities": {
+            "streaming": false,
+            "modalities": {
+              "input": [
+                "TEXT",
+                "IMAGE"
+              ],
+              "output": [
+                "IMAGE"
+              ]
+            },
+            "lifecycle": "LEGACY",
+            "customization": {
+              "supported": false,
+              "types": []
+            }
+          },
+          "access": {
+            "onDemand": false,
+            "provisionable": true
+          }
+        },
+        {
+          "modelId": "stability.stable-diffusion-xl-v1",
+          "provider": "bedrock",
+          "vendor": "stability ai",
+          "capabilities": {
+            "streaming": false,
+            "modalities": {
+              "input": [
+                "TEXT",
+                "IMAGE"
+              ],
+              "output": [
+                "IMAGE"
+              ]
+            },
+            "lifecycle": "LEGACY",
+            "customization": {
+              "supported": false,
+              "types": []
+            }
+          },
+          "access": {
+            "onDemand": true,
+            "provisionable": false
+          }
+        }
+      ]
+    },
+    {
+      "name": "ai21 labs",
+      "models": [
+        {
+          "modelId": "ai21.jamba-instruct-v1:0",
+          "provider": "bedrock",
+          "vendor": "ai21 labs",
+          "capabilities": {
+            "streaming": true,
+            "modalities": {
+              "input": [
+                "TEXT"
+              ],
+              "output": [
+                "TEXT"
+              ]
+            },
+            "lifecycle": "LEGACY",
+            "customization": {
+              "supported": false,
+              "types": []
+            }
+          },
+          "access": {
+            "onDemand": true,
+            "provisionable": false
+          }
+        },
+        {
+          "modelId": "ai21.jamba-1-5-large-v1:0",
+          "provider": "bedrock",
+          "vendor": "ai21 labs",
+          "capabilities": {
+            "streaming": true,
+            "modalities": {
+              "input": [
+                "TEXT"
+              ],
+              "output": [
+                "TEXT"
+              ]
+            },
+            "lifecycle": "ACTIVE",
+            "customization": {
+              "supported": false,
+              "types": []
+            }
+          },
+          "access": {
+            "onDemand": true,
+            "provisionable": false
+          }
+        },
+        {
+          "modelId": "ai21.jamba-1-5-mini-v1:0",
+          "provider": "bedrock",
+          "vendor": "ai21 labs",
+          "capabilities": {
+            "streaming": true,
+            "modalities": {
+              "input": [
+                "TEXT"
+              ],
+              "output": [
+                "TEXT"
+              ]
+            },
+            "lifecycle": "ACTIVE",
+            "customization": {
+              "supported": false,
+              "types": []
+            }
+          },
+          "access": {
+            "onDemand": true,
+            "provisionable": false
+          }
+        }
+      ]
+    },
+    {
+      "name": "anthropic",
+      "models": [
+        {
+          "modelId": "anthropic.claude-instant-v1:2:100k",
+          "provider": "bedrock",
+          "vendor": "anthropic",
+          "capabilities": {
+            "streaming": true,
+            "modalities": {
+              "input": [
+                "TEXT"
+              ],
+              "output": [
+                "TEXT"
+              ]
+            },
+            "lifecycle": "LEGACY",
+            "customization": {
+              "supported": false,
+              "types": []
+            }
+          },
+          "access": {
+            "onDemand": false,
+            "provisionable": true
+          }
+        },
+        {
+          "modelId": "anthropic.claude-instant-v1",
+          "provider": "bedrock",
+          "vendor": "anthropic",
+          "capabilities": {
+            "streaming": true,
+            "modalities": {
+              "input": [
+                "TEXT"
+              ],
+              "output": [
+                "TEXT"
+              ]
+            },
+            "lifecycle": "LEGACY",
+            "customization": {
+              "supported": false,
+              "types": []
+            }
+          },
+          "access": {
+            "onDemand": true,
+            "provisionable": false
+          }
+        },
+        {
+          "modelId": "anthropic.claude-v2:0:18k",
+          "provider": "bedrock",
+          "vendor": "anthropic",
+          "capabilities": {
+            "streaming": true,
+            "modalities": {
+              "input": [
+                "TEXT"
+              ],
+              "output": [
+                "TEXT"
+              ]
+            },
+            "lifecycle": "LEGACY",
+            "customization": {
+              "supported": false,
+              "types": []
+            }
+          },
+          "access": {
+            "onDemand": false,
+            "provisionable": true
+          }
+        },
+        {
+          "modelId": "anthropic.claude-v2:0:100k",
+          "provider": "bedrock",
+          "vendor": "anthropic",
+          "capabilities": {
+            "streaming": true,
+            "modalities": {
+              "input": [
+                "TEXT"
+              ],
+              "output": [
+                "TEXT"
+              ]
+            },
+            "lifecycle": "LEGACY",
+            "customization": {
+              "supported": false,
+              "types": []
+            }
+          },
+          "access": {
+            "onDemand": false,
+            "provisionable": true
+          }
+        },
+        {
+          "modelId": "anthropic.claude-v2:1:18k",
+          "provider": "bedrock",
+          "vendor": "anthropic",
+          "capabilities": {
+            "streaming": true,
+            "modalities": {
+              "input": [
+                "TEXT"
+              ],
+              "output": [
+                "TEXT"
+              ]
+            },
+            "lifecycle": "LEGACY",
+            "customization": {
+              "supported": false,
+              "types": []
+            }
+          },
+          "access": {
+            "onDemand": false,
+            "provisionable": true
+          }
+        },
+        {
+          "modelId": "anthropic.claude-v2:1:200k",
+          "provider": "bedrock",
+          "vendor": "anthropic",
+          "capabilities": {
+            "streaming": true,
+            "modalities": {
+              "input": [
+                "TEXT"
+              ],
+              "output": [
+                "TEXT"
+              ]
+            },
+            "lifecycle": "LEGACY",
+            "customization": {
+              "supported": false,
+              "types": []
+            }
+          },
+          "access": {
+            "onDemand": false,
+            "provisionable": true
+          }
+        },
+        {
+          "modelId": "anthropic.claude-v2:1",
+          "provider": "bedrock",
+          "vendor": "anthropic",
+          "capabilities": {
+            "streaming": true,
+            "modalities": {
+              "input": [
+                "TEXT"
+              ],
+              "output": [
+                "TEXT"
+              ]
+            },
+            "lifecycle": "LEGACY",
+            "customization": {
+              "supported": false,
+              "types": []
+            }
+          },
+          "access": {
+            "onDemand": true,
+            "provisionable": false
+          }
+        },
+        {
+          "modelId": "anthropic.claude-v2",
+          "provider": "bedrock",
+          "vendor": "anthropic",
+          "capabilities": {
+            "streaming": true,
+            "modalities": {
+              "input": [
+                "TEXT"
+              ],
+              "output": [
+                "TEXT"
+              ]
+            },
+            "lifecycle": "LEGACY",
+            "customization": {
+              "supported": false,
+              "types": []
+            }
+          },
+          "access": {
+            "onDemand": true,
+            "provisionable": false
+          }
+        },
+        {
+          "modelId": "anthropic.claude-3-sonnet-20240229-v1:0:28k",
+          "provider": "bedrock",
+          "vendor": "anthropic",
+          "capabilities": {
+            "streaming": true,
+            "modalities": {
+              "input": [
+                "TEXT",
+                "IMAGE"
+              ],
+              "output": [
+                "TEXT"
+              ]
+            },
+            "lifecycle": "LEGACY",
+            "customization": {
+              "supported": false,
+              "types": []
+            }
+          },
+          "access": {
+            "onDemand": false,
+            "provisionable": true
+          }
+        },
+        {
+          "modelId": "anthropic.claude-3-sonnet-20240229-v1:0:200k",
+          "provider": "bedrock",
+          "vendor": "anthropic",
+          "capabilities": {
+            "streaming": true,
+            "modalities": {
+              "input": [
+                "TEXT",
+                "IMAGE"
+              ],
+              "output": [
+                "TEXT"
+              ]
+            },
+            "lifecycle": "LEGACY",
+            "customization": {
+              "supported": false,
+              "types": []
+            }
+          },
+          "access": {
+            "onDemand": false,
+            "provisionable": true
+          }
+        },
+        {
+          "modelId": "anthropic.claude-3-sonnet-20240229-v1:0",
+          "provider": "bedrock",
+          "vendor": "anthropic",
+          "capabilities": {
+            "streaming": true,
+            "modalities": {
+              "input": [
+                "TEXT",
+                "IMAGE"
+              ],
+              "output": [
+                "TEXT"
+              ]
+            },
+            "lifecycle": "LEGACY",
+            "customization": {
+              "supported": false,
+              "types": []
+            }
+          },
+          "access": {
+            "onDemand": true,
+            "provisionable": false
+          }
+        },
+        {
+          "modelId": "anthropic.claude-3-haiku-20240307-v1:0:48k",
+          "provider": "bedrock",
+          "vendor": "anthropic",
+          "capabilities": {
+            "streaming": true,
+            "modalities": {
+              "input": [
+                "TEXT",
+                "IMAGE"
+              ],
+              "output": [
+                "TEXT"
+              ]
+            },
+            "lifecycle": "ACTIVE",
+            "customization": {
+              "supported": false,
+              "types": []
+            }
+          },
+          "access": {
+            "onDemand": false,
+            "provisionable": true
+          }
+        },
+        {
+          "modelId": "anthropic.claude-3-haiku-20240307-v1:0:200k",
+          "provider": "bedrock",
+          "vendor": "anthropic",
+          "capabilities": {
+            "streaming": true,
+            "modalities": {
+              "input": [
+                "TEXT",
+                "IMAGE"
+              ],
+              "output": [
+                "TEXT"
+              ]
+            },
+            "lifecycle": "ACTIVE",
+            "customization": {
+              "supported": false,
+              "types": []
+            }
+          },
+          "access": {
+            "onDemand": false,
+            "provisionable": true
+          }
+        },
+        {
+          "modelId": "anthropic.claude-3-haiku-20240307-v1:0",
+          "provider": "bedrock",
+          "vendor": "anthropic",
+          "capabilities": {
+            "streaming": true,
+            "modalities": {
+              "input": [
+                "TEXT",
+                "IMAGE"
+              ],
+              "output": [
+                "TEXT"
+              ]
+            },
+            "lifecycle": "ACTIVE",
+            "customization": {
+              "supported": false,
+              "types": []
+            }
+          },
+          "access": {
+            "onDemand": true,
+            "provisionable": false
+          }
+        },
+        {
+          "modelId": "anthropic.claude-3-opus-20240229-v1:0:12k",
+          "provider": "bedrock",
+          "vendor": "anthropic",
+          "capabilities": {
+            "streaming": true,
+            "modalities": {
+              "input": [
+                "TEXT",
+                "IMAGE"
+              ],
+              "output": [
+                "TEXT"
+              ]
+            },
+            "lifecycle": "ACTIVE",
+            "customization": {
+              "supported": false,
+              "types": []
+            }
+          },
+          "access": {
+            "onDemand": false,
+            "provisionable": true
+          }
+        },
+        {
+          "modelId": "anthropic.claude-3-opus-20240229-v1:0:28k",
+          "provider": "bedrock",
+          "vendor": "anthropic",
+          "capabilities": {
+            "streaming": true,
+            "modalities": {
+              "input": [
+                "TEXT",
+                "IMAGE"
+              ],
+              "output": [
+                "TEXT"
+              ]
+            },
+            "lifecycle": "ACTIVE",
+            "customization": {
+              "supported": false,
+              "types": []
+            }
+          },
+          "access": {
+            "onDemand": false,
+            "provisionable": true
+          }
+        },
+        {
+          "modelId": "anthropic.claude-3-opus-20240229-v1:0:200k",
+          "provider": "bedrock",
+          "vendor": "anthropic",
+          "capabilities": {
+            "streaming": true,
+            "modalities": {
+              "input": [
+                "TEXT",
+                "IMAGE"
+              ],
+              "output": [
+                "TEXT"
+              ]
+            },
+            "lifecycle": "ACTIVE",
+            "customization": {
+              "supported": false,
+              "types": []
+            }
+          },
+          "access": {
+            "onDemand": false,
+            "provisionable": true
+          }
+        },
+        {
+          "modelId": "anthropic.claude-3-opus-20240229-v1:0",
+          "provider": "bedrock",
+          "vendor": "anthropic",
+          "capabilities": {
+            "streaming": true,
+            "modalities": {
+              "input": [
+                "TEXT",
+                "IMAGE"
+              ],
+              "output": [
+                "TEXT"
+              ]
+            },
+            "lifecycle": "ACTIVE",
+            "customization": {
+              "supported": false,
+              "types": []
+            }
+          },
+          "access": {
+            "onDemand": false,
+            "provisionable": false
+          }
+        },
+        {
+          "modelId": "anthropic.claude-3-5-sonnet-20240620-v1:0",
+          "provider": "bedrock",
+          "vendor": "anthropic",
+          "capabilities": {
+            "streaming": true,
+            "modalities": {
+              "input": [
+                "TEXT",
+                "IMAGE"
+              ],
+              "output": [
+                "TEXT"
+              ]
+            },
+            "lifecycle": "ACTIVE",
+            "customization": {
+              "supported": false,
+              "types": []
+            }
+          },
+          "access": {
+            "onDemand": true,
+            "provisionable": false
+          }
+        },
+        {
+          "modelId": "anthropic.claude-3-5-sonnet-20241022-v2:0",
+          "provider": "bedrock",
+          "vendor": "anthropic",
+          "capabilities": {
+            "streaming": true,
+            "modalities": {
+              "input": [
+                "TEXT",
+                "IMAGE"
+              ],
+              "output": [
+                "TEXT"
+              ]
+            },
+            "lifecycle": "ACTIVE",
+            "customization": {
+              "supported": false,
+              "types": []
+            }
+          },
+          "access": {
+            "onDemand": false,
+            "provisionable": false
+          }
+        },
+        {
+          "modelId": "anthropic.claude-3-7-sonnet-20250219-v1:0",
+          "provider": "bedrock",
+          "vendor": "anthropic",
+          "capabilities": {
+            "streaming": true,
+            "modalities": {
+              "input": [
+                "TEXT",
+                "IMAGE"
+              ],
+              "output": [
+                "TEXT"
+              ]
+            },
+            "lifecycle": "ACTIVE",
+            "customization": {
+              "supported": false,
+              "types": []
+            }
+          },
+          "access": {
+            "onDemand": false,
+            "provisionable": false
+          }
+        },
+        {
+          "modelId": "anthropic.claude-3-5-haiku-20241022-v1:0",
+          "provider": "bedrock",
+          "vendor": "anthropic",
+          "capabilities": {
+            "streaming": true,
+            "modalities": {
+              "input": [
+                "TEXT",
+                "IMAGE"
+              ],
+              "output": [
+                "TEXT"
+              ]
+            },
+            "lifecycle": "ACTIVE",
+            "customization": {
+              "supported": false,
+              "types": []
+            }
+          },
+          "access": {
+            "onDemand": false,
+            "provisionable": false
+          }
+        }
+      ]
+    },
+    {
+      "name": "cohere",
+      "models": [
+        {
+          "modelId": "cohere.command-text-v14:7:4k",
+          "provider": "bedrock",
+          "vendor": "cohere",
+          "capabilities": {
+            "streaming": true,
+            "modalities": {
+              "input": [
+                "TEXT"
+              ],
+              "output": [
+                "TEXT"
+              ]
+            },
+            "lifecycle": "ACTIVE",
+            "customization": {
+              "supported": true,
+              "types": [
+                "FINE_TUNING"
+              ]
+            }
+          },
+          "access": {
+            "onDemand": false,
+            "provisionable": true
+          }
+        },
+        {
+          "modelId": "cohere.command-text-v14",
+          "provider": "bedrock",
+          "vendor": "cohere",
+          "capabilities": {
+            "streaming": true,
+            "modalities": {
+              "input": [
+                "TEXT"
+              ],
+              "output": [
+                "TEXT"
+              ]
+            },
+            "lifecycle": "ACTIVE",
+            "customization": {
+              "supported": false,
+              "types": []
+            }
+          },
+          "access": {
+            "onDemand": true,
+            "provisionable": false
+          }
+        },
+        {
+          "modelId": "cohere.command-r-v1:0",
+          "provider": "bedrock",
+          "vendor": "cohere",
+          "capabilities": {
+            "streaming": true,
+            "modalities": {
+              "input": [
+                "TEXT"
+              ],
+              "output": [
+                "TEXT"
+              ]
+            },
+            "lifecycle": "ACTIVE",
+            "customization": {
+              "supported": false,
+              "types": []
+            }
+          },
+          "access": {
+            "onDemand": true,
+            "provisionable": false
+          }
+        },
+        {
+          "modelId": "cohere.command-r-plus-v1:0",
+          "provider": "bedrock",
+          "vendor": "cohere",
+          "capabilities": {
+            "streaming": true,
+            "modalities": {
+              "input": [
+                "TEXT"
+              ],
+              "output": [
+                "TEXT"
+              ]
+            },
+            "lifecycle": "ACTIVE",
+            "customization": {
+              "supported": false,
+              "types": []
+            }
+          },
+          "access": {
+            "onDemand": true,
+            "provisionable": false
+          }
+        },
+        {
+          "modelId": "cohere.command-light-text-v14:7:4k",
+          "provider": "bedrock",
+          "vendor": "cohere",
+          "capabilities": {
+            "streaming": true,
+            "modalities": {
+              "input": [
+                "TEXT"
+              ],
+              "output": [
+                "TEXT"
+              ]
+            },
+            "lifecycle": "ACTIVE",
+            "customization": {
+              "supported": true,
+              "types": [
+                "FINE_TUNING"
+              ]
+            }
+          },
+          "access": {
+            "onDemand": false,
+            "provisionable": true
+          }
+        },
+        {
+          "modelId": "cohere.command-light-text-v14",
+          "provider": "bedrock",
+          "vendor": "cohere",
+          "capabilities": {
+            "streaming": true,
+            "modalities": {
+              "input": [
+                "TEXT"
+              ],
+              "output": [
+                "TEXT"
+              ]
+            },
+            "lifecycle": "ACTIVE",
+            "customization": {
+              "supported": false,
+              "types": []
+            }
+          },
+          "access": {
+            "onDemand": true,
+            "provisionable": false
+          }
+        },
+        {
+          "modelId": "cohere.embed-english-v3:0:512",
+          "provider": "bedrock",
+          "vendor": "cohere",
+          "capabilities": {
+            "streaming": false,
+            "modalities": {
+              "input": [
+                "TEXT"
+              ],
+              "output": [
+                "EMBEDDING"
+              ]
+            },
+            "lifecycle": "ACTIVE",
+            "customization": {
+              "supported": false,
+              "types": []
+            }
+          },
+          "access": {
+            "onDemand": false,
+            "provisionable": true
+          }
+        },
+        {
+          "modelId": "cohere.embed-english-v3",
+          "provider": "bedrock",
+          "vendor": "cohere",
+          "capabilities": {
+            "streaming": false,
+            "modalities": {
+              "input": [
+                "TEXT"
+              ],
+              "output": [
+                "EMBEDDING"
+              ]
+            },
+            "lifecycle": "ACTIVE",
+            "customization": {
+              "supported": false,
+              "types": []
+            }
+          },
+          "access": {
+            "onDemand": true,
+            "provisionable": false
+          }
+        },
+        {
+          "modelId": "cohere.embed-multilingual-v3:0:512",
+          "provider": "bedrock",
+          "vendor": "cohere",
+          "capabilities": {
+            "streaming": false,
+            "modalities": {
+              "input": [
+                "TEXT"
+              ],
+              "output": [
+                "EMBEDDING"
+              ]
+            },
+            "lifecycle": "ACTIVE",
+            "customization": {
+              "supported": false,
+              "types": []
+            }
+          },
+          "access": {
+            "onDemand": false,
+            "provisionable": true
+          }
+        },
+        {
+          "modelId": "cohere.embed-multilingual-v3",
+          "provider": "bedrock",
+          "vendor": "cohere",
+          "capabilities": {
+            "streaming": false,
+            "modalities": {
+              "input": [
+                "TEXT"
+              ],
+              "output": [
+                "EMBEDDING"
+              ]
+            },
+            "lifecycle": "ACTIVE",
+            "customization": {
+              "supported": false,
+              "types": []
+            }
+          },
+          "access": {
+            "onDemand": true,
+            "provisionable": false
+          }
+        }
+      ]
+    },
+    {
+      "name": "deepseek",
+      "models": [
+        {
+          "modelId": "deepseek.r1-v1:0",
+          "provider": "bedrock",
+          "vendor": "deepseek",
+          "capabilities": {
+            "streaming": true,
+            "modalities": {
+              "input": [
+                "TEXT"
+              ],
+              "output": [
+                "TEXT"
+              ]
+            },
+            "lifecycle": "ACTIVE",
+            "customization": {
+              "supported": false,
+              "types": []
+            }
+          },
+          "access": {
+            "onDemand": false,
+            "provisionable": false
+          }
+        }
+      ]
+    },
+    {
+      "name": "meta",
+      "models": [
+        {
+          "modelId": "meta.llama3-8b-instruct-v1:0",
+          "provider": "bedrock",
+          "vendor": "meta",
+          "capabilities": {
+            "streaming": true,
+            "modalities": {
+              "input": [
+                "TEXT"
+              ],
+              "output": [
+                "TEXT"
+              ]
+            },
+            "lifecycle": "ACTIVE",
+            "customization": {
+              "supported": false,
+              "types": []
+            }
+          },
+          "access": {
+            "onDemand": true,
+            "provisionable": false
+          }
+        },
+        {
+          "modelId": "meta.llama3-70b-instruct-v1:0",
+          "provider": "bedrock",
+          "vendor": "meta",
+          "capabilities": {
+            "streaming": true,
+            "modalities": {
+              "input": [
+                "TEXT"
+              ],
+              "output": [
+                "TEXT"
+              ]
+            },
+            "lifecycle": "ACTIVE",
+            "customization": {
+              "supported": false,
+              "types": []
+            }
+          },
+          "access": {
+            "onDemand": true,
+            "provisionable": false
+          }
+        },
+        {
+          "modelId": "meta.llama3-1-8b-instruct-v1:0",
+          "provider": "bedrock",
+          "vendor": "meta",
+          "capabilities": {
+            "streaming": true,
+            "modalities": {
+              "input": [
+                "TEXT"
+              ],
+              "output": [
+                "TEXT"
+              ]
+            },
+            "lifecycle": "ACTIVE",
+            "customization": {
+              "supported": false,
+              "types": []
+            }
+          },
+          "access": {
+            "onDemand": false,
+            "provisionable": false
+          }
+        },
+        {
+          "modelId": "meta.llama3-1-70b-instruct-v1:0",
+          "provider": "bedrock",
+          "vendor": "meta",
+          "capabilities": {
+            "streaming": true,
+            "modalities": {
+              "input": [
+                "TEXT"
+              ],
+              "output": [
+                "TEXT"
+              ]
+            },
+            "lifecycle": "ACTIVE",
+            "customization": {
+              "supported": false,
+              "types": []
+            }
+          },
+          "access": {
+            "onDemand": false,
+            "provisionable": false
+          }
+        },
+        {
+          "modelId": "meta.llama3-2-11b-instruct-v1:0",
+          "provider": "bedrock",
+          "vendor": "meta",
+          "capabilities": {
+            "streaming": true,
+            "modalities": {
+              "input": [
+                "TEXT",
+                "IMAGE"
+              ],
+              "output": [
+                "TEXT"
+              ]
+            },
+            "lifecycle": "ACTIVE",
+            "customization": {
+              "supported": false,
+              "types": []
+            }
+          },
+          "access": {
+            "onDemand": false,
+            "provisionable": false
+          }
+        },
+        {
+          "modelId": "meta.llama3-2-90b-instruct-v1:0",
+          "provider": "bedrock",
+          "vendor": "meta",
+          "capabilities": {
+            "streaming": true,
+            "modalities": {
+              "input": [
+                "TEXT",
+                "IMAGE"
+              ],
+              "output": [
+                "TEXT"
+              ]
+            },
+            "lifecycle": "ACTIVE",
+            "customization": {
+              "supported": false,
+              "types": []
+            }
+          },
+          "access": {
+            "onDemand": false,
+            "provisionable": false
+          }
+        },
+        {
+          "modelId": "meta.llama3-2-1b-instruct-v1:0",
+          "provider": "bedrock",
+          "vendor": "meta",
+          "capabilities": {
+            "streaming": true,
+            "modalities": {
+              "input": [
+                "TEXT"
+              ],
+              "output": [
+                "TEXT"
+              ]
+            },
+            "lifecycle": "ACTIVE",
+            "customization": {
+              "supported": false,
+              "types": []
+            }
+          },
+          "access": {
+            "onDemand": false,
+            "provisionable": false
+          }
+        },
+        {
+          "modelId": "meta.llama3-2-3b-instruct-v1:0",
+          "provider": "bedrock",
+          "vendor": "meta",
+          "capabilities": {
+            "streaming": true,
+            "modalities": {
+              "input": [
+                "TEXT"
+              ],
+              "output": [
+                "TEXT"
+              ]
+            },
+            "lifecycle": "ACTIVE",
+            "customization": {
+              "supported": false,
+              "types": []
+            }
+          },
+          "access": {
+            "onDemand": false,
+            "provisionable": false
+          }
+        },
+        {
+          "modelId": "meta.llama3-3-70b-instruct-v1:0",
+          "provider": "bedrock",
+          "vendor": "meta",
+          "capabilities": {
+            "streaming": true,
+            "modalities": {
+              "input": [
+                "TEXT"
+              ],
+              "output": [
+                "TEXT"
+              ]
+            },
+            "lifecycle": "ACTIVE",
+            "customization": {
+              "supported": false,
+              "types": []
+            }
+          },
+          "access": {
+            "onDemand": false,
+            "provisionable": false
+          }
+        }
+      ]
+    },
+    {
+      "name": "mistral ai",
+      "models": [
+        {
+          "modelId": "mistral.mistral-7b-instruct-v0:2",
+          "provider": "bedrock",
+          "vendor": "mistral ai",
+          "capabilities": {
+            "streaming": true,
+            "modalities": {
+              "input": [
+                "TEXT"
+              ],
+              "output": [
+                "TEXT"
+              ]
+            },
+            "lifecycle": "ACTIVE",
+            "customization": {
+              "supported": false,
+              "types": []
+            }
+          },
+          "access": {
+            "onDemand": true,
+            "provisionable": false
+          }
+        },
+        {
+          "modelId": "mistral.mixtral-8x7b-instruct-v0:1",
+          "provider": "bedrock",
+          "vendor": "mistral ai",
+          "capabilities": {
+            "streaming": true,
+            "modalities": {
+              "input": [
+                "TEXT"
+              ],
+              "output": [
+                "TEXT"
+              ]
+            },
+            "lifecycle": "ACTIVE",
+            "customization": {
+              "supported": false,
+              "types": []
+            }
+          },
+          "access": {
+            "onDemand": true,
+            "provisionable": false
+          }
+        },
+        {
+          "modelId": "mistral.mistral-large-2402-v1:0",
+          "provider": "bedrock",
+          "vendor": "mistral ai",
+          "capabilities": {
+            "streaming": true,
+            "modalities": {
+              "input": [
+                "TEXT"
+              ],
+              "output": [
+                "TEXT"
+              ]
+            },
+            "lifecycle": "ACTIVE",
+            "customization": {
+              "supported": false,
+              "types": []
+            }
+          },
+          "access": {
+            "onDemand": true,
+            "provisionable": false
+          }
+        },
+        {
+          "modelId": "mistral.mistral-small-2402-v1:0",
+          "provider": "bedrock",
+          "vendor": "mistral ai",
+          "capabilities": {
+            "streaming": true,
+            "modalities": {
+              "input": [
+                "TEXT"
+              ],
+              "output": [
+                "TEXT"
+              ]
+            },
+            "lifecycle": "ACTIVE",
+            "customization": {
+              "supported": false,
+              "types": []
+            }
+          },
+          "access": {
+            "onDemand": true,
+            "provisionable": false
+          }
+        }
+      ]
+    }
+  ],
+  "lastUpdated": "2025-04-04T15:42:11.304Z"
+}

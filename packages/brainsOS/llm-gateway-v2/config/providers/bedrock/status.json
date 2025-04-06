@@ -1,0 +1,400 @@
+{
+  "statuses": [
+    {
+      "status": "READY",
+      "connections": [
+        {
+          "type": "ONDEMAND",
+          "vendors": [
+            {
+              "name": "amazon",
+              "models": [
+                {
+                  "modelId": "amazon.titan-tg1-large",
+                  "billing": "ONDEMAND"
+                },
+                {
+                  "modelId": "amazon.titan-image-generator-v1",
+                  "billing": "ONDEMAND"
+                },
+                {
+                  "modelId": "amazon.titan-image-generator-v2:0",
+                  "billing": "ONDEMAND"
+                },
+                {
+                  "modelId": "amazon.titan-text-premier-v1:0",
+                  "billing": "ONDEMAND"
+                },
+                {
+                  "modelId": "amazon.nova-pro-v1:0",
+                  "billing": "ONDEMAND"
+                },
+                {
+                  "modelId": "amazon.nova-lite-v1:0",
+                  "billing": "ONDEMAND"
+                },
+                {
+                  "modelId": "amazon.nova-canvas-v1:0",
+                  "billing": "ONDEMAND"
+                },
+                {
+                  "modelId": "amazon.nova-reel-v1:0",
+                  "billing": "ONDEMAND"
+                },
+                {
+                  "modelId": "amazon.nova-micro-v1:0",
+                  "billing": "ONDEMAND"
+                },
+                {
+                  "modelId": "amazon.titan-embed-g1-text-02",
+                  "billing": "ONDEMAND"
+                },
+                {
+                  "modelId": "amazon.titan-text-lite-v1",
+                  "billing": "ONDEMAND"
+                },
+                {
+                  "modelId": "amazon.titan-text-express-v1",
+                  "billing": "ONDEMAND"
+                },
+                {
+                  "modelId": "amazon.titan-embed-text-v1",
+                  "billing": "ONDEMAND"
+                },
+                {
+                  "modelId": "amazon.titan-embed-text-v2:0",
+                  "billing": "ONDEMAND"
+                },
+                {
+                  "modelId": "amazon.titan-embed-image-v1",
+                  "billing": "ONDEMAND"
+                }
+              ]
+            },
+            {
+              "name": "stability ai",
+              "models": [
+                {
+                  "modelId": "stability.stable-diffusion-xl-v1",
+                  "billing": "ONDEMAND"
+                }
+              ]
+            },
+            {
+              "name": "ai21 labs",
+              "models": [
+                {
+                  "modelId": "ai21.jamba-instruct-v1:0",
+                  "billing": "ONDEMAND"
+                },
+                {
+                  "modelId": "ai21.jamba-1-5-large-v1:0",
+                  "billing": "ONDEMAND"
+                },
+                {
+                  "modelId": "ai21.jamba-1-5-mini-v1:0",
+                  "billing": "ONDEMAND"
+                }
+              ]
+            },
+            {
+              "name": "anthropic",
+              "models": [
+                {
+                  "modelId": "anthropic.claude-instant-v1",
+                  "billing": "ONDEMAND"
+                },
+                {
+                  "modelId": "anthropic.claude-v2:1",
+                  "billing": "ONDEMAND"
+                },
+                {
+                  "modelId": "anthropic.claude-v2",
+                  "billing": "ONDEMAND"
+                },
+                {
+                  "modelId": "anthropic.claude-3-sonnet-20240229-v1:0",
+                  "billing": "ONDEMAND"
+                },
+                {
+                  "modelId": "anthropic.claude-3-haiku-20240307-v1:0",
+                  "billing": "ONDEMAND"
+                },
+                {
+                "modelId": "anthropic.claude-3-5-sonnet-20240620-v1:0",
+                  "billing": "ONDEMAND"
+                }
+              ]
+            },
+            {
+              "name": "cohere",
+              "models": [
+                {
+                  "modelId": "cohere.command-text-v14",
+                  "billing": "ONDEMAND"
+                },
+                {
+                  "modelId": "cohere.command-r-v1:0",
+                  "billing": "ONDEMAND"
+                },
+                {
+                  "modelId": "cohere.command-r-plus-v1:0",
+                  "billing": "ONDEMAND"
+                },
+                {
+                  "modelId": "cohere.command-light-text-v14",
+                  "billing": "ONDEMAND"
+                },
+                {
+                  "modelId": "cohere.embed-english-v3",
+                  "billing": "ONDEMAND"
+                },
+                {
+                  "modelId": "cohere.embed-multilingual-v3",
+                  "billing": "ONDEMAND"
+                }
+              ]
+            },
+            {
+              "name": "meta",
+              "models": [
+                {
+                  "modelId": "meta.llama3-8b-instruct-v1:0",
+                  "billing": "ONDEMAND"
+                },
+                {
+                  "modelId": "meta.llama3-70b-instruct-v1:0",
+                  "billing": "ONDEMAND"
+                }
+              ]
+            },
+            {
+              "name": "mistral ai",
+              "models": [
+                {
+                  "modelId": "mistral.mistral-7b-instruct-v0:2",
+                  "billing": "ONDEMAND"
+                },
+                {
+                  "modelId": "mistral.mixtral-8x7b-instruct-v0:1",
+                  "billing": "ONDEMAND"
+                },
+                {
+                  "modelId": "mistral.mistral-large-2402-v1:0",
+                  "billing": "ONDEMAND"
+                },
+                {
+                  "modelId": "mistral.mistral-small-2402-v1:0",
+                  "billing": "ONDEMAND"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "PROVISIONED",
+          "vendors": []
+        }
+      ]
+    },
+    {
+      "status": "NOT_READY",
+      "vendors": [
+        {
+          "name": "amazon",
+          "models": [
+            {
+              "modelId": "amazon.titan-image-generator-v1:0",
+              "billing": "TBD"
+            },
+            {
+              "modelId": "amazon.nova-pro-v1:0:24k",
+              "billing": "TBD"
+            },
+            {
+              "modelId": "amazon.nova-pro-v1:0:300k",
+              "billing": "TBD"
+            },
+            {
+              "modelId": "amazon.nova-lite-v1:0:24k",
+              "billing": "TBD"
+            },
+            {
+              "modelId": "amazon.nova-lite-v1:0:300k",
+              "billing": "TBD"
+            },
+            {
+              "modelId": "amazon.nova-micro-v1:0:24k",
+              "billing": "TBD"
+            },
+            {
+              "modelId": "amazon.nova-micro-v1:0:128k",
+              "billing": "TBD"
+            },
+            {
+              "modelId": "amazon.titan-text-lite-v1:0:4k",
+              "billing": "TBD"
+            },
+            {
+              "modelId": "amazon.titan-text-express-v1:0:8k",
+              "billing": "TBD"
+            },
+            {
+              "modelId": "amazon.titan-embed-text-v1:2:8k",
+              "billing": "TBD"
+            },
+            {
+              "modelId": "amazon.titan-embed-text-v2:0:8k",
+              "billing": "TBD"
+            },
+            {
+              "modelId": "amazon.titan-embed-image-v1:0",
+              "billing": "TBD"
+            }
+          ]
+        },
+        {
+          "name": "stability ai",
+          "models": [
+            {
+              "modelId": "stability.stable-diffusion-xl-v1:0",
+              "billing": "TBD"
+            }
+          ]
+        },
+        {
+          "name": "anthropic",
+          "models": [
+            {
+              "modelId": "anthropic.claude-instant-v1:2:100k",
+              "billing": "TBD"
+            },
+            {
+              "modelId": "anthropic.claude-v2:0:18k",
+              "billing": "TBD"
+            },
+            {
+              "modelId": "anthropic.claude-v2:0:100k",
+              "billing": "TBD"
+            },
+            {
+              "modelId": "anthropic.claude-v2:1:18k",
+              "billing": "TBD"
+            },
+            {
+              "modelId": "anthropic.claude-v2:1:200k",
+              "billing": "TBD"
+            },
+            {
+              "modelId": "anthropic.claude-3-sonnet-20240229-v1:0:28k",
+              "billing": "TBD"
+            },
+            {
+              "modelId": "anthropic.claude-3-sonnet-20240229-v1:0:200k",
+              "billing": "TBD"
+            },
+            {
+              "modelId": "anthropic.claude-3-haiku-20240307-v1:0:48k",
+              "billing": "TBD"
+            },
+            {
+              "modelId": "anthropic.claude-3-haiku-20240307-v1:0:200k",
+              "billing": "TBD"
+            },
+            {
+              "modelId": "anthropic.claude-3-opus-20240229-v1:0:12k",
+              "billing": "TBD"
+            },
+            {
+              "modelId": "anthropic.claude-3-opus-20240229-v1:0:28k",
+              "billing": "TBD"
+            },
+            {
+              "modelId": "anthropic.claude-3-opus-20240229-v1:0:200k",
+              "billing": "TBD"
+            },
+            {
+              "modelId": "anthropic.claude-3-opus-20240229-v1:0",
+              "billing": "TBD"
+            },
+            {
+              "modelId": "anthropic.claude-3-5-sonnet-20241022-v2:0",
+              "billing": "TBD"
+            },
+            {
+              "modelId": "anthropic.claude-3-7-sonnet-20250219-v1:0",
+              "billing": "TBD"
+            },
+            {
+              "modelId": "anthropic.claude-3-5-haiku-20241022-v1:0",
+              "billing": "TBD"
+            }
+          ]
+        },
+        {
+          "name": "cohere",
+          "models": [
+            {
+              "modelId": "cohere.command-text-v14:7:4k",
+              "billing": "TBD"
+            },
+            {
+              "modelId": "cohere.command-light-text-v14:7:4k",
+              "billing": "TBD"
+            },
+            {
+              "modelId": "cohere.embed-english-v3:0:512",
+              "billing": "TBD"
+            },
+            {
+              "modelId": "cohere.embed-multilingual-v3:0:512",
+              "billing": "TBD"
+            }
+          ]
+        },
+        {
+          "name": "deepseek",
+          "models": [
+            {
+              "modelId": "deepseek.r1-v1:0",
+              "billing": "TBD"
+            }
+          ]
+        },
+        {
+          "name": "meta",
+          "models": [
+            {
+              "modelId": "meta.llama3-1-8b-instruct-v1:0",
+              "billing": "TBD"
+            },
+            {
+              "modelId": "meta.llama3-1-70b-instruct-v1:0",
+              "billing": "TBD"
+            },
+            {
+              "modelId": "meta.llama3-2-11b-instruct-v1:0",
+              "billing": "TBD"
+            },
+            {
+              "modelId": "meta.llama3-2-90b-instruct-v1:0",
+              "billing": "TBD"
+            },
+            {
+              "modelId": "meta.llama3-2-1b-instruct-v1:0",
+              "billing": "TBD"
+            },
+            {
+              "modelId": "meta.llama3-2-3b-instruct-v1:0",
+              "billing": "TBD"
+            },
+            {
+              "modelId": "meta.llama3-3-70b-instruct-v1:0",
+              "billing": "TBD"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -8,233 +8,167 @@ A flexible and extensible LLM Gateway implementation supporting multiple provide
 - Support for multiple vendors (Anthropic, Meta, etc.)
 - Support for multiple modalities (text-to-text, text-to-image, etc.)
 - Configuration-driven model management
-- Automatic model discovery
+- Model status tracking and availability management
+- Intelligent error handling with model suggestions
 - Streaming support
 - Provisioned/On-demand model support
-- Model aliasing
 - Strong type safety
-- Comprehensive error handling
+- Clear separation of provider, vendor, and model configurations
 
 ## Structure
 
 ```
 llm-gateway-v2/
 ├── src/
-│   ├── core/              # Core gateway logic
-│   ├── registries/        # Configuration registries
+│   ├── Gateway.ts         # Main gateway implementation
 │   ├── providers/         # Provider implementations
 │   ├── vendors/          # Vendor-specific handling
 │   ├── modalities/       # Modality implementations
-│   ├── utils/            # Utilities and discovery
-│   ├── types/            # Type definitions
-│   └── config/           # Configuration files
+│   ├── utils/            # Utilities and helpers
+│   └── types/            # Type definitions
+└── config/               # Configuration files
+    ├── providers.json    # Provider index
+    ├── providers/        # Provider-specific configs
+    │   └── bedrock/
+    │       ├── models.json
+    │       └── settings.json
+    ├── vendors/          # Vendor configurations
+    └── modalities/       # Modality definitions
 ```
 
 ## Configuration
 
-The gateway uses JSON configuration files for:
-- Models and their capabilities
-- Provider settings
-- Vendor-specific handling
-- Modality definitions
+The gateway uses a hierarchical configuration system with clear separation between providers, vendors, and models:
 
-Example configurations are provided in the `config` directory.
-
-## Configuration Organization
-
-The configuration system is organized in a provider-centric way, with a registry-based architecture for managing models, providers, and vendors.
-
-### Directory Structure
-
-```
-config/
-  bedrock/                    # Bedrock-specific configurations
-    models/                   # Individual model configurations
-      claude-3-sonnet.json
-      claude-3-opus.json
-      ...
-    vendors/                  # Vendor-specific configurations
-      anthropic.json
-      amazon.json
-      ...
-    provider.json            # Bedrock provider configuration
-  models.json                # Global model registry (for backward compatibility)
+### Provider Settings (`config/providers/bedrock/settings.json`)
+```json
+{
+  "name": "bedrock",
+  "type": "bedrock",
+  "displayName": "AWS Bedrock",
+  "region": "us-east-1",
+  "capabilities": {
+    "streaming": true,
+    "inferenceTypes": {
+      "onDemand": true,
+      "provisioned": false
+    }
+  }
+}
 ```
 
-### Configuration Files
+### Models Configuration (`config/providers/bedrock/models.json`)
+```json
+{
+  "vendors": [
+    {
+      "name": "anthropic",
+      "models": [
+        {
+          "modelId": "anthropic.claude-3-sonnet-20240229-v1:0",
+          "provider": "bedrock",
+          "vendor": "anthropic",
+          "modality": "text-to-text",
+          "capabilities": {
+            "streaming": true,
+            "inferenceTypes": {
+              "onDemand": true,
+              "provisioned": false
+            }
+          },
+          "llmgateway": {
+            "status": "READY",
+            "billing": "ONDEMAND",
+            "provisioned": false
+          }
+        }
+      ]
+    }
+  ]
+}
+```
 
-1. **Provider Configuration** (`bedrock/provider.json`):
-   ```json
-   {
-     "name": "bedrock",
-     "type": "bedrock",
-     "vendorConfigs": {
-       "anthropic": {
-         "models": ["claude-3-sonnet", "claude-3-opus"]
-       }
-     }
-   }
-   ```
+### Vendor Configuration (`config/vendors/anthropic.json`)
+```json
+{
+  "name": "anthropic",
+  "displayName": "Anthropic",
+  "apiFormats": {
+    "messages": true,
+    "prompt": false
+  },
+  "capabilities": {
+    "streaming": true,
+    "systemPrompts": true
+  }
+}
+```
 
-2. **Model Configuration** (`bedrock/models/claude-3-sonnet.json`):
-   ```json
-   {
-     "modelId": "anthropic.claude-3-sonnet-20240229-v1:0",
-     "provider": "bedrock",
-     "vendor": "anthropic",
-     "modality": "text-to-text",
-     "capabilities": {
-       "streaming": true,
-       "inferenceTypes": {
-         "onDemand": true,
-         "provisioned": false,
-         "streaming": true
-       }
-     }
-   }
-   ```
+## Key Features
 
-3. **Vendor Configuration** (`bedrock/vendors/anthropic.json`):
-   ```json
-   {
-     "name": "anthropic",
-     "models": ["claude-3-sonnet", "claude-3-opus"]
-   }
-   ```
+### Model Status Management
 
-## Registry System
+Each model includes status information:
+```json
+"llmgateway": {
+  "status": "READY" | "NOT READY",
+  "billing": "ONDEMAND" | "provisioned",
+  "provisioned": false
+}
+```
 
-The registry system provides a structured way to access and manage models, providers, and vendors.
+### Intelligent Error Handling
 
-### Key Components
+When a model is unavailable, the gateway suggests alternatives:
+- First tries alternatives from the same vendor
+- Falls back to other vendors on the same provider
+- Includes helpful model information in suggestions
 
-1. **ModelRegistry**
-   - Manages individual model configurations
-   - Handles model aliases
-   - Validates model capabilities
-   - Provides model lookup by ID
-
-2. **ProviderRegistry**
-   - Manages provider configurations and instances
-   - Initializes provider-specific implementations
-   - Handles vendor configurations
-   - Provides provider and vendor lookup
-
-3. **VendorRegistry**
-   - Manages vendor-specific configurations
-   - Handles vendor-specific model capabilities
-   - Provides vendor lookup
-
-### Usage Example
+### Model Discovery
 
 ```typescript
-// Initialize registries
-const modelRegistry = new ModelRegistry();
-const providerRegistry = new ProviderRegistry();
-const vendorRegistry = new VendorRegistry();
+// Get all ready models
+const allReadyModels = await gateway.getReadyModels();
 
-await modelRegistry.initialize(configPath);
-await providerRegistry.initialize(configPath);
-await vendorRegistry.initialize(configPath);
+// Get ready models for specific provider
+const bedrockModels = await gateway.getReadyModels('bedrock');
 
-// Get a model
-const model = modelRegistry.getModel('claude-3-sonnet');
+// Get ready models for specific vendor
+const anthropicModels = await gateway.getReadyModels(undefined, 'anthropic');
 
-// Get a provider
-const provider = providerRegistry.getProvider('bedrock');
-
-// Validate model capabilities
-modelRegistry.validateModelCapabilities('claude-3-sonnet', {
-  modality: 'text-to-text',
-  streaming: true
-});
+// Get ready models for specific provider and vendor
+const bedrockAnthropicModels = await gateway.getReadyModels('bedrock', 'anthropic');
 ```
-
-## Discovery Service
-
-The discovery service automatically detects and updates model configurations from provider APIs.
-
-### Process
-
-1. **Provider Discovery**
-   - Queries provider APIs for available models
-   - Detects model capabilities and inference types
-   - Updates provider-specific configurations
-
-2. **Configuration Update**
-   - Generates provider-specific model configurations
-   - Updates vendor configurations
-   - Maintains registry structure
-   - Preserves backward compatibility
-
-### Running Discovery
-
-```bash
-npm run discover
-```
-
-This will:
-1. Query provider APIs (currently Bedrock)
-2. Generate/update configurations
-3. Maintain registry structure
-4. Log discovery results
-
-## Adding New Providers
-
-To add a new provider:
-
-1. Create provider directory in `config/`
-2. Implement provider-specific discovery
-3. Update registry implementations
-4. Add provider configuration
-
-Example:
-```
-config/
-  new-provider/
-    models/
-    vendors/
-    provider.json
-```
-
-## Best Practices
-
-1. **Configuration Management**
-   - Keep provider-specific configurations separate
-   - Use consistent naming conventions
-   - Document model capabilities clearly
-
-2. **Registry Usage**
-   - Use registries for all model/provider access
-   - Validate capabilities before use
-   - Handle errors appropriately
-
-3. **Discovery**
-   - Run discovery after provider updates
-   - Review generated configurations
-   - Test with updated configurations
 
 ## Usage
 
 ```typescript
 import { Gateway } from '@brainsos/llm-gateway-v2';
 
-const gateway = new Gateway({
-  configPath: './config'
-});
+const gateway = new Gateway();
 
-await gateway.initialize();
+// Initialize with local configuration
+await gateway.initialize('local');
 
+// Chat with a model
 const response = await gateway.chat({
   provider: 'bedrock',
-  vendor: 'anthropic',
-  modelId: 'claude-3',
+  modelId: 'anthropic.claude-3-sonnet-20240229-v1:0',
   messages: [
     { role: 'user', content: 'Hello, how are you?' }
-  ],
-  modality: 'text-to-text',
-  streaming: true
+  ]
 });
+
+// Stream chat responses
+for await (const chunk of gateway.streamChat({
+  provider: 'bedrock',
+  modelId: 'anthropic.claude-3-sonnet-20240229-v1:0',
+  messages: [
+    { role: 'user', content: 'Tell me a story' }
+  ]
+})) {
+  console.log(chunk);
+}
 ```
 
 ## Development

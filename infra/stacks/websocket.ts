@@ -37,21 +37,15 @@ const disconnectHandlerFunction = new sst.aws.Function("disconnectHandlerFunctio
 });
 
 const gwchatFunction = new sst.aws.Function("gwchatFunction", {
-    handler: "packages/brainsOS/handlers/websocket/llm-gateway/chat.handler",
+    handler: "packages/brainsOS/handlers/websocket/llm-gateway-v2/chat.handler",
     link: [brainsOS_websocket_API, systemData],
     permissions: [bedrockPermissions],
     environment: {
       WEBSOCKET_API_ENDPOINT: brainsOS_websocket_API.url
-    }
-  });
+    },
+    copyFiles: [{ from: "packages/brainsOS/llm-gateway-v2/config/", to: "config" }]
 
-const gwstreamFunction = new sst.aws.Function("gwstreamFunction", {
-    handler: "packages/brainsOS/handlers/websocket/llm-gateway/stream.handler",
-    link: [brainsOS_websocket_API],
-    permissions: [bedrockPermissions],
-    environment: {
-      WEBSOCKET_API_ENDPOINT: brainsOS_websocket_API.url
-    }
+    
   });
 
 
@@ -89,7 +83,6 @@ brainsOS_websocket_API.route("$default", defaultHandlerFunction.arn, {});
 
 // LLM Gateway routes
 brainsOS_websocket_API.route("llm/chat", gwchatFunction.arn, {});
-brainsOS_websocket_API.route("llm/stream", gwstreamFunction.arn, {});
 
 // Controller routes
 brainsOS_websocket_API.route("controller/prompt", controllerPromptFunction.arn, {});

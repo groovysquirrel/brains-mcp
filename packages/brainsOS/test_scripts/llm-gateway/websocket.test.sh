@@ -32,29 +32,29 @@ echo "----------------------------------------"
 echo "Connection established! You can now send messages."
 echo "Example messages (copy and paste):"
 echo ""
-echo "1. Basic chat with Claude 3 Sonnet (v2):"
+echo "1. Default Claude 3 model:"
 echo '{"action": "llm/chat", "data": {"messages": [{"role": "user", "content": "Hello, how are you?"}], "provider": "bedrock", "modality": "text"}}'
 echo ""
-echo "2. Streaming chat with Claude 3 Sonnet (v2):"
+echo "2. Specific Claude 3 model:"
+echo '{"action": "llm/chat", "data": {"messages": [{"role": "user", "content": "What is the capital of France?"}], "provider": "bedrock", "modality": "text", "modelId": "anthropic.claude-3-sonnet-20240229-v1:0"}}'
+echo ""
+echo "3. Llama model (v2) - Model not configured"
+echo '{"action": "llm/chat", "data": {"messages": [{"role": "user", "content": "Explain quantum computing in simple terms"}], "provider": "bedrock", "modality": "text", "modelId": "meta.llama2-13b-chat-v1"}}'
+echo ""
+echo "4. Llama model - Model not ready"
+echo '{"action": "llm/chat", "data": {"messages": [{"role": "user", "content": "Explain quantum computing in simple terms"}], "provider": "bedrock", "modality": "text", "modelId": "meta.llama3-2-1b-instruct-v1:0"}}'
+echo ""
+echo "5. Llama model - Model READY"
+echo '{"action": "llm/chat", "data": {"messages": [{"role": "user", "content": "Explain quantum computing in simple terms"}], "provider": "bedrock", "modality": "text", "modelId": "meta.llama3-70b-instruct-v1:0"}}'
+echo ""
+echo "6. Claude 2 model (v2):"
+echo '{"action": "llm/chat", "data": {"messages": [{"role": "user", "content": "Write a short poem about technology"}], "provider": "bedrock", "modality": "text", "modelId": "anthropic.claude-v2"}}'
+echo ""
+echo "7. Streaming chat with Claude 3 (v2):"
 echo '{"action": "llm/chat", "data": {"messages": [{"role": "user", "content": "Tell me a short story about a robot"}], "provider": "bedrock", "modality": "text", "streaming": true}}'
 echo ""
-echo "3. Chat with Llama 2 (v2):"
-echo '{"action": "llm/chat", "data": {"messages": [{"role": "user", "content": "What is machine learning?"}], "provider": "bedrock", "modality": "text", "modelId": "meta.llama2-70b-chat-v2:0"}}'
-echo ""
-echo "4. Chat with Claude 3 Haiku (v2):"
-echo '{"action": "llm/chat", "data": {"messages": [{"role": "user", "content": "What is the capital of France?"}], "provider": "bedrock", "modality": "text", "modelId": "anthropic.claude-3-haiku-20240307-v1:0"}}'
-echo ""
-echo "5. Chat with system prompt and temperature (v2):"
-echo '{"action": "llm/chat", "data": {"messages": [{"role": "user", "content": "Write a haiku about coding"}], "provider": "bedrock", "modality": "text", "systemPrompt": "You are a creative poet who writes in various styles.", "temperature": 0.8}}'
-echo ""
-echo "6. Chat with Mistral (v2):"
-echo '{"action": "llm/chat", "data": {"messages": [{"role": "user", "content": "Write a function to sort an array"}], "provider": "bedrock", "modality": "text", "modelId": "mistral.mistral-7b-instruct-v0:2"}}'
-echo ""
-echo "7. Chat with max tokens (v2):"
-echo '{"action": "llm/chat", "data": {"messages": [{"role": "user", "content": "Explain quantum computing"}], "provider": "bedrock", "modality": "text", "maxTokens": 100}}'
-echo ""
-echo "8. Chat with metadata (v2):"
-echo '{"action": "llm/chat", "data": {"messages": [{"role": "user", "content": "What is the weather?"}], "provider": "bedrock", "modality": "text", "metadata": {"location": "New York", "time": "morning"}}}'
+echo "8. Chat with system prompt (v2):"
+echo '{"action": "llm/chat", "data": {"messages": [{"role": "user", "content": "Write a haiku about coding"}], "provider": "bedrock", "modality": "text", "systemPrompt": "You are a creative poet who writes in various styles."}}'
 echo ""
 echo "9. To exit gracefully, press Ctrl+C"
 echo "----------------------------------------"

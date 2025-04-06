@@ -1,54 +1,102 @@
 import { AbstractProvider } from './AbstractProvider';
 import { GatewayRequest } from '../types/Request';
-import { GatewayResponse } from '../types/Response';
 import { ModelConfig } from '../types/Model';
+import { BedrockRuntimeClient, InvokeModelCommand, InvokeModelWithResponseStreamCommand } from '@aws-sdk/client-bedrock-runtime';
+import { AbstractVendor } from '../vendors/AbstractVendor';
 import { ProviderConfig } from '../types/Provider';
-import { Logger } from '../utils/logging/Logger';
-import { BedrockRuntimeClient } from '@aws-sdk/client-bedrock-runtime';
-import { InvokeModelCommand, InvokeModelWithResponseStreamCommand, InvokeModelCommandOutput, InvokeModelWithResponseStreamCommandOutput } from '@aws-sdk/client-bedrock-runtime';
+import { VendorConfig } from '../types/Vendor';
+import { AnthropicVendor } from '../vendors/AnthropicVendor';
+import { MetaVendor } from '../vendors/MetaVendor';
 
 export class BedrockProvider extends AbstractProvider {
   private bedrock: BedrockRuntimeClient;
+  private vendorConfigs: Record<string, VendorConfig>;
 
-  constructor(config: ProviderConfig) {
+  constructor(config: ProviderConfig, vendorConfigs: Record<string, VendorConfig>) {
     super(config);
-    this.bedrock = new BedrockRuntimeClient({
-      region: config.region || 'us-east-1'
-    });
+    this.bedrock = new BedrockRuntimeClient({});
+    this.vendorConfigs = vendorConfigs;
+  }
+
+  protected getVendor(modelId: string): AbstractVendor {
+    const vendorName = modelId.split('.')[0];
+    
+    switch (vendorName.toLowerCase()) {
+      case 'anthropic':
+        return new AnthropicVendor(this.vendorConfigs.anthropic);
+      case 'meta':
+        return new MetaVendor(this.vendorConfigs.meta);
+      default:
+        throw new Error(`No vendor handler implemented for ${vendorName}`);
+    }
   }
 
   supportsVendor(vendor: string): boolean {
-    return ['anthropic', 'meta', 'mistral'].includes(vendor.toLowerCase());
+    return ['anthropic', 'meta'].includes(vendor.toLowerCase());
   }
 
-  async chat(request: GatewayRequest, model: ModelConfig): Promise<GatewayResponse> {
-    this.validateRequest(request, model);
+  async chat(request: GatewayRequest, model: ModelConfig): Promise<{ content: string; metadata?: Record<string, unknown> }> {
+    const vendor = this.getVendor(model.modelId);
+    const formattedRequest = vendor.formatRequest(request, model.modelId);
+
+    console.debug('Sending request to Bedrock:', {
+      modelId: model.modelId,
+      request: formattedRequest
+    });
 
     try {
       const command = new InvokeModelCommand({
         modelId: model.modelId,
         contentType: 'application/json',
         accept: 'application/json',
-        body: this.formatRequest(request, model)
+        body: JSON.stringify(formattedRequest)
       });
 
       const response = await this.bedrock.send(command);
-      return this.formatResponse(response, model);
+      
+      console.debug('Received response from Bedrock:', {
+        modelId: model.modelId,
+        response
+      });
+
+      // Decode the response body
+      const responseBody = new TextDecoder().decode(response.body);
+      const parsedResponse = JSON.parse(responseBody);
+
+      console.debug('Parsed response from Bedrock:', {
+        modelId: model.modelId,
+        parsedResponse
+      });
+
+      return vendor.formatResponse({
+        ...parsedResponse,
+        model: model.modelId
+      });
     } catch (error) {
-      this.logger.error('Failed to invoke Bedrock model:', error);
+      console.error('Error in Bedrock chat:', {
+        error,
+        modelId: model.modelId,
+        request: formattedRequest
+      });
       throw error;
     }
   }
 
-  async *streamChat(request: GatewayRequest, model: ModelConfig): AsyncGenerator<GatewayResponse> {
-    this.validateRequest(request, model);
+  async *streamChat(request: GatewayRequest, model: ModelConfig): AsyncGenerator<{ content: string; metadata?: Record<string, unknown> }> {
+    const vendor = this.getVendor(model.modelId);
+    const formattedRequest = vendor.formatRequest(request, model.modelId);
+
+    console.debug('Sending streaming request to Bedrock:', {
+      modelId: model.modelId,
+      request: formattedRequest
+    });
 
     try {
       const command = new InvokeModelWithResponseStreamCommand({
         modelId: model.modelId,
         contentType: 'application/json',
         accept: 'application/json',
-        body: this.formatRequest(request, model)
+        body: JSON.stringify(formattedRequest)
       });
 
       const response = await this.bedrock.send(command);
@@ -59,38 +107,22 @@ export class BedrockProvider extends AbstractProvider {
 
       for await (const chunk of response.body) {
         if (chunk.chunk?.bytes) {
-          const decoded = new TextDecoder().decode(chunk.chunk.bytes);
-          const parsed = JSON.parse(decoded);
-          yield this.formatResponse(parsed, model);
+          const chunkString = new TextDecoder().decode(chunk.chunk.bytes);
+          const parsedChunk = JSON.parse(chunkString);
+          
+          yield vendor.formatResponse({
+            ...parsedChunk,
+            model: model.modelId
+          });
         }
       }
     } catch (error) {
-      this.logger.error('Failed to stream from Bedrock model:', error);
+      console.error('Error in Bedrock streamChat:', {
+        error,
+        modelId: model.modelId,
+        request: formattedRequest
+      });
       throw error;
     }
-  }
-
-  private formatRequest(request: GatewayRequest, model: ModelConfig): Uint8Array {
-    // This is a simplified version. In reality, you'd need to handle
-    // different vendor formats (Anthropic, Meta, etc.)
-    const formatted = {
-      prompt: request.messages?.map(m => `${m.role}: ${m.content}`).join('\n') || request.prompt,
-      max_tokens: request.maxTokens || this.config.defaultMaxTokens,
-      temperature: request.temperature || this.config.defaultTemperature
-    };
-
-    return new TextEncoder().encode(JSON.stringify(formatted));
-  }
-
-  private formatResponse(response: InvokeModelCommandOutput | any, model: ModelConfig): GatewayResponse {
-    // This is a simplified version. In reality, you'd need to handle
-    // different vendor response formats
-    return {
-      content: response.completion || response.output || '',
-      metadata: {
-        modelId: model.modelId,
-        vendor: model.vendor
-      }
-    };
   }
 } 

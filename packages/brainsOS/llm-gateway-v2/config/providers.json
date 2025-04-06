@@ -1,0 +1,9 @@
+{
+  "providers": [
+    {
+      "name": "bedrock",
+      "configPath": "bedrock/settings.json",
+      "enabled": true
+    }
+  ]
+} 

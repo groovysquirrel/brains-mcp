@@ -26,8 +26,21 @@ export abstract class AbstractProvider {
       throw new Error(`Model ${model.modelId} does not support streaming`);
     }
 
-    if (request.provisioned && !model.capabilities.provisioned) {
-      throw new Error(`Model ${model.modelId} is not provisioned`);
+    if (request.provisioned && !model.access.provisionable) {
+      throw new Error(`Model ${model.modelId} is not provisionable`);
     }
+  }
+
+  protected getDefaultSettings(): {
+    temperature?: number;
+    topP?: number;
+    maxTokens?: number;
+    stopSequences?: string[];
+  } {
+    return this.config.defaultSettings || {
+      maxTokens: 1024,
+      temperature: 0.7,
+      topP: 1
+    };
   }
 } 

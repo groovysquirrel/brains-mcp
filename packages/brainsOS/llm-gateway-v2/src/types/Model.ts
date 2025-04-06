@@ -1,25 +1,57 @@
-export interface ModelCapabilities {
-  modalities: string[];
-  streaming: boolean;
+export interface InferenceTypes {
+  onDemand: boolean;
   provisioned: boolean;
-  inputModalities: string[];
-  outputModalities: string[];
-  maxTokens?: number;
-  temperatureRange?: {
-    min: number;
-    max: number;
+  streaming: boolean;
+}
+
+export interface ModelCapabilities {
+  streaming: boolean;
+  modalities: {
+    input: string[];
+    output: string[];
   };
-  imageSizes?: string[];
+  lifecycle: string;
+  customization: {
+    supported: boolean;
+    types: string[];
+  };
+  inferenceTypes: InferenceTypes;
+}
+
+export interface ModelAccess {
+  onDemand: boolean;
+  provisionable: boolean;
+}
+
+export interface ModelStatus {
+  gateway: string;
+  connection: string;
 }
 
 export interface ModelConfig {
   modelId: string;
-  aliases?: string[];
   provider: string;
   vendor: string;
-  modality: string;
   capabilities: ModelCapabilities;
-  maxTokens?: number;
-  temperature?: number;
-  vendorConfig?: Record<string, unknown>;
+  access: ModelAccess;
+  status: ModelStatus;
+  displayName?: string;
+  description?: string;
+  aliases?: string[];
+}
+
+export interface ModelsConfiguration {
+  models: ModelConfig[];
+  lastUpdated: string;
+}
+
+export function getDefaultConfig(): ModelsConfiguration {
+  return {
+    models: [],
+    lastUpdated: new Date().toISOString()
+  };
+}
+
+export interface ModelConfigWithAliases extends ModelConfig {
+  aliases?: string[];
 } 
