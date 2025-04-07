@@ -171,9 +171,11 @@ export const handler = async (event: WebSocketEvent) => {
       messages: data.messages || [],
       prompt: data.prompt,
       modality: 'text-to-text',     // Always use text-to-text regardless of input modality
-      streaming: data.stream || false,  // Whether to stream the response
+      streaming: data.streaming || data.stream || false,  // Support both streaming and stream fields
+      tokenGrouping: data.tokenGrouping || 10,
       maxTokens: data.maxTokens,
       temperature: data.temperature,
+      systemPrompt: data.systemPrompt,  // Include system prompt
       metadata: {
         ...data.metadata,
         userId,

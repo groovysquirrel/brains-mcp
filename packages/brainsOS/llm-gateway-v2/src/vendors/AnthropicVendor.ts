@@ -1,153 +1,145 @@
 import { AbstractVendor } from './AbstractVendor';
 import { GatewayRequest } from '../types/Request';
 import { VendorConfig } from '../types/Vendor';
+import { ProviderConfig } from '../types/Provider';
+import { ModelConfig } from '../types/Model';
+import { GatewayResponse } from '../types/Response';
+import { AbstractProvider } from '../providers/AbstractProvider';
+import { InvokeModelWithResponseStreamCommand } from '@aws-sdk/client-bedrock-runtime';
 
 export class AnthropicVendor extends AbstractVendor {
-  constructor(config: VendorConfig) {
-    super(config);
+  constructor(config: VendorConfig, providerConfig: ProviderConfig) {
+    super(config, providerConfig);
   }
 
-  private getBedrockModelId(modelId: string): string {
-    // Remove any existing prefix to normalize the ID
-    const normalizedId = modelId.replace(/^anthropic\./, '');
-    
-    // Check if this is a Claude 3 model
-    if (normalizedId.includes('claude-3')) {
-      // For Claude 3 models, we need the full model ID with version
-      const model = this.config.models?.find(m => 
-        m.name === normalizedId || 
-        m.id === normalizedId || 
-        m.id === normalizedId
-      );
+  async process(request: GatewayRequest, model: ModelConfig): Promise<GatewayResponse> {
+    throw new Error('Method not implemented.');
+  }
 
-      if (model) {
-        return model.id;
+  async *streamProcess(request: GatewayRequest, model: ModelConfig, provider: AbstractProvider): AsyncGenerator<GatewayResponse> {
+    const formattedRequest = this.formatRequest(request, model.modelId);
+    
+    try {
+      const command = new InvokeModelWithResponseStreamCommand({
+        modelId: model.modelId,
+        contentType: 'application/json',
+        accept: 'application/json',
+        body: JSON.stringify(formattedRequest)
+      });
+
+      console.debug('Sending streaming request to Bedrock:', {
+        modelId: model.modelId,
+        request: formattedRequest,
+        tokenGrouping: request.tokenGrouping
+      });
+
+      const response = await (provider as any).bedrock.send(command);
+      
+      if (!response.body) {
+        throw new Error('No response body received from Bedrock');
       }
 
-      // If no match found, construct the full model ID
-      return normalizedId;
+      yield* this.handleStreamingResponse(response, model.modelId, provider, request);
+    } catch (error) {
+      console.error('Error in Anthropic streaming:', {
+        error,
+        modelId: model.modelId,
+        request: formattedRequest
+      });
+      throw error;
     }
-
-    // For older models, just return the normalized ID
-    return normalizedId;
   }
 
-  getApiFormat(modelId: string): string {
-    // Remove the vendor prefix if present
-    const normalizedModelId = modelId.replace(/^anthropic\./, '');
+  processStreamChunk(chunk: unknown, modelId: string): { content: string; metadata?: Record<string, unknown> } | null {
+    const chunkObj = chunk as Record<string, unknown>;
     
-    // Use the modelApiMapping from the vendor config
-    const apiFormat = this.config.modelApiMapping?.[normalizedModelId];
-    if (apiFormat) {
-      return apiFormat;
+    if (chunkObj.type === 'content_block_delta') {
+      const content = (chunkObj.delta as Record<string, unknown>).text as string;
+      return {
+        content,
+        metadata: {
+          model: modelId,
+          isStreaming: true
+        }
+      };
+    } else if (chunkObj.type === 'message_stop') {
+      return {
+        content: '',
+        metadata: {
+          model: modelId,
+          usage: chunkObj.usage,
+          isStreaming: false
+        }
+      };
     }
     
-    // If no mapping found, check if the model is in the messages API list
-    if (this.config.apiFormats?.messages?.models?.includes(normalizedModelId)) {
-      return 'messages';
-    }
-    
-    // Default to prompt API
-    return 'prompt';
+    return null;
   }
 
   formatRequest(request: GatewayRequest, modelId: string): Record<string, unknown> {
     if (!request.messages) {
-      throw new Error('Messages are required for Anthropic models');
+      throw new Error('Messages are required for Claude models');
     }
 
-    const apiFormat = this.getApiFormat(modelId);
     const defaultSettings = this.getDefaultSettings();
-
-    if (apiFormat === 'messages') {
-      // Messages API format for Claude 3
-      return {
-        messages: request.messages.map(msg => ({
-          role: msg.role,
-          content: msg.content
-        })),
-        max_tokens: request.maxTokens || defaultSettings.maxTokens,
-        temperature: request.temperature || defaultSettings.temperature,
-        top_p: request.topP || defaultSettings.topP,
-        anthropic_version: 'bedrock-2023-05-31'
-      };
-    }
-
-    // Prompt API format for Claude 2
-    let prompt = '';
     
-    // Add system message if present
-    const systemMessage = request.messages.find(msg => msg.role === 'system');
-    if (systemMessage) {
-      prompt += `\n\nHuman: ${systemMessage.content}\n\n`;
-    }
-
-    // Add user messages
-    const userMessages = request.messages.filter(msg => msg.role === 'user');
-    if (userMessages.length > 0) {
-      prompt += `\n\nHuman: ${userMessages[0].content}\n\n`;
-    }
-
-    // Add assistant messages if present
-    const assistantMessages = request.messages.filter(msg => msg.role === 'assistant');
-    if (assistantMessages.length > 0) {
-      prompt += `Assistant: ${assistantMessages[0].content}\n\n`;
-    }
-
-    // Add final assistant prefix
-    prompt += 'Assistant:';
-
-    return {
-      prompt,
-      max_tokens_to_sample: request.maxTokens || defaultSettings.maxTokens,
+    // Format messages according to Bedrock's requirements
+    const messages = request.messages.map(msg => ({
+      role: msg.role,
+      content: msg.content
+    }));
+    
+    const requestBody: Record<string, unknown> = {
+      messages,
+      max_tokens: request.maxTokens || defaultSettings.maxTokens,
       temperature: request.temperature || defaultSettings.temperature,
       top_p: request.topP || defaultSettings.topP,
-      stop_sequences: request.stopSequences || defaultSettings.stopSequences
+      anthropic_version: 'bedrock-2023-05-31'
     };
+
+    // Add system prompt if provided
+    if (request.systemPrompt) {
+      requestBody.system = request.systemPrompt;
+    }
+
+    console.debug('AnthropicVendor formatRequest:', {
+      modelId,
+      requestBody,
+      systemPrompt: request.systemPrompt
+    });
+    
+    return requestBody;
   }
 
   validateRequest(request: GatewayRequest): void {
     if (!request.messages || request.messages.length === 0) {
-      throw new Error('At least one message is required');
-    }
-
-    const validRoles = ['user', 'assistant', 'system'];
-    for (const message of request.messages) {
-      if (!validRoles.includes(message.role)) {
-        throw new Error(`Invalid message role: ${message.role}`);
-      }
+      throw new Error('Messages are required for Claude models');
     }
   }
 
   getDefaultSettings() {
     return this.config.defaultSettings || {
-      maxTokens: 1024,
+      maxTokens: 4096,
       temperature: 0.7,
-      topP: 1,
-      stopSequences: ['\n\nHuman:', '\n\nAssistant:']
+      topP: 1
     };
+  }
+
+  getApiFormat(modelId: string): string {
+    return 'messages';
   }
 
   formatResponse(response: unknown): { content: string; metadata?: Record<string, unknown> } {
     const responseObj = response as Record<string, unknown>;
-    const apiFormat = this.getApiFormat(responseObj.model as string);
+    const content = responseObj.content as Array<{ text: string }> | undefined;
     
-    if (apiFormat === 'messages') {
-      const content = Array.isArray(responseObj.content) 
-        ? (responseObj.content[0] as { text: string })?.text || ''
-        : responseObj.content as string;
-
-      return {
-        content,
-        metadata: {
-          model: responseObj.model,
-          usage: responseObj.usage
-        }
-      };
-    }
-
+    console.debug('AnthropicVendor formatResponse:', {
+      response: responseObj,
+      content
+    });
+    
     return {
-      content: responseObj.completion as string,
+      content: content?.[0]?.text || '',
       metadata: {
         model: responseObj.model,
         usage: responseObj.usage

@@ -23,9 +23,9 @@ export class BedrockProvider extends AbstractProvider {
     
     switch (vendorName.toLowerCase()) {
       case 'anthropic':
-        return new AnthropicVendor(this.vendorConfigs.anthropic);
+        return new AnthropicVendor(this.vendorConfigs.anthropic, this.config);
       case 'meta':
-        return new MetaVendor(this.vendorConfigs.meta);
+        return new MetaVendor(this.vendorConfigs.meta, this.config);
       default:
         throw new Error(`No vendor handler implemented for ${vendorName}`);
     }
@@ -105,16 +105,8 @@ export class BedrockProvider extends AbstractProvider {
         throw new Error('No response body received from Bedrock');
       }
 
-      for await (const chunk of response.body) {
-        if (chunk.chunk?.bytes) {
-          const chunkString = new TextDecoder().decode(chunk.chunk.bytes);
-          const parsedChunk = JSON.parse(chunkString);
-          
-          yield vendor.formatResponse({
-            ...parsedChunk,
-            model: model.modelId
-          });
-        }
+      for await (const chunk of vendor.streamProcess(request, model, this)) {
+        yield chunk;
       }
     } catch (error) {
       console.error('Error in Bedrock streamChat:', {

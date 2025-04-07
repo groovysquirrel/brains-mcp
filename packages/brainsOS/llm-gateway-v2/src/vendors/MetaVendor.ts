@@ -1,45 +1,54 @@
 import { AbstractVendor } from './AbstractVendor';
 import { GatewayRequest } from '../types/Request';
 import { VendorConfig } from '../types/Vendor';
+import { ProviderConfig } from '../types/Provider';
+import { ModelConfig } from '../types/Model';
+import { GatewayResponse } from '../types/Response';
+import { AbstractProvider } from '../providers/AbstractProvider';
+import { InvokeModelWithResponseStreamCommand } from '@aws-sdk/client-bedrock-runtime';
 
 export class MetaVendor extends AbstractVendor {
-  constructor(config: VendorConfig) {
-    super(config);
+  constructor(config: VendorConfig, providerConfig: ProviderConfig) {
+    super(config, providerConfig);
   }
 
   formatRequest(request: GatewayRequest, modelId: string): Record<string, unknown> {
     if (!request.messages) {
-      throw new Error('Messages are required for Meta models');
+      throw new Error('Messages are required for Llama models');
     }
 
     const defaultSettings = this.getDefaultSettings();
     
-    // Format messages according to Bedrock's requirements
-    let prompt = '';
+    // Get the user's message content
+    const userMessage = request.messages.find(msg => msg.role === 'user');
+    if (!userMessage) {
+      throw new Error('User message is required');
+    }
+
+    // Format the prompt according to Llama 3's instruction format
+    let formattedPrompt = '';
     
-    // Add system message if present
-    const systemMessage = request.messages.find(msg => msg.role === 'system');
-    if (systemMessage) {
-      prompt += `System: ${systemMessage.content}\n\n`;
+    // Add system prompt if provided
+    if (request.systemPrompt) {
+      formattedPrompt += `<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n${request.systemPrompt}\n<|eot_id|>\n`;
+    } else {
+      formattedPrompt += `<|begin_of_text|>`;
     }
-
-    // Add user messages
-    const userMessages = request.messages.filter(msg => msg.role === 'user');
-    if (userMessages.length > 0) {
-      prompt += `Human: ${userMessages[0].content}\n\n`;
-    }
-
-    // Add assistant messages if present
-    const assistantMessages = request.messages.filter(msg => msg.role === 'assistant');
-    if (assistantMessages.length > 0) {
-      prompt += `Assistant: ${assistantMessages[0].content}\n\n`;
-    }
-
-    // Add final assistant prefix
-    prompt += 'Assistant:';
-
+    
+    // Add user message
+    formattedPrompt += `<|start_header_id|>user<|end_header_id|>\n${userMessage.content}\n<|eot_id|>\n`;
+    
+    // Add assistant header
+    formattedPrompt += `<|start_header_id|>assistant<|end_header_id|>\n`;
+    
+    console.debug('Formatted prompt for Llama:', {
+      modelId,
+      systemPrompt: request.systemPrompt,
+      formattedPrompt
+    });
+    
     return {
-      prompt,
+      prompt: formattedPrompt,
       max_gen_len: request.maxTokens || defaultSettings.maxTokens,
       temperature: request.temperature || defaultSettings.temperature,
       top_p: request.topP || defaultSettings.topP
@@ -59,6 +68,52 @@ export class MetaVendor extends AbstractVendor {
     }
   }
 
+  processStreamChunk(chunk: unknown, modelId: string): { content: string; metadata?: Record<string, unknown> } | null {
+    const chunkObj = chunk as Record<string, unknown>;
+    
+    // Handle generation chunk
+    if (chunkObj.generation) {
+      const content = chunkObj.generation as string;
+      
+      // Skip empty content
+      if (!content.trim()) {
+        return null;
+      }
+      
+      return {
+        content,
+        metadata: {
+          model: modelId,
+          isStreaming: true
+        }
+      };
+    }
+    
+    // Handle final message with usage stats
+    if (chunkObj.usage) {
+      return {
+        content: '',
+        metadata: {
+          model: modelId,
+          usage: chunkObj.usage,
+          isStreaming: false
+        }
+      };
+    }
+    
+    // Handle error chunk
+    if (chunkObj.error) {
+      console.error('Received error chunk:', {
+        modelId,
+        error: chunkObj.error
+      });
+      
+      return null;
+    }
+    
+    return null;
+  }
+
   getDefaultSettings() {
     return this.config.defaultSettings || {
       maxTokens: 4096,
@@ -68,7 +123,6 @@ export class MetaVendor extends AbstractVendor {
   }
 
   getApiFormat(modelId: string): string {
-    // Meta models use a single format
     return 'prompt';
   }
 
@@ -82,5 +136,43 @@ export class MetaVendor extends AbstractVendor {
         usage: responseObj.usage
       }
     };
+  }
+
+  async process(request: GatewayRequest, model: ModelConfig): Promise<GatewayResponse> {
+    throw new Error('Method not implemented.');
+  }
+
+  async *streamProcess(request: GatewayRequest, model: ModelConfig, provider: AbstractProvider): AsyncGenerator<GatewayResponse> {
+    const formattedRequest = this.formatRequest(request, model.modelId);
+    
+    try {
+      const command = new InvokeModelWithResponseStreamCommand({
+        modelId: model.modelId,
+        contentType: 'application/json',
+        accept: 'application/json',
+        body: JSON.stringify(formattedRequest)
+      });
+
+      console.debug('Sending streaming request to Bedrock:', {
+        modelId: model.modelId,
+        request: formattedRequest,
+        tokenGrouping: request.tokenGrouping
+      });
+
+      const response = await (provider as any).bedrock.send(command);
+      
+      if (!response.body) {
+        throw new Error('No response body received from Bedrock');
+      }
+
+      yield* this.handleStreamingResponse(response, model.modelId, provider, request);
+    } catch (error) {
+      console.error('Error in Llama streaming:', {
+        error,
+        modelId: model.modelId,
+        request: formattedRequest
+      });
+      throw error;
+    }
   }
 } 

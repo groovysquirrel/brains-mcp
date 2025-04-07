@@ -11,6 +11,7 @@ export interface GatewayRequest {
   prompt?: string;
   modality: string;
   streaming?: boolean;
+  stream?: boolean;
   provisioned?: boolean;
   systemPrompt?: string;
   temperature?: number;
@@ -19,4 +20,5 @@ export interface GatewayRequest {
   topP?: number;
   stopSequences?: string[];
   model?: string;
+  tokenGrouping?: number;
 } 

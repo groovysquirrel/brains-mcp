@@ -20,13 +20,18 @@ import { GatewayResponse } from '../../../llm-gateway-v2/src/types/Response';
 const logger = new Logger('StreamHandler');
 const connectionManager = ConnectionManager.getInstance();
 
+
 export class StreamHandler {
-  // Map to track active streams and their abort controllers
-  // This allows us to cancel streams if needed
-  private activeStreams: Map<string, AbortController>;
+  private buffers: Map<string, {
+    content: string;
+    metadata?: Record<string, unknown>;
+    lastFlush: number;
+    timeout?: ReturnType<typeof setTimeout>;
+    aborted?: boolean;
+  }>;
 
   constructor() {
-    this.activeStreams = new Map();
+    this.buffers = new Map();
   }
 
   /**
@@ -44,59 +49,92 @@ export class StreamHandler {
    * @param metadata - Optional metadata to include in responses
    */
   public async handleStream(
-    stream: AsyncIterable<GatewayResponse>,
+    stream: AsyncGenerator<GatewayResponse>,
     connectionId: string,
-    userId?: string,
+    userId: string,
     conversationId?: string,
     metadata?: Record<string, unknown>
   ): Promise<void> {
-    // Create an abort controller for this stream
-    const abortController = new AbortController();
-    this.activeStreams.set(connectionId, abortController);
-
     try {
-      // Process each chunk from the stream
       for await (const chunk of stream) {
-        // Check if the stream has been aborted
-        if (abortController.signal.aborted) {
-          logger.info('Stream aborted', { connectionId, userId });
-          break;
-        }
-
-        // Send the chunk to the client
-        await connectionManager.sendMessage(connectionId, {
-          type: 'stream',
-          data: {
-            ...chunk,
-            conversationId,
-            metadata
-          }
-        });
+        await this.handleChunk(chunk, connectionId);
       }
-
-      // Send stream end message when complete
+      
+      // Flush any remaining content
+      await this.flushBuffer(connectionId);
+      
+      // Send final message with metadata
       await connectionManager.sendMessage(connectionId, {
         type: 'stream_end',
         data: {
-          conversationId,
-          metadata
+          metadata: {
+            ...metadata,
+            userId,
+            conversationId,
+            timestamp: new Date().toISOString()
+          }
         }
       });
     } catch (error) {
-      // Log and handle stream errors
-      logger.error('Stream error', { error, connectionId, userId });
+      logger.error('Error handling stream:', {
+        error,
+        connectionId,
+        userId
+      });
+      
       await connectionManager.sendMessage(connectionId, {
         type: 'error',
         data: {
           message: error.message,
-          code: error.code || 'STREAM_ERROR',
-          conversationId
+          code: error.code || 'INTERNAL_ERROR'
         }
       });
-    } finally {
-      // Clean up the stream from active streams
-      this.activeStreams.delete(connectionId);
     }
+  }
+
+  private async handleChunk(chunk: GatewayResponse, connectionId: string) {
+    const buffer = this.getOrCreateBuffer(connectionId);
+    
+    // Check if stream was aborted
+    if (buffer.aborted) {
+      return;
+    }
+    
+    // Pass through all chunks directly without buffering
+    await connectionManager.sendMessage(connectionId, {
+      type: 'stream',
+      data: {
+        content: chunk.content,
+        metadata: chunk.metadata
+      }
+    });
+  }
+
+  private getOrCreateBuffer(connectionId: string) {
+    if (!this.buffers.has(connectionId)) {
+      this.buffers.set(connectionId, {
+        content: '',
+        lastFlush: Date.now()
+      });
+    }
+    return this.buffers.get(connectionId)!;
+  }
+
+  private async flushBuffer(connectionId: string) {
+    const buffer = this.buffers.get(connectionId);
+    if (!buffer || !buffer.content || buffer.aborted) return;
+    
+    // Clear the buffer
+    buffer.content = '';
+    buffer.metadata = undefined;
+    
+    // Clear any existing timeout
+    if (buffer.timeout) {
+      clearTimeout(buffer.timeout);
+      buffer.timeout = undefined;
+    }
+    
+    buffer.lastFlush = Date.now();
   }
 
   /**
@@ -109,12 +147,24 @@ export class StreamHandler {
    * @param connectionId - ID of the connection to abort
    */
   public abortStream(connectionId: string): void {
-    const controller = this.activeStreams.get(connectionId);
-    if (controller) {
-      // Abort the stream
-      controller.abort();
-      // Remove from active streams
-      this.activeStreams.delete(connectionId);
+    const buffer = this.buffers.get(connectionId);
+    if (buffer) {
+      // Mark the stream as aborted
+      buffer.aborted = true;
+      
+      // Clear any pending timeout
+      if (buffer.timeout) {
+        clearTimeout(buffer.timeout);
+        buffer.timeout = undefined;
+      }
+      
+      // Clear the buffer
+      buffer.content = '';
+      buffer.metadata = undefined;
+      
+      // Remove the buffer
+      this.buffers.delete(connectionId);
+      
       logger.info('Aborted stream', { connectionId });
     }
   }
