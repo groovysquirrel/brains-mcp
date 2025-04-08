@@ -10,7 +10,10 @@ export default $config({
       home: "aws",
       providers: {        
         aws: { region: "us-east-1" }      
-      } 
+      },
+      env: {
+        AWS_REGION: "us-east-1"
+      }
 
     };
   },
@@ -26,6 +29,8 @@ export default $config({
     const frontend = await import("./infra/stacks/frontends");
     const api = await import("./infra/stacks/api");
     const websocket = await import("./infra/stacks/websocket");
+    const storage = await import("./infra/stacks/storage");
+    const queues = await import("./infra/stacks/queues");
 
     // Import the apps
     const llmGateway = await import("./infra/apps/llm-gateway");
@@ -33,13 +38,16 @@ export default $config({
     const library = await import("./infra/apps/library");
     
     return {
-      userPool: auth.userPool.id,
-      Region: aws.getRegionOutput().name,
-      identityPool: auth.identityPool.id,
-      userPoolClient: auth.userPoolClient.id,
-      app: api.brainsOS_API.url,
-      frontend: frontend.latest_brains.url,
-      websocket: websocket.brainsOS_wss.url,
+      REGION: aws.getRegionOutput().name,
+      IDENTITY_POOL_ID: auth.userPool.id,
+      USER_POOL_ID: auth.identityPool.id,
+      APP_CLIENT_ID: auth.userPoolClient.id,
+      
+      api_url: api.brainsOS_API.url,
+      frontend_url: frontend.latest_brains.url,
+      wss_url: websocket.brainsOS_wss.url,
+      brainsosbucket: storage.BrainsOSBucket.name,
+      queue_url: queues.BrainsOSMetricsQueue.url      
     };
    
     

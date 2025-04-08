@@ -1,5 +1,6 @@
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
+import { Resource } from 'sst';
 
 // Create a single DynamoDB client instance to allow connection reuse
 let dynamoClient: DynamoDBClient | null = null;
@@ -42,4 +43,9 @@ export const getDocumentClient = (): DynamoDBDocumentClient => {
     });
   }
   return docClient;
+};
+
+export const getServerName = (): string => {
+  // @ts-ignore - This property is added at runtime by SST; the error can be safely ignored
+  return Resource.userData.name;
 };

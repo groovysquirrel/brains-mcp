@@ -39,6 +39,9 @@ export interface GatewayRequest {
   // Additional parameters
   stopSequences?: string[];
   
+  // Request source tracking
+  source?: 'api' | 'websocket';
+  
   // Arbitrary metadata
   metadata?: Record<string, unknown>;
 } 

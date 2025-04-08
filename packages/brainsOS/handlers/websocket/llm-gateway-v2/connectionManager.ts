@@ -62,13 +62,8 @@ export class ConnectionManager {
 
   private initializeApiGateway(): void {
     try {
-      const endpoint = Resource.brains_websocket_api_latest.url;
+      const endpoint = Resource.brainsos_wss.url;
       logger.info('Initializing API Gateway with endpoint:', { endpoint });
-
-      if (!endpoint) {
-        throw new Error('WEBSOCKET_API_ENDPOINT environment variable is not set');
-      }
-
       // Remove the wss:// prefix if present and ensure https:// prefix
       const apiEndpoint = endpoint.replace('wss://', '').replace('https://', '');
       const finalEndpoint = `https://${apiEndpoint}`;

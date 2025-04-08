@@ -1,0 +1,1 @@
+export const BrainsOSMetricsQueue = new sst.aws.Queue("BrainsOSMetricsQueue");

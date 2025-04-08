@@ -5,6 +5,14 @@
 
 declare module "sst" {
   export interface Resource {
+    "BrainsOSBucket": {
+      "name": string
+      "type": "sst.aws.Bucket"
+    }
+    "BrainsOSMetricsQueue": {
+      "type": "sst.aws.Queue"
+      "url": string
+    }
     "EmailBucket": {
       "name": string
       "type": "sst.aws.Bucket"

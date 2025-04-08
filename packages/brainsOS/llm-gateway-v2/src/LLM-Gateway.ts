@@ -12,6 +12,8 @@ import { ConversationRepository } from './repositories/conversation/Conversation
 import { DynamoConversationRepository } from './repositories/conversation/DynamoConversationRepository';
 import { ConversationMessage, Conversation, ListConversationsResponse } from './repositories/conversation/ConversationTypes';
 import { v4 as uuidv4 } from 'uuid';
+import { LLMUsageMetadata, MetricsConfig, MetricsDestination } from './types/Metrics';
+import { recordLLMMetrics, initializeMetricsCollector } from './utils/MetricsCollector';
 
 /**
  * ARCHITECTURE OVERVIEW
@@ -96,9 +98,30 @@ export class Gateway {
     // In serverless environments, we want to reuse the repository if possible
     this.conversationRepository = options?.conversationRepositoryImpl || new DynamoConversationRepository();
     
+    // Initialize metrics collector with metrics config from repository
+    this.initializeMetricsCollector();
+    
     this.logger.info('Gateway initialized', { 
       configSource: this.configSource
     });
+  }
+
+  /**
+   * Initialize the metrics collector with configuration from repository
+   */
+  private async initializeMetricsCollector(): Promise<void> {
+    try {
+      const metricsConfig = await this.configRepository.getMetricsConfig();
+      initializeMetricsCollector(metricsConfig);
+    } catch (error) {
+      this.logger.error('Failed to initialize metrics collector', { error });
+      // Use default config if loading fails
+      const defaultConfig: MetricsConfig = {
+        enabled: false,
+        destination: MetricsDestination.NONE
+      };
+      initializeMetricsCollector(defaultConfig);
+    }
   }
 
   /**
@@ -125,6 +148,9 @@ export class Gateway {
       } else {
         throw new Error(`Unknown configuration source: ${source}`);
       }
+      
+      // Re-initialize metrics collector with updated config repository
+      await this.initializeMetricsCollector();
       
       // Load vendor configs
       this.vendorConfigs = await this.configRepository.loadAllVendorConfigs();
@@ -346,30 +372,48 @@ export class Gateway {
    * @returns The AI's response
    */
   async chat(request: GatewayRequest): Promise<GatewayResponse> {
-    // Validate the request
-    this.validateRequest(request);
+    // Track starting time for metrics
+    const startTime = Date.now();
+    
+    try {
+      // Validate the request
+      this.validateRequest(request);
 
-    // Convert simple "text" modality to "text-to-text"
-    if (request.modality === 'text') {
-      request.modality = 'text-to-text';
+      // Convert simple "text" modality to "text-to-text"
+      if (request.modality === 'text') {
+        request.modality = 'text-to-text';
+      }
+
+      // Load conversation history if a conversation ID is provided
+      const enrichedRequest = await this.loadConversationHistory(request);
+
+      // Get model config
+      const model = await this.configRepository.getModelConfig(request.modelId!, request.provider!);
+      
+      // Get appropriate modality handler
+      const handler = await this.getModalityHandler(model);
+      
+      // Process the request
+      const response = await handler.process(enrichedRequest, model);
+      
+      // Save the conversation exchange if tracking is enabled
+      await this.saveConversationExchange(request, response);
+      
+      // Track usage metrics (guess the source as api if not specified)
+      const source = request.source || 'api';
+      await this.trackUsageMetrics(request, response, source, startTime);
+      
+      return response;
+    } catch (error: any) {
+      // Log the error
+      this.logger.error('Error in chat method:', {
+        error,
+        errorMessage: error.message,
+        userId: request.userId,
+        modelId: request.modelId
+      });
+      throw error;
     }
-
-    // Load conversation history if a conversation ID is provided
-    const enrichedRequest = await this.loadConversationHistory(request);
-
-    // Get model config
-    const model = await this.configRepository.getModelConfig(request.modelId!, request.provider!);
-    
-    // Get appropriate modality handler
-    const handler = await this.getModalityHandler(model);
-    
-    // Process the request
-    const response = await handler.process(enrichedRequest, model);
-    
-    // Save the conversation exchange if tracking is enabled
-    await this.saveConversationExchange(request, response);
-    
-    return response;
   }
 
   /**
@@ -379,49 +423,67 @@ export class Gateway {
    * @returns A stream of responses
    */
   async *streamChat(request: GatewayRequest): AsyncGenerator<GatewayResponse> {
-    // Validate the request
-    this.validateRequest(request);
-
-    // Convert simple "text" modality to "text-to-text"
-    if (request.modality === 'text') {
-      request.modality = 'text-to-text';
-    }
-
-    // Load conversation history if a conversation ID is provided
-    const enrichedRequest = await this.loadConversationHistory(request);
-
-    // Get model config
-    const model = await this.configRepository.getModelConfig(request.modelId!, request.provider!);
+    // Track starting time for metrics
+    const startTime = Date.now();
     
-    // Get appropriate modality handler
-    const handler = await this.getModalityHandler(model);
-    
-    // Create variables to track the full response for saving to conversation
-    let fullContent = '';
-    let lastMetadata: Record<string, unknown> | undefined;
-    
-    // Process the request and yield each chunk
-    for await (const chunk of handler.streamProcess(enrichedRequest, model)) {
-      // Accumulate the content
-      fullContent += chunk.content;
+    try {
+      // Validate the request
+      this.validateRequest(request);
+
+      // Convert simple "text" modality to "text-to-text"
+      if (request.modality === 'text') {
+        request.modality = 'text-to-text';
+      }
+
+      // Load conversation history if a conversation ID is provided
+      const enrichedRequest = await this.loadConversationHistory(request);
+
+      // Get model config
+      const model = await this.configRepository.getModelConfig(request.modelId!, request.provider!);
       
-      // Update the metadata (taking the last one)
-      if (chunk.metadata) {
-        lastMetadata = chunk.metadata;
+      // Get appropriate modality handler
+      const handler = await this.getModalityHandler(model);
+      
+      // Create variables to track the full response for saving to conversation
+      let fullContent = '';
+      let lastMetadata: Record<string, unknown> | undefined;
+      
+      // Process the request and yield each chunk
+      for await (const chunk of handler.streamProcess(enrichedRequest, model)) {
+        // Accumulate the content
+        fullContent += chunk.content;
+        
+        // Update the metadata (taking the last one)
+        if (chunk.metadata) {
+          lastMetadata = chunk.metadata;
+        }
+        
+        // Yield the chunk
+        yield chunk;
       }
       
-      // Yield the chunk
-      yield chunk;
+      // Create a consolidated response to save
+      const consolidatedResponse: GatewayResponse = {
+        content: fullContent,
+        metadata: lastMetadata
+      };
+      
+      // Save the conversation exchange if tracking is enabled
+      await this.saveConversationExchange(request, consolidatedResponse);
+      
+      // Track usage metrics (guess the source as api if not specified)
+      const source = request.source || 'api';
+      await this.trackUsageMetrics(request, consolidatedResponse, source, startTime);
+    } catch (error: any) {
+      // Log the error
+      this.logger.error('Error in streamChat method:', {
+        error,
+        errorMessage: error.message,
+        userId: request.userId,
+        modelId: request.modelId
+      });
+      throw error;
     }
-    
-    // Create a consolidated response to save
-    const consolidatedResponse: GatewayResponse = {
-      content: fullContent,
-      metadata: lastMetadata
-    };
-    
-    // Save the conversation exchange if tracking is enabled
-    await this.saveConversationExchange(request, consolidatedResponse);
   }
 
   /**
@@ -506,6 +568,11 @@ export class Gateway {
    * @returns List of conversations and optional next token
    */
   async listConversations(userId: string, limit?: number, nextToken?: string): Promise<ListConversationsResponse> {
+    // Validate userId is not empty to prevent DynamoDB errors
+    if (!userId || userId.trim() === '') {
+      throw new Error('userId is required and cannot be empty');
+    }
+    
     return this.conversationRepository.listConversations({
       userId,
       limit,
@@ -551,69 +618,97 @@ export class Gateway {
    * @returns The response with conversation ID
    */
   async conversationChat(request: GatewayRequest & ConversationOptions): Promise<ConversationGatewayResponse> {
-    // Ensure required fields
-    if (!request.userId) {
-      throw new Error('userId is required for conversation management');
-    }
-
-    // Create or validate conversation
-    const { conversationId, isNew } = await this.createConversation({
-      userId: request.userId,
-      conversationId: request.conversationId,
-      title: request.title as string,
-      metadata: request.metadata as Record<string, any>
-    });
-
-    // Add conversationId to request for history loading
-    const enrichedRequest: GatewayRequest = {
-      ...request,
-      conversationId
-    };
-
-    // Process chat with conversation history
-    const response = await this.chat(enrichedRequest);
-
-    // Add user message to conversation if it's a new one or not provided in request
-    if (request.messages && request.messages.length > 0) {
-      const userMessage = request.messages[request.messages.length - 1];
-      await this.addMessageToConversation(
-        request.userId,
-        conversationId,
-        {
-          role: userMessage.role,
-          content: userMessage.content,
-          timestamp: Date.now()
-        }
-      );
-    } else if (request.prompt) {
-      await this.addMessageToConversation(
-        request.userId,
-        conversationId,
-        {
-          role: 'user',
-          content: request.prompt,
-          timestamp: Date.now()
-        }
-      );
-    }
-
-    // Add assistant response to conversation
-    await this.addMessageToConversation(
-      request.userId,
-      conversationId,
-      {
-        role: 'assistant',
-        content: response.content,
-        timestamp: Date.now(),
-        metadata: response.metadata
+    // Track starting time for metrics
+    const startTime = Date.now();
+    
+    try {
+      // Ensure required fields
+      if (!request.userId) {
+        throw new Error('userId is required for conversation management');
       }
-    );
-
-    // Return response with conversation ID
-    return {
-      ...response,
-      conversationId
-    } as ConversationGatewayResponse;
+  
+      // Create or validate conversation
+      const { conversationId, isNew } = await this.createConversation({
+        userId: request.userId,
+        conversationId: request.conversationId,
+        title: request.title as string,
+        metadata: request.metadata as Record<string, any>
+      });
+  
+      // Add conversationId to request for history loading
+      const enrichedRequest: GatewayRequest = {
+        ...request,
+        conversationId
+      };
+  
+      // Process chat with conversation history only - no automatic saving
+      // We'll manually save messages to avoid duplication
+      const modifiedRequest = await this.loadConversationHistory(enrichedRequest);
+      
+      // Get model config
+      const model = await this.configRepository.getModelConfig(modifiedRequest.modelId!, modifiedRequest.provider!);
+      
+      // Get appropriate modality handler
+      const handler = await this.getModalityHandler(model);
+      
+      // Process the request
+      const response = await handler.process(modifiedRequest, model);
+  
+      // Add user message to conversation if it's a new one or not provided in request
+      if (request.messages && request.messages.length > 0) {
+        const userMessage = request.messages[request.messages.length - 1];
+        await this.addMessageToConversation(
+          request.userId,
+          conversationId,
+          {
+            role: userMessage.role,
+            content: userMessage.content,
+            timestamp: Date.now()
+          }
+        );
+      } else if (request.prompt) {
+        await this.addMessageToConversation(
+          request.userId,
+          conversationId,
+          {
+            role: 'user',
+            content: request.prompt,
+            timestamp: Date.now()
+          }
+        );
+      }
+  
+      // Add assistant response to conversation
+      await this.addMessageToConversation(
+        request.userId,
+        conversationId,
+        {
+          role: 'assistant',
+          content: response.content,
+          timestamp: Date.now(),
+          metadata: response.metadata
+        }
+      );
+  
+      // Track usage metrics (guess the source as api if not specified)
+      const source = request.source || 'api';
+      await this.trackUsageMetrics(enrichedRequest, response, source, startTime);
+      
+      // Return response with conversation ID
+      return {
+        ...response,
+        conversationId
+      } as ConversationGatewayResponse;
+    } catch (error: any) {
+      // Log the error
+      this.logger.error('Error in conversationChat method:', {
+        error,
+        errorMessage: error.message,
+        userId: request.userId,
+        conversationId: request.conversationId
+      });
+      throw error;
+    }
   }
 
   /**
@@ -625,78 +720,184 @@ export class Gateway {
    * @returns An async generator that yields response chunks
    */
   async *conversationStreamChat(request: GatewayRequest & ConversationOptions): AsyncGenerator<ConversationGatewayResponse, void, unknown> {
-    // Ensure required fields
-    if (!request.userId) {
-      throw new Error('userId is required for conversation management');
-    }
-
-    // Create or validate conversation
-    const { conversationId, isNew } = await this.createConversation({
-      userId: request.userId,
-      conversationId: request.conversationId,
-      title: request.title as string,
-      metadata: request.metadata as Record<string, any>
-    });
-
-    // Add conversationId to request for history loading
-    const enrichedRequest: GatewayRequest = {
-      ...request,
-      conversationId
-    };
-
-    // Add user message to conversation
-    if (request.messages && request.messages.length > 0) {
-      const userMessage = request.messages[request.messages.length - 1];
+    // Track starting time for metrics
+    const startTime = Date.now();
+    
+    try {
+      // Ensure required fields
+      if (!request.userId) {
+        throw new Error('userId is required for conversation management');
+      }
+  
+      // Create or validate conversation
+      const { conversationId, isNew } = await this.createConversation({
+        userId: request.userId,
+        conversationId: request.conversationId,
+        title: request.title as string,
+        metadata: request.metadata as Record<string, any>
+      });
+  
+      // Add conversationId to request for history loading
+      const enrichedRequest: GatewayRequest = {
+        ...request,
+        conversationId
+      };
+  
+      // Add user message to conversation
+      if (request.messages && request.messages.length > 0) {
+        const userMessage = request.messages[request.messages.length - 1];
+        await this.addMessageToConversation(
+          request.userId,
+          conversationId,
+          {
+            role: userMessage.role,
+            content: userMessage.content,
+            timestamp: Date.now()
+          }
+        );
+      } else if (request.prompt) {
+        await this.addMessageToConversation(
+          request.userId, 
+          conversationId,
+          {
+            role: 'user',
+            content: request.prompt,
+            timestamp: Date.now()
+          }
+        );
+      }
+  
+      // Variables to track full response for saving
+      let fullContent = '';
+      let lastMetadata: Record<string, unknown> | undefined;
+  
+      // Process streaming response - doing the loading manually to avoid saving duplicates
+      const modifiedRequest = await this.loadConversationHistory(enrichedRequest);
+      
+      // Get model config
+      const model = await this.configRepository.getModelConfig(modifiedRequest.modelId!, modifiedRequest.provider!);
+      
+      // Get appropriate modality handler
+      const handler = await this.getModalityHandler(model);
+      
+      // Process the request and stream responses
+      for await (const chunk of handler.streamProcess(modifiedRequest, model)) {
+        // Accumulate content and update metadata
+        fullContent += chunk.content;
+        if (chunk.metadata) {
+          lastMetadata = chunk.metadata;
+        }
+  
+        // Yield the chunk with conversationId
+        yield {
+          ...chunk,
+          conversationId
+        } as ConversationGatewayResponse;
+      }
+  
+      // Create a consolidated response to save
+      const consolidatedResponse: GatewayResponse = {
+        content: fullContent,
+        metadata: lastMetadata
+      };
+      
+      // Add assistant response to conversation
       await this.addMessageToConversation(
         request.userId,
         conversationId,
         {
-          role: userMessage.role,
-          content: userMessage.content,
-          timestamp: Date.now()
+          role: 'assistant',
+          content: fullContent,
+          timestamp: Date.now(),
+          metadata: lastMetadata
         }
       );
-    } else if (request.prompt) {
-      await this.addMessageToConversation(
-        request.userId, 
-        conversationId,
-        {
-          role: 'user',
-          content: request.prompt,
-          timestamp: Date.now()
-        }
-      );
+      
+      // Track usage metrics (guess the source as api if not specified)
+      const source = request.source || 'api';
+      await this.trackUsageMetrics(enrichedRequest, consolidatedResponse, source, startTime);
+    } catch (error: any) {
+      // Log the error
+      this.logger.error('Error in conversationStreamChat method:', {
+        error,
+        errorMessage: error.message,
+        userId: request.userId,
+        conversationId: request.conversationId
+      });
+      throw error;
     }
+  }
 
-    // Variables to track full response for saving
-    let fullContent = '';
-    let lastMetadata: Record<string, unknown> | undefined;
-
-    // Process streaming response
-    for await (const chunk of this.streamChat(enrichedRequest)) {
-      // Accumulate content and update metadata
-      fullContent += chunk.content;
-      if (chunk.metadata) {
-        lastMetadata = chunk.metadata;
-      }
-
-      // Yield the chunk with conversationId
-      yield {
-        ...chunk,
-        conversationId
-      } as ConversationGatewayResponse;
+  /**
+   * Tracks usage metrics for a chat operation
+   * @param request - The chat request
+   * @param response - The chat response
+   * @param source - The source of the request (api or websocket)
+   */
+  async trackUsageMetrics(
+    request: GatewayRequest, 
+    response: GatewayResponse, 
+    source: 'api' | 'websocket',
+    requestStartTime: number
+  ): Promise<void> {
+    try {
+      // Generate a unique request ID
+      const requestId = uuidv4();
+      
+      // Calculate timing information
+      const endTime = Date.now();
+      const startTime = requestStartTime;
+      const duration = endTime - startTime;
+      
+      // Extract metadata fields with proper type handling
+      const inputTokensFromMetadata = typeof response.metadata?.input_tokens === 'number' 
+        ? response.metadata.input_tokens 
+        : undefined;
+      
+      const outputTokensFromMetadata = typeof response.metadata?.output_tokens === 'number'
+        ? response.metadata.output_tokens
+        : undefined;
+      
+      // Estimate token usage (simple approximation if not provided in metadata)
+      // This is a very rough approximation; production should use actual token counts
+      const tokensIn = inputTokensFromMetadata || 
+                     Math.ceil(JSON.stringify(request.messages || []).length / 4);
+      const tokensOut = outputTokensFromMetadata || 
+                      Math.ceil(response.content.length / 4);
+      
+      // Extract tags from request if available
+      const tagsFromMetadata = request.metadata?.tags;
+      const tags = Array.isArray(tagsFromMetadata) ? tagsFromMetadata : [];
+      
+      // Extract promptId from metadata if available
+      const promptId = typeof request.metadata?.promptId === 'string' 
+        ? request.metadata.promptId 
+        : undefined;
+      
+      // Create the metrics payload
+      const metadata: LLMUsageMetadata = {
+        userId: request.userId || 'anonymous',
+        requestId,
+        conversationId: request.conversationId,
+        promptId,
+        modelId: request.modelId || 'unknown',
+        provider: request.provider || 'unknown',
+        tokensIn,
+        tokensOut,
+        startTime: new Date(startTime).toISOString(),
+        endTime: new Date(endTime).toISOString(),
+        duration,
+        source,
+        tags,
+        success: true
+      };
+      
+      // Send metrics asynchronously
+      // We use void to not await this operation
+      void recordLLMMetrics(metadata);
+    } catch (error) {
+      // Never let metrics tracking interfere with the main flow
+      this.logger.error('Failed to track usage metrics', { error });
     }
-
-    // Add assistant response to conversation
-    await this.addMessageToConversation(
-      request.userId,
-      conversationId,
-      {
-        role: 'assistant',
-        content: fullContent,
-        timestamp: Date.now(),
-        metadata: lastMetadata
-      }
-    );
   }
 } 

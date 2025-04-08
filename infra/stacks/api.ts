@@ -1,15 +1,16 @@
 import { userData, systemData, loadDefaultData } from "./database";
 import { getDomainName, getCorsOrigins } from "../config";
-//import { bedrockPermissions } from "./auth";  
+import { userPoolClient, userPool } from "./auth";
+import {  } from "./auth";  
 
-export const bedrockPermissions = {
+const bedrockPermissions = {
   actions: [
     'bedrock:ListFoundationModels',
     'bedrock:InvokeModel',
     'bedrock:GetFoundationModel'
   ],
   resources: ['*']
-};
+}; 
 
 export const brainsOS_API = new sst.aws.ApiGatewayV2("brainsos_api", {
   cors: {
@@ -26,21 +27,25 @@ export const brainsOS_API = new sst.aws.ApiGatewayV2("brainsos_api", {
     allowCredentials: true,
     maxAge: `300 seconds`
   },
-  transform: {
-    route: {
-      handler: {
-        link: [userData, systemData, loadDefaultData],
-      },
-      args: {
-        auth: { iam: true }
-      },
-    }
-  },
+  // transform: {
+  //   route: {
+  //     handler: {
+  //       link: [userData, systemData, loadDefaultData],
+  //     },
+  //   }
+  // },
   domain: {
     name: getDomainName('api', 'latest', $app.stage)
   },
 });
 
+
+brainsOS_API.addAuthorizer({
+  name: "api-gateway-authorizer",
+  lambda: {
+    function: "packages/brainsOS/handlers/auth/authorizer.handler"
+  }
+});
 // brainsOS system data API
 
 brainsOS_API.route("POST /latest/commands", {

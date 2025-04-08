@@ -17,35 +17,70 @@ import {
   ListConversationsResponse,
   ConversationMessage
 } from './ConversationTypes';
-import { getDynamoClient} from '../../utils/dynamodb/DynamoClient';
+import { getDynamoClient, getServerName } from '../../utils/aws/DynamoClient';
 import { Resource } from 'sst';
 
 /**
- * Implementation of ConversationRepository that uses DynamoDB
- * Optimized for serverless environments
+ * DynamoDB Implementation of the Conversation Repository
+ * 
+ * This class handles storing and retrieving conversations from DynamoDB.
+ * 
+ * DATA MODEL:
+ * -----------
+ * Conversations are stored with two main item types:
+ * 
+ * 1. METADATA ITEM:
+ *    - Key: { userId, typeName: "CONVERSATION#{id}#META" }
+ *    - Attributes:
+ *      - conversationId: The unique ID of the conversation
+ *      - created: Timestamp when the conversation was created
+ *      - updated: Timestamp when the conversation was last updated
+ *      - metadata: JSON string containing conversation metadata
+ *      - title: Conversation title (extracted from metadata for easy querying)
+ *      - tags: String set of tags (if provided)
+ * 
+ * 2. MESSAGE ITEMS:
+ *    - Key: { userId, typeName: "CONVERSATION#{id}#MSG#{sequence}" }
+ *    - Attributes:
+ *      - conversationId: The conversation the message belongs to
+ *      - sequenceNumber: Order of message in conversation
+ *      - role: Who sent the message ("user", "assistant", "system")
+ *      - content: The actual message text
+ *      - timestamp: When the message was sent/created
+ *      - metadata: JSON string with message-specific metadata
  */
 export class DynamoConversationRepository implements ConversationRepository {
   private logger: Logger;
   private tableName: string;
 
   /**
-   * Constructor
-   * @param tableName - DynamoDB table name (optional, uses SST Resource reference by default)
+   * Constructor initializes the repository with the DynamoDB table name
    */
   constructor() {
     this.logger = new Logger('DynamoConversationRepository');
-    this.tableName = Resource.userData.name;
+    
+    this.tableName = getServerName(); 
+    
+    // Fallback if the Resource isn't available
+    if (!this.tableName) {
+      throw new Error('userData table not found.');
+    }
+    
     this.logger.info('Initialized with table', { tableName: this.tableName });
   }
 
   /**
    * Creates a new conversation
-   * @param options - Options for creating the conversation
+   * @param options - Options containing userId, conversationId, and metadata
    * @returns The created conversation
    */
   async createConversation(options: CreateConversationOptions): Promise<Conversation> {
     const { userId, conversationId = uuidv4(), initialMessages = [], metadata = {} } = options;
     const timestamp = Date.now();
+    
+    // Extract title and tags from metadata if present
+    const title = metadata.title || 'New Conversation';
+    const tags = Array.isArray(metadata.tags) ? metadata.tags : [];
     
     const conversation: Conversation = {
       userId,
@@ -62,16 +97,7 @@ export class DynamoConversationRepository implements ConversationRepository {
       // Store the conversation metadata
       await dynamoClient.send(new PutItemCommand({
         TableName: this.tableName,
-        Item: {
-          typeName: { S: `CONVERSATION#${conversationId}#META` },
-          userId: { S: userId },
-          conversationId: { S: conversationId },
-          created: { N: timestamp.toString() },
-          updated: { N: timestamp.toString() },
-          metadata: { S: JSON.stringify(metadata) },
-          // Add TTL attribute if needed in the future
-          // TTL: { N: (Math.floor(Date.now() / 1000) + 2592000).toString() } // 30 day expiration
-        }
+        Item: this.formatConversationMetaItem(userId, conversationId, timestamp, metadata)
       }));
 
       // Store each message if there are any
@@ -79,7 +105,7 @@ export class DynamoConversationRepository implements ConversationRepository {
         await this.addMessages(userId, conversationId, initialMessages);
       }
 
-      this.logger.info('Created conversation', { userId, conversationId });
+      this.logger.info('Created conversation', { userId, conversationId, title, tagsCount: tags.length });
       return conversation;
     } catch (error: any) {
       this.logger.error('Failed to create conversation', { error, userId, conversationId });
@@ -89,7 +115,7 @@ export class DynamoConversationRepository implements ConversationRepository {
 
   /**
    * Retrieves a conversation by userId and conversationId
-   * @param options - Options for retrieving the conversation
+   * @param options - Options containing userId, conversationId, and optional limit
    * @returns The conversation, or null if not found
    */
   async getConversation(options: GetConversationOptions): Promise<Conversation | null> {
@@ -114,7 +140,7 @@ export class DynamoConversationRepository implements ConversationRepository {
       // Get messages
       const messagesResult = await dynamoClient.send(new QueryCommand({
         TableName: this.tableName,
-        KeyConditionExpression: 'PK = :pk and begins_with(SK, :sk)',
+        KeyConditionExpression: 'userId = :userId and begins_with(typeName, :typeName)',
         ExpressionAttributeValues: {
           ':userId': { S: userId },
           ':typeName': { S: `CONVERSATION#${conversationId}#MSG#` }
@@ -123,10 +149,12 @@ export class DynamoConversationRepository implements ConversationRepository {
         Limit: limit // Apply limit if provided
       }));
 
+      // Parse the metadata and created/updated timestamps
       const metadata = JSON.parse(metaResult.Item.metadata?.S || '{}');
       const created = Number(metaResult.Item.created?.N || '0');
       const updated = Number(metaResult.Item.updated?.N || '0');
 
+      // Parse the messages from DynamoDB format to ConversationMessage format
       const messages: ConversationMessage[] = messagesResult.Items?.map(item => ({
         role: item.role?.S || '',
         content: item.content?.S || '',
@@ -134,6 +162,7 @@ export class DynamoConversationRepository implements ConversationRepository {
         metadata: JSON.parse(item.metadata?.S || '{}')
       })) || [];
 
+      // Build the complete conversation object
       const conversation: Conversation = {
         userId,
         conversationId,
@@ -151,10 +180,9 @@ export class DynamoConversationRepository implements ConversationRepository {
   }
 
   /**
-   * Adds a message to an existing conversation
-   * @param options - Options for adding the message
+   * Adds a single message to an existing conversation
+   * @param options - Options containing userId, conversationId, and the message to add
    * @returns The updated conversation
-   * @throws Error if the conversation does not exist
    */
   async addMessage(options: AddMessageOptions): Promise<Conversation> {
     const { userId, conversationId, message } = options;
@@ -171,7 +199,7 @@ export class DynamoConversationRepository implements ConversationRepository {
       // Get the current count of messages to determine sequence number
       const countResult = await dynamoClient.send(new QueryCommand({
         TableName: this.tableName,
-        KeyConditionExpression: 'PK = :pk and begins_with(SK, :sk)',
+        KeyConditionExpression: 'userId = :userId and begins_with(typeName, :typeName)',
         ExpressionAttributeValues: {
           ':userId': { S: userId },
           ':typeName': { S: `CONVERSATION#${conversationId}#MSG#` }
@@ -179,34 +207,29 @@ export class DynamoConversationRepository implements ConversationRepository {
         Select: 'COUNT'
       }));
 
-      const sequenceNumber = countResult.Count || 0;
-      const timestamp = message.timestamp || Date.now();
-
-      // Add the message
-      await dynamoClient.send(new PutItemCommand({
+      // Get existing conversation metadata to preserve it
+      const existingMeta = await dynamoClient.send(new GetItemCommand({
         TableName: this.tableName,
-        Item: {
-          typeName: { S: `CONVERSATION#${conversationId}#MSG#${sequenceNumber.toString().padStart(10, '0')}` },
-          userId: { S: userId },
-          conversationId: { S: conversationId },
-          sequenceNumber: { N: sequenceNumber.toString() },
-          role: { S: message.role },
-          content: { S: message.content },
-          timestamp: { N: timestamp.toString() },
-          metadata: { S: JSON.stringify(message.metadata || {}) }
+        Key: {
+          typeName: { S: `CONVERSATION#${conversationId}#META` },
+          userId: { S: userId }
         }
       }));
 
-      // Update the conversation metadata (updated timestamp)
+      const sequenceNumber = countResult.Count || 0;
+      const timestamp = message.timestamp || Date.now();
+
+      // Add the message to DynamoDB
       await dynamoClient.send(new PutItemCommand({
         TableName: this.tableName,
-        Item: {
-          typeName: { S: `CONVERSATION#${conversationId}#META` },
-          userId: { S: userId },
-          conversationId: { S: conversationId },
-          updated: { N: timestamp.toString() }
-        },
-        ConditionExpression: 'attribute_exists(PK) AND attribute_exists(SK)'
+        Item: this.formatMessageItem(userId, conversationId, sequenceNumber, message)
+      }));
+
+      // Update the conversation metadata preserving existing attributes
+      await dynamoClient.send(new PutItemCommand({
+        TableName: this.tableName,
+        Item: this.buildMetaUpdateItem(existingMeta.Item, userId, conversationId, timestamp),
+        ConditionExpression: 'attribute_exists(userId) AND attribute_exists(typeName)'
       }));
 
       // Return the updated conversation
@@ -219,8 +242,8 @@ export class DynamoConversationRepository implements ConversationRepository {
 
   /**
    * Lists conversations for a user
-   * @param options - Options for listing conversations
-   * @returns A response containing conversations and optional pagination token
+   * @param options - Options containing userId, optional limit and pagination token
+   * @returns A response with conversations and optional pagination token
    */
   async listConversations(options: ListConversationsOptions): Promise<ListConversationsResponse> {
     const { userId, limit = 10, nextToken } = options;
@@ -228,14 +251,16 @@ export class DynamoConversationRepository implements ConversationRepository {
     try {
       const dynamoClient = getDynamoClient();
       
+      // Build query parameters to find metadata items (filter by itemType)
       const queryParams: any = {
         TableName: this.tableName,
-        KeyConditionExpression: 'PK = :pk and begins_with(SK, :sk)',
+        KeyConditionExpression: 'userId = :userId and begins_with(typeName, :prefix)',
+        FilterExpression: 'itemType = :metaType',
         ExpressionAttributeValues: {
           ':userId': { S: userId },
-          ':typeName': { S: 'CONVERSATION#' }
+          ':prefix': { S: 'CONVERSATION#' },
+          ':metaType': { S: 'META' }
         },
-        FilterExpression: 'contains(SK, "#META")', // Only return metadata items
         Limit: limit
       };
 
@@ -248,10 +273,10 @@ export class DynamoConversationRepository implements ConversationRepository {
       
       // Extract conversation IDs from metadata items
       const conversationIds = result.Items?.map(item => {
-        const sk = item.SK.S || '';
-        // Extract ID from "CONVERSATION#123#META"
-        return sk.split('#')[1];
-      }) || [];
+        const typeName = item.typeName.S || '';
+        const parts = typeName.split('#');
+        return parts.length >= 2 ? parts[1] : '';
+      }).filter(id => id) || [];
 
       // Get full conversations
       const conversations: Conversation[] = [];
@@ -279,7 +304,7 @@ export class DynamoConversationRepository implements ConversationRepository {
   }
 
   /**
-   * Deletes a conversation
+   * Deletes a conversation and all its messages
    * @param userId - The user ID
    * @param conversationId - The conversation ID
    * @returns true if the conversation was deleted, false if it wasn't found
@@ -297,7 +322,7 @@ export class DynamoConversationRepository implements ConversationRepository {
       // Get all items related to this conversation
       const items = await dynamoClient.send(new QueryCommand({
         TableName: this.tableName,
-        KeyConditionExpression: 'PK = :pk and begins_with(SK, :sk)',
+        KeyConditionExpression: 'userId = :userId and begins_with(typeName, :typeName)',
         ExpressionAttributeValues: {
           ':userId': { S: userId },
           ':typeName': { S: `CONVERSATION#${conversationId}#` }
@@ -341,7 +366,6 @@ export class DynamoConversationRepository implements ConversationRepository {
    * @param conversationId - The conversation ID
    * @param messages - The messages to add
    * @returns The updated conversation
-   * @throws Error if the conversation does not exist
    */
   async addMessages(userId: string, conversationId: string, messages: ConversationMessage[]): Promise<Conversation> {
     if (messages.length === 0) {
@@ -357,10 +381,19 @@ export class DynamoConversationRepository implements ConversationRepository {
         throw new Error(`Conversation ${conversationId} does not exist for user ${userId}`);
       }
 
+      // Get existing conversation metadata to preserve it
+      const existingMeta = await dynamoClient.send(new GetItemCommand({
+        TableName: this.tableName,
+        Key: {
+          typeName: { S: `CONVERSATION#${conversationId}#META` },
+          userId: { S: userId }
+        }
+      }));
+
       // Get current count
       const countResult = await dynamoClient.send(new QueryCommand({
         TableName: this.tableName,
-        KeyConditionExpression: 'PK = :pk and begins_with(SK, :sk)',
+        KeyConditionExpression: 'userId = :userId and begins_with(typeName, :typeName)',
         ExpressionAttributeValues: {
           ':userId': { S: userId },
           ':typeName': { S: `CONVERSATION#${conversationId}#MSG#` }
@@ -384,16 +417,7 @@ export class DynamoConversationRepository implements ConversationRepository {
               
               return {
                 PutRequest: {
-                  Item: {
-                    typeName: { S: `CONVERSATION#${conversationId}#MSG#${seqNum.toString().padStart(10, '0')}` },
-                    userId: { S: userId },
-                    conversationId: { S: conversationId },
-                    sequenceNumber: { N: seqNum.toString() },
-                    role: { S: message.role },
-                    content: { S: message.content },
-                    timestamp: { N: timestamp.toString() },
-                    metadata: { S: JSON.stringify(message.metadata || {}) }
-                  }
+                  Item: this.formatMessageItem(userId, conversationId, seqNum, message)
                 }
               };
             })
@@ -401,16 +425,11 @@ export class DynamoConversationRepository implements ConversationRepository {
         }));
       }
 
-      // Update conversation metadata (updated timestamp)
+      // Update the conversation metadata preserving existing attributes
       await dynamoClient.send(new PutItemCommand({
         TableName: this.tableName,
-        Item: {
-          typeName: { S: `CONVERSATION#${conversationId}#META` },
-          userId: { S: userId },
-          conversationId: { S: conversationId },
-          updated: { N: latestTimestamp.toString() }
-        },
-        ConditionExpression: 'attribute_exists(PK) AND attribute_exists(SK)'
+        Item: this.buildMetaUpdateItem(existingMeta.Item, userId, conversationId, latestTimestamp),
+        ConditionExpression: 'attribute_exists(userId) AND attribute_exists(typeName)'
       }));
 
       // Return the updated conversation
@@ -437,7 +456,7 @@ export class DynamoConversationRepository implements ConversationRepository {
           typeName: { S: `CONVERSATION#${conversationId}#META` },
           userId: { S: userId }
         },
-        ProjectionExpression: 'PK, SK' // Only retrieve keys to minimize data transfer
+        ProjectionExpression: 'userId, typeName' // Only retrieve keys to minimize data transfer
       }));
 
       return !!result.Item;
@@ -445,5 +464,130 @@ export class DynamoConversationRepository implements ConversationRepository {
       this.logger.error('Failed to check if conversation exists', { error, userId, conversationId });
       throw new Error(`Failed to check if conversation exists: ${error.message}`);
     }
+  }
+
+  /**
+   * FORMAT HELPERS
+   * These methods help format data for DynamoDB storage
+   */
+
+  /**
+   * Creates a formatted DynamoDB item for conversation metadata
+   * 
+   * @param userId - The user ID
+   * @param conversationId - The conversation ID
+   * @param timestamp - The timestamp for created/updated
+   * @param metadata - The conversation metadata
+   * @returns A formatted DynamoDB item
+   */
+  private formatConversationMetaItem(
+    userId: string,
+    conversationId: string,
+    timestamp: number,
+    metadata: Record<string, any>
+  ): Record<string, any> {
+    // Extract title and tags if present
+    const title = metadata.title || 'New Conversation';
+    const tags = Array.isArray(metadata.tags) ? metadata.tags : [];
+    
+    // Format the item for DynamoDB
+    const item: Record<string, any> = {
+      typeName: { S: `CONVERSATION#${conversationId}#META` },
+      userId: { S: userId },
+      conversationId: { S: conversationId },
+      itemType: { S: 'META' }, // Add explicit itemType
+      created: { N: timestamp.toString() },
+      updated: { N: timestamp.toString() },
+      metadata: { S: JSON.stringify(metadata) },
+      title: { S: title.toString() }
+    };
+    
+    // Add tags if there are any
+    if (tags.length > 0) {
+      item.tags = { SS: tags.map((tag: string) => tag.toString()) };
+    }
+    
+    return item;
+  }
+
+  /**
+   * Creates a formatted DynamoDB item for a message
+   * 
+   * @param userId - The user ID
+   * @param conversationId - The conversation ID
+   * @param sequenceNumber - The message sequence number
+   * @param message - The message object
+   * @returns A formatted DynamoDB item
+   */
+  private formatMessageItem(
+    userId: string,
+    conversationId: string,
+    sequenceNumber: number,
+    message: ConversationMessage
+  ): Record<string, any> {
+    const timestamp = message.timestamp || Date.now();
+    
+    return {
+      typeName: { S: `CONVERSATION#${conversationId}#MSG#${sequenceNumber.toString().padStart(10, '0')}` },
+      userId: { S: userId },
+      conversationId: { S: conversationId },
+      itemType: { S: 'MSG' }, // Add explicit itemType
+      sequenceNumber: { N: sequenceNumber.toString() },
+      role: { S: message.role },
+      content: { S: message.content },
+      timestamp: { N: timestamp.toString() },
+      metadata: { S: JSON.stringify(message.metadata || {}) }
+    };
+  }
+
+  /**
+   * Builds an item for updating conversation metadata
+   * This preserves existing attributes while updating the timestamp
+   * 
+   * @param existingItem - The existing item from DynamoDB
+   * @param userId - The user ID
+   * @param conversationId - The conversation ID
+   * @param timestamp - The new updated timestamp
+   * @returns A DynamoDB item with preserved attributes
+   */
+  private buildMetaUpdateItem(
+    existingItem: Record<string, any> | undefined,
+    userId: string,
+    conversationId: string,
+    timestamp: number
+  ): Record<string, any> {
+    // Base item with required fields
+    const metaItem: Record<string, any> = {
+      typeName: { S: `CONVERSATION#${conversationId}#META` },
+      userId: { S: userId },
+      conversationId: { S: conversationId },
+      itemType: { S: 'META' }, // Add explicit itemType
+      updated: { N: timestamp.toString() }
+    };
+    
+    // If we have an existing item, preserve its attributes
+    if (existingItem) {
+      // Copy created time if it exists
+      if (existingItem.created && existingItem.created.N) {
+        metaItem.created = { N: existingItem.created.N };
+      }
+      
+      // Copy metadata JSON if it exists
+      if (existingItem.metadata && existingItem.metadata.S) {
+        metaItem.metadata = { S: existingItem.metadata.S };
+      }
+      
+      // Copy title if it exists
+      if (existingItem.title && existingItem.title.S) {
+        metaItem.title = { S: existingItem.title.S };
+      }
+      
+      // Copy tags if they exist
+      if (existingItem.tags && existingItem.tags.SS) {
+        metaItem.tags = { SS: existingItem.tags.SS };
+      }
+    }
+    
+    return metaItem;
   }
 }

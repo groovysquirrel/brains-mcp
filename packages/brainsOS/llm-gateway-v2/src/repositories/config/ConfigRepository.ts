@@ -3,6 +3,7 @@ import { VendorConfig } from '../../types/Vendor';
 import { ModelConfig } from '../../types/Model';
 import { ModalityConfig } from '../../types/Modality';
 import { GatewayModelState, GatewayModelAliases } from '../../types/GatewayState';
+import { MetricsConfig } from '../../types/Metrics';
 
 /**
  * Interface that defines methods for loading various configurations
@@ -70,4 +71,9 @@ export interface ConfigRepository {
    * @param providerName - The name of the provider
    */
   isModelReady(modelId: string, providerName: string): Promise<boolean>;
+  
+  /**
+   * Gets the metrics configuration
+   */
+  getMetricsConfig(): Promise<MetricsConfig>;
 } 

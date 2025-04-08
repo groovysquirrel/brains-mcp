@@ -15,22 +15,3 @@ export const UserApprovalEmail = new sst.aws.Email("UserApprovalEmail", {
     link: [UserApprovalEmail]
 
   });
-
-  
-  const emailBucket = new sst.aws.Bucket("EmailBucket");
-  emailBucket.subscribe({
-    handler: "packages/brainsOS/functions/email/emailResponse.handler",
-    timeout: "60 seconds",
-    environment: {
-      COGNITO_USER_POOL_ID: userPool.id,
-    },
-    permissions: [{
-        actions: ["cognito-idp:AdminConfirmSignUp", "s3:GetObject"],
-        resources: ["*"],
-      },
-    ],
-  },
-    {
-      events: ["s3:ObjectCreated:*"],
-    }
-  );

@@ -1,5 +1,5 @@
 import { getDomainName } from "../config";
-import { userPool, userPoolClient} from "./auth";
+import { authFunction} from "./auth";
 
 export const brainsOS_wss = new sst.aws.ApiGatewayWebSocket("brainsos_wss", {
   domain: {
@@ -7,10 +7,7 @@ export const brainsOS_wss = new sst.aws.ApiGatewayWebSocket("brainsos_wss", {
   }
 });
 
-const authFunction = new sst.aws.Function("authFunction", {
-    handler: "packages/brainsOS/handlers/auth/authorizer.handler",
-    link: [userPool, userPoolClient],
-  });
+
 
 
 const defaultHandlerFunction = new sst.aws.Function("defaultHandlerFunction", {

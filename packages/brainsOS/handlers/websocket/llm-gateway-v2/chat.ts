@@ -13,7 +13,7 @@
  */
 
 import { Logger } from '../../shared/logging/logger';
-import { Gateway, ConversationOptions } from '../../../llm-gateway-v2/src/Gateway';
+import { Gateway, ConversationOptions } from '../../../llm-gateway-v2/src/LLM-Gateway';
 import { GatewayRequest } from '../../../llm-gateway-v2/src/types/Request';
 import { ConnectionManager } from './connectionManager';
 import { StreamHandler } from './streamHandler';
@@ -110,7 +110,7 @@ const handleWebSocketEvent = async (event: WebSocketEvent, handler: MessageHandl
 const initializeGateway = async () => {
   try {
     logger.info('Initializing Gateway', {
-      websocketEndpoint: Resource.brains_websocket_api_latest.url
+      websocketEndpoint: Resource.brainsos_wss.url
     });
 
     gateway = new Gateway();
@@ -268,6 +268,9 @@ export class LLMChatMessageHandler implements MessageHandler {
     const { connectionId, userId } = data;
 
     try {
+      // Add source field for metrics tracking
+      request.source = 'websocket';
+      
       // Handle streaming request
       if (request.streaming) {
         // Set up stream handler
@@ -336,6 +339,27 @@ export class LLMChatMessageHandler implements MessageHandler {
         throw new Error('userId is required for conversation tracking');
       }
 
+      // Extract title and tags for conversation metadata
+      const { title, tags } = data;
+      
+      // Prepare conversation metadata
+      const conversationMetadata = {
+        ...(data.metadata || {}),
+        userId: data.userId,
+        connectionId: data.connectionId,
+        timestamp: new Date().toISOString()
+      };
+      
+      // Add title to metadata if provided
+      if (title) {
+        conversationMetadata.title = title;
+      }
+      
+      // Add tags to metadata if provided
+      if (tags && Array.isArray(tags)) {
+        conversationMetadata.tags = tags;
+      }
+
       // Create request object with conversation options
       const request: GatewayRequest & ConversationOptions = {
         provider: data.provider || 'bedrock',
@@ -352,12 +376,8 @@ export class LLMChatMessageHandler implements MessageHandler {
         userId: data.userId,
         conversationId: data.conversationId,
         title: data.title,
-        metadata: {
-          ...data.metadata,
-          userId: data.userId,
-          connectionId: data.connectionId,
-          timestamp: new Date().toISOString()
-        }
+        source: 'websocket', // Set source for metrics tracking
+        metadata: conversationMetadata
       };
 
       // Handle streaming vs non-streaming using gateway's conversation methods

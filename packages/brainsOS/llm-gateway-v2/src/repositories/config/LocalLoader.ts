@@ -4,10 +4,11 @@ import { VendorConfig } from '../../types/Vendor';
 import { ModelConfig } from '../../types/Model';
 import { ModalityConfig } from '../../types/Modality';
 import { GatewayModelState, GatewayModelAliases } from '../../types/GatewayState';
+import { MetricsConfig, MetricsDestination } from '../../types/Metrics';
 import * as fs from 'fs/promises';
 import path from 'path';
 import { Logger } from '../../utils/logging/Logger';
-
+import { Resource } from 'sst';
 /**
  * ProvidersIndex interface for the providers.json file
  */
@@ -220,5 +221,55 @@ export class LocalConfigLoader implements ConfigRepository {
     }
     
     return false;
+  }
+
+  /**
+   * Gets the metrics configuration
+   */
+  async getMetricsConfig(): Promise<MetricsConfig> {
+    try {
+      // For testing, we're only getting the region from the metrics.json file
+      // The actual resources will be accessed directly from SST Resource object
+      const metricsPath = path.join(this.configPath, 'system', 'metrics.json');
+      this.logger.info('Looking for metrics config at:', { path: metricsPath });
+      
+      const configContent = await fs.readFile(metricsPath, 'utf-8');
+      const rawConfig = JSON.parse(configContent);
+      
+      // Extract only basic configuration
+      const enabled = rawConfig.environment?.LLM_METRICS_ENABLED === true;
+      const destStr = rawConfig.environment?.LLM_METRICS_DESTINATION?.toLowerCase() || 'none';
+      const awsRegion = rawConfig.environment?.AWS_REGION || 'us-east-1';
+      
+      // Parse destination
+      let destination: MetricsDestination;
+      switch (destStr) {
+        case 'sqs':
+          destination = MetricsDestination.SQS;
+          break;
+        case 's3':
+          destination = MetricsDestination.S3;
+          break;
+        case 'both':
+          destination = MetricsDestination.BOTH;
+          break;
+        default:
+          destination = MetricsDestination.NONE;
+      }
+      
+      return {
+        enabled,
+        destination,
+        awsRegion
+      };
+    } catch (error) {
+      this.logger.error('Failed to load metrics config:', { error });
+      // Return default configuration if file not found or parsing error
+      return {
+        enabled: false,
+        destination: MetricsDestination.NONE,
+        awsRegion: 'us-east-1'
+      };
+    }
   }
 } 
