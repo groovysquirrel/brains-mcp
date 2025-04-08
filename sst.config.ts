@@ -1,12 +1,11 @@
 /// <reference path="./.sst/platform/config.d.ts" />
 
-
 export default $config({
   
   // Base sst app settings
   app(input) {
     return {
-      name: "brains-mcp",
+      name: "brainsos",
       removal: input?.stage === "production" ? "retain" : "remove",
       home: "aws",
       providers: {        
@@ -23,11 +22,15 @@ export default $config({
     // Import the stacks
     const auth = await import("./infra/stacks/auth");
     const email = await import("./infra/stacks/email");
-    
+    const database = await import("./infra/stacks/database");
     const frontend = await import("./infra/stacks/frontends");
     const api = await import("./infra/stacks/api");
-
     const websocket = await import("./infra/stacks/websocket");
+
+    // Import the apps
+    const llmGateway = await import("./infra/apps/llm-gateway");
+    const mcpServer = await import("./infra/apps/mcp-server");
+    const library = await import("./infra/apps/library");
     
     return {
       userPool: auth.userPool.id,
@@ -36,7 +39,7 @@ export default $config({
       userPoolClient: auth.userPoolClient.id,
       app: api.brainsOS_API.url,
       frontend: frontend.latest_brains.url,
-      websocket: websocket.brainsOS_websocket_API.url,
+      websocket: websocket.brainsOS_wss.url,
     };
    
     

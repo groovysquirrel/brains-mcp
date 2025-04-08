@@ -1,18 +1,7 @@
 import { getDomainName } from "../config";
-import { userData, systemData, loadDefaultData } from "./database";
 import { userPool, userPoolClient} from "./auth";
 
-export const bedrockPermissions = {
-  actions: [
-    'bedrock:ListFoundationModels',
-    'bedrock:InvokeModel',
-    'bedrock:GetFoundationModel',
-    'bedrock:InvokeModelWithResponseStream'
-  ],
-  resources: ['*']
-};
-
-export const brainsOS_websocket_API = new sst.aws.ApiGatewayWebSocket("brains_websocket_api_latest", {
+export const brainsOS_wss = new sst.aws.ApiGatewayWebSocket("brainsos_wss", {
   domain: {
     name: getDomainName('websocket', 'latest', $app.stage)
   }
@@ -36,54 +25,20 @@ const disconnectHandlerFunction = new sst.aws.Function("disconnectHandlerFunctio
   handler: "packages/brainsOS/handlers/websocket/util/disconnect.handler",
 });
 
-const gwchatFunction = new sst.aws.Function("gwchatFunction", {
-    handler: "packages/brainsOS/handlers/websocket/llm-gateway-v2/chat.handler",
-    link: [brainsOS_websocket_API, systemData],
-    permissions: [bedrockPermissions],
-    environment: {
-      WEBSOCKET_API_ENDPOINT: brainsOS_websocket_API.url
-    },
-    copyFiles: [{ from: "packages/brainsOS/llm-gateway-v2/config/", to: "config" }]
-
-    
-  });
-
-
-const controllerPromptFunction = new sst.aws.Function("controllerPromptFunction", {
-    handler: "packages/brainsOS/handlers/websocket/controller/prompt.handler",
-  });
-  
-const controllerMcpFunction = new sst.aws.Function("controllerMcpFunction", {
-    handler: "packages/brainsOS/handlers/websocket/controller/mcp.handler",
-  });
-
-
-
 
 //Add a Lambda authorizer for the WebSocket API
-const authorizer = brainsOS_websocket_API.addAuthorizer("llm-gateway-authorizer", {
+const authorizer = brainsOS_wss.addAuthorizer("llm-gateway-authorizer", {
     lambda: {
       function: authFunction.arn,
     },
     
 });
 
-
-
-
-
 // Common routes
-brainsOS_websocket_API.route("$connect", connectHandlerFunction.arn,  {
+brainsOS_wss.route("$connect", connectHandlerFunction.arn,  {
   auth: {
       lambda: authorizer.id
   }
 });
-brainsOS_websocket_API.route("$disconnect", disconnectHandlerFunction.arn, {});
-brainsOS_websocket_API.route("$default", defaultHandlerFunction.arn, {});
-
-// LLM Gateway routes
-brainsOS_websocket_API.route("llm/chat", gwchatFunction.arn, {});
-
-// Controller routes
-brainsOS_websocket_API.route("controller/prompt", controllerPromptFunction.arn, {});
-brainsOS_websocket_API.route("controller/mcp", controllerMcpFunction.arn, {}); 
+brainsOS_wss.route("$disconnect", disconnectHandlerFunction.arn, {});
+brainsOS_wss.route("$default", defaultHandlerFunction.arn, {});

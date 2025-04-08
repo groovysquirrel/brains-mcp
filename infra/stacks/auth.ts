@@ -1,5 +1,15 @@
 import { brainsOS_API } from "./api";
 
+export const bedrockPermissions = {
+  actions: [
+    'bedrock:ListFoundationModels',
+    'bedrock:InvokeModel',
+    'bedrock:GetFoundationModel',
+    'bedrock:InvokeModelWithResponseStream'
+  ],
+  resources: ['*']
+};
+
 const region = aws.getRegionOutput().name;
 
 export const userPool = new sst.aws.CognitoUserPool("brainsOS_userPool", {

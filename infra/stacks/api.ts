@@ -11,7 +11,7 @@ export const bedrockPermissions = {
   resources: ['*']
 };
 
-export const brainsOS_API = new sst.aws.ApiGatewayV2("brains_api_latest", {
+export const brainsOS_API = new sst.aws.ApiGatewayV2("brainsos_api", {
   cors: {
     allowHeaders: [
       "Content-Type",
@@ -72,45 +72,4 @@ brainsOS_API.route("GET /latest/services/prompt/{promptType}", {
   handler: "packages/brainsOS/functions/api/services/prompt/promptHandler.handler",
 });
 
-brainsOS_API.route("POST /latest/services/llm-gateway/{promptType}", {
-  permissions: [ bedrockPermissions ],
-  handler: "packages/brainsOS/functions/api/services/llm-gateway/gatewayHandler.handler",
-});
-
-// For user data
-brainsOS_API.route("GET /latest/resources/{dataStore}/{object}", {
-  link: [userData, loadDefaultData],
-  handler: "packages/brainsOS/functions/api/resources/resourcesHandler.handler",
-});
-
-brainsOS_API.route("GET /latest/resources/{dataStore}/{object}/{name}", {
-  link: [userData, loadDefaultData],
-  handler: "packages/brainsOS/functions/api/resources/resourcesHandler.handler",
-});
-
-brainsOS_API.route("GET /latest/resources/{dataStore}/{object}/{name}/{version}", {
-  link: [userData, loadDefaultData],
-  handler: "packages/brainsOS/functions/api/resources/resourcesHandler.handler",
-});
-
-brainsOS_API.route("POST /latest/resources/{dataStore}/{object}", {
-  link: [userData],
-  handler: "packages/brainsOS/functions/api/resources/resourcesHandler.handler",
-});
-
-// MCP Endpoints
-brainsOS_API.route("POST /latest/mcp/{type}/{name}", {
-  handler: "packages/brainsOS/mcp/mcpHandler.handler",
-  link: [systemData],
-});
-
-brainsOS_API.route("POST /latest/mcp/index", {
-  handler: "packages/brainsOS/mcp/mcpHandler.handler",
-  link: [systemData],
-});
-
-brainsOS_API.route("POST /latest/mcp/index/{type}", {
-  handler: "packages/brainsOS/mcp/mcpHandler.handler",
-  link: [systemData],
-});
 

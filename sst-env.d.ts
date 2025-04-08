@@ -86,15 +86,15 @@ declare module "sst" {
       "secret": string
       "type": "sst.aws.CognitoUserPoolClient"
     }
-    "brains_api_latest": {
-      "type": "sst.aws.ApiGatewayV2"
-      "url": string
-    }
     "brains_latest": {
       "type": "sst.aws.StaticSite"
       "url": string
     }
-    "brains_websocket_api_latest": {
+    "brainsos_api": {
+      "type": "sst.aws.ApiGatewayV2"
+      "url": string
+    }
+    "brainsos_wss": {
       "managementEndpoint": string
       "type": "sst.aws.ApiGatewayWebSocket"
       "url": string

@@ -32,17 +32,29 @@ echo "----------------------------------------"
 echo "Connection established! You can now send messages."
 echo "Example messages (copy and paste):"
 echo ""
-echo "1. Claude with system prompt (non-streaming):"
+echo "1. LEGACY: Claude with system prompt (non-streaming):"
 echo '{"action": "llm/chat", "data": {"messages": [{"role": "user", "content": "tell me a joke"}], "provider": "bedrock", "modality": "text", "systemPrompt": "talk like you are a pirate"}}'
 echo ""
-echo "2. Claude with system prompt (streaming):"
+echo "2. LEGACY: Claude with system prompt (streaming):"
 echo '{"action": "llm/chat", "data": {"messages": [{"role": "user", "content": "tell me a joke"}], "provider": "bedrock", "modality": "text", "systemPrompt": "talk like you are a pirate", "streaming": true}}'
 echo ""
-echo "3. Llama with system prompt (non-streaming):"
-echo '{"action": "llm/chat", "data": {"messages": [{"role": "user", "content": "tell me a joke"}], "provider": "bedrock", "modality": "text", "modelId": "meta.llama3-70b-instruct-v1:0", "systemPrompt": "talk like a pirate"}}'
+echo "3. ONE-OFF PROMPT: Claude prompt (non-streaming):"
+echo '{"action": "llm/prompt", "data": {"messages": [{"role": "user", "content": "tell me a joke"}], "provider": "bedrock", "modality": "text", "systemPrompt": "talk like you are a pirate"}}'
 echo ""
-echo "4. Llama with system prompt (streaming):"
-echo '{"action": "llm/chat", "data": {"messages": [{"role": "user", "content": "tell me a joke"}], "provider": "bedrock", "modality": "text", "modelId": "meta.llama3-70b-instruct-v1:0", "systemPrompt": "talk like a pirate", "streaming": true}}'
+echo "4. ONE-OFF PROMPT: Claude prompt (streaming):"
+echo '{"action": "llm/prompt", "data": {"messages": [{"role": "user", "content": "tell me a joke"}], "provider": "bedrock", "modality": "text", "systemPrompt": "talk like you are a pirate", "streaming": true}}'
+echo ""
+echo "5. NEW CONVERSATION: Start a new conversation with Claude:"
+echo '{"action": "llm/conversation", "data": {"messages": [{"role": "user", "content": "tell me a joke"}], "provider": "bedrock", "modality": "text", "systemPrompt": "talk like you are a pirate", "title": "Pirate Jokes Conversation"}}'
+echo ""
+echo "6. NEW CONVERSATION: Start a new streaming conversation with Claude:"
+echo '{"action": "llm/conversation", "data": {"messages": [{"role": "user", "content": "tell me a joke"}], "provider": "bedrock", "modality": "text", "systemPrompt": "talk like you are a pirate", "title": "Pirate Jokes Conversation", "streaming": true}}'
+echo ""
+echo "7. CONTINUE CONVERSATION: Continue a conversation (replace CONVERSATION_ID):"
+echo '{"action": "llm/conversation", "data": {"conversationId": "CONVERSATION_ID", "messages": [{"role": "user", "content": "tell me another joke"}], "provider": "bedrock", "modality": "text"}}'
+echo ""
+echo "8. LLAMA CONVERSATION: Start a new conversation with Llama:"
+echo '{"action": "llm/conversation", "data": {"messages": [{"role": "user", "content": "tell me a joke"}], "provider": "bedrock", "modelId": "meta.llama3-70b-instruct-v1:0", "modality": "text", "systemPrompt": "talk like a pirate", "title": "Llama Pirate Jokes"}}'
 echo ""
 echo "To exit gracefully, press Ctrl+C"
 echo "----------------------------------------"

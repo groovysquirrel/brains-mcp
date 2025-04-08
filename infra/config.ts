@@ -1,6 +1,6 @@
 // Base domain configuration
 // domain must be registered in Route53
-export const baseDomain = "mcp.patternsatscale.com";
+export const baseDomain = "brainsos.ai";
 
 interface DomainConfig {
   api: {
@@ -72,7 +72,7 @@ export const domains: DomainConfig = {
     latest: {
       prod: `wss.${baseDomain}`,
       demo: `demo-wss.${baseDomain}`,
-      dev: `dev-io.${baseDomain}`
+      dev: `dev-wss.${baseDomain}`
     },
   },
   frontend: {
