@@ -26,8 +26,8 @@ export abstract class AbstractProvider {
       throw new Error(`Model ${model.modelId} does not support streaming`);
     }
 
-    if (request.provisioned && !model.access.provisionable) {
-      throw new Error(`Model ${model.modelId} is not provisionable`);
+    if (request.connectionType === 'PROVISIONED' && !model.access.provisionable) {
+      throw new Error(`Model ${model.modelId} does not support provisioned access`);
     }
   }
 

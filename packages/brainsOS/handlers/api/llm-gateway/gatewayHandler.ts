@@ -13,7 +13,7 @@
  */
 
 import { Logger } from '../../shared/logging/logger';
-import { Gateway, ConversationOptions } from '../../../llm-gateway-v2/src/LLM-Gateway';
+import { Gateway, ConversationOptions } from '../../../llm-gateway-v2/src/Gateway';
 import { GatewayRequest } from '../../../llm-gateway-v2/src/types/Request';
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 
@@ -50,6 +50,7 @@ const initializeGateway = async () => {
   }
 };
 
+// Initialize BedrockClient with the same region as Gateway (add near other initializations)
 // Initialize gateway immediately and ensure it's ready before handling requests
 let initializationPromise: Promise<void>;
 

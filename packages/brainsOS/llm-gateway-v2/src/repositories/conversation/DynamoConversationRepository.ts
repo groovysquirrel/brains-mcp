@@ -16,7 +16,7 @@ import {
   ListConversationsOptions,
   ListConversationsResponse,
   ConversationMessage
-} from './ConversationTypes';
+} from '../../types/Conversation';
 import { getDynamoClient, getServerName } from '../../utils/aws/DynamoClient';
 import { Resource } from 'sst';
 

@@ -28,10 +28,23 @@ export class StreamHandler {
     lastFlush: number;
     timeout?: ReturnType<typeof setTimeout>;
     aborted?: boolean;
+    outputTokenCount: number;
+    inputTokenEstimate: number;
   }>;
 
   constructor() {
     this.buffers = new Map();
+  }
+
+  /**
+   * Estimates token count from text using a simple word-based approach
+   * This is a rough estimate assuming ~1.3 tokens per word on average
+   */
+  private estimateTokenCount(text: string): number {
+    // Split by whitespace and count words
+    const words = text.trim().split(/\s+/).length;
+    // Apply a multiplier to account for the fact that tokens are smaller than words
+    return Math.ceil(words * 1.3);
   }
 
   /**
@@ -47,15 +60,39 @@ export class StreamHandler {
    * @param userId - Optional user ID
    * @param conversationId - Optional conversation ID for tracking
    * @param metadata - Optional metadata to include in responses
+   * @param request - The original request that was sent to get tokens from input
    */
   public async handleStream(
     stream: AsyncGenerator<GatewayResponse>,
     connectionId: string,
     userId: string,
     conversationId?: string,
-    metadata?: Record<string, unknown>
+    metadata?: Record<string, unknown>,
+    request?: any
   ): Promise<void> {
     try {
+      // Estimate input tokens if we have messages
+      let inputTokenEstimate = 0;
+      if (request?.messages) {
+        // Combine all message content for token estimation
+        const allContent = request.messages.map(m => m.content).join(' ');
+        inputTokenEstimate = this.estimateTokenCount(allContent);
+        
+        // Add tokens for system prompt if present
+        if (request.systemPrompt) {
+          inputTokenEstimate += this.estimateTokenCount(request.systemPrompt);
+        }
+        
+        logger.debug('Estimated input tokens', {
+          inputTokenEstimate,
+          messageCount: request.messages.length
+        });
+        
+        // Store this estimate in the buffer
+        const buffer = this.getOrCreateBuffer(connectionId);
+        buffer.inputTokenEstimate = inputTokenEstimate;
+      }
+      
       for await (const chunk of stream) {
         await this.handleChunk(chunk, connectionId);
       }
@@ -63,7 +100,11 @@ export class StreamHandler {
       // Flush any remaining content
       await this.flushBuffer(connectionId);
       
-      // Send final message with metadata
+      // Get final token counts
+      const buffer = this.buffers.get(connectionId);
+      const outputTokenCount = buffer ? buffer.outputTokenCount : 0;
+      
+      // Send final message with metadata and token counts
       await connectionManager.sendMessage(connectionId, {
         type: 'stream_end',
         data: {
@@ -71,7 +112,12 @@ export class StreamHandler {
             ...metadata,
             userId,
             conversationId,
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
+            usage: {
+              promptTokens: inputTokenEstimate,
+              completionTokens: outputTokenCount,
+              totalTokens: inputTokenEstimate + outputTokenCount
+            }
           }
         }
       });
@@ -100,12 +146,36 @@ export class StreamHandler {
       return;
     }
     
+    // Preserve usage information when present in metadata
+    const metadata = { ...chunk.metadata };
+    
+    // Estimate tokens in this chunk of text and add to count
+    if (chunk.content) {
+      const tokensInChunk = this.estimateTokenCount(chunk.content);
+      buffer.outputTokenCount += tokensInChunk;
+    }
+    
+    // Add our own token count to the metadata
+    metadata.usage = {
+      promptTokens: buffer.inputTokenEstimate,
+      completionTokens: buffer.outputTokenCount,
+      totalTokens: buffer.inputTokenEstimate + buffer.outputTokenCount
+    };
+    
+    // Log token counts
+    logger.debug('Updated token counts for stream chunk:', {
+      connectionId,
+      contentLength: chunk.content?.length || 0,
+      outputTokenCount: buffer.outputTokenCount,
+      metadata: metadata
+    });
+    
     // Pass through all chunks directly without buffering
     await connectionManager.sendMessage(connectionId, {
       type: 'stream',
       data: {
         content: chunk.content,
-        metadata: chunk.metadata
+        metadata: metadata
       }
     });
   }
@@ -114,7 +184,9 @@ export class StreamHandler {
     if (!this.buffers.has(connectionId)) {
       this.buffers.set(connectionId, {
         content: '',
-        lastFlush: Date.now()
+        lastFlush: Date.now(),
+        outputTokenCount: 0,
+        inputTokenEstimate: 0
       });
     }
     return this.buffers.get(connectionId)!;

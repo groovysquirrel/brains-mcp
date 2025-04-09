@@ -19,6 +19,14 @@ export const userData = new sst.aws.Dynamo("userData", {
     },
     primaryIndex: { hashKey: "userId", rangeKey: "typeName" }
   });
-  
-  
-
+    
+export const BrainsOSRDSVpc = new sst.aws.Vpc("BrainsOSRDSVpc", { bastion: true, nat: "ec2" });
+export const BrainsOSAuroraRDS = new sst.aws.Aurora("BrainsOSAuroraRDS", {
+    engine: "postgres",
+    dataApi: true,
+    vpc: BrainsOSRDSVpc,
+    scaling: {
+      min: "0 ACU",
+      max: "2 ACU"
+    },
+  });

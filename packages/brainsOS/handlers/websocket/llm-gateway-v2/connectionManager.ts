@@ -17,7 +17,18 @@ import { Logger } from '../../shared/logging/logger';
 import { ApiGatewayManagementApi } from 'aws-sdk';
 import { Resource } from 'sst';
 
+// Set to 'none', 'error', 'warn', or 'info' to control logging verbosity
+const LOG_LEVEL = 'none';
+
+// Create logger with configured log level
 const logger = new Logger('ConnectionManager');
+
+// Immediately configure the logger to respect our log level
+// This will silence outputs if LOG_LEVEL is 'none'
+console.log = LOG_LEVEL === 'none' ? () => {} : console.log;
+console.info = LOG_LEVEL === 'none' || LOG_LEVEL === 'error' ? () => {} : console.info;
+console.warn = LOG_LEVEL === 'none' || LOG_LEVEL === 'error' ? () => {} : console.warn;
+console.error = LOG_LEVEL === 'none' ? () => {} : console.error;
 
 // Define the structure of a WebSocket message
 interface Message {

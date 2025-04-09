@@ -4,6 +4,20 @@ export interface InferenceTypes {
   streaming: boolean;
 }
 
+/**
+ * Cost per token structure for input and output tokens
+ */
+export interface CostPerToken {
+  onDemand: number | {
+    input: number;
+    output: number;
+  };
+  provisioned?: number | {
+    input: number;
+    output: number;
+  };
+}
+
 export interface ModelCapabilities {
   streaming: boolean;
   modalities: {
@@ -38,6 +52,7 @@ export interface ModelConfig {
   displayName?: string;
   description?: string;
   aliases?: string[];
+  costPerToken?: CostPerToken; // Cost per token data
 }
 
 export interface ModelsConfiguration {

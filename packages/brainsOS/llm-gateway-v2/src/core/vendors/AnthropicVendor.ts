@@ -4,8 +4,6 @@ import { VendorConfig } from '../../types/Vendor';
 import { ProviderConfig } from '../../types/Provider';
 import { ModelConfig } from '../../types/Model';
 import { GatewayResponse } from '../../types/Response';
-import { AbstractProvider } from '../providers/AbstractProvider';
-import { InvokeModelWithResponseStreamCommand } from '@aws-sdk/client-bedrock-runtime';
 
 export class AnthropicVendor extends AbstractVendor {
   constructor(config: VendorConfig, providerConfig: ProviderConfig) {
@@ -14,40 +12,6 @@ export class AnthropicVendor extends AbstractVendor {
 
   async process(request: GatewayRequest, model: ModelConfig): Promise<GatewayResponse> {
     throw new Error('Method not implemented.');
-  }
-
-  async *streamProcess(request: GatewayRequest, model: ModelConfig, provider: AbstractProvider): AsyncGenerator<GatewayResponse> {
-    const formattedRequest = this.formatRequest(request, model.modelId);
-    
-    try {
-      const command = new InvokeModelWithResponseStreamCommand({
-        modelId: model.modelId,
-        contentType: 'application/json',
-        accept: 'application/json',
-        body: JSON.stringify(formattedRequest)
-      });
-
-      console.debug('Sending streaming request to Bedrock:', {
-        modelId: model.modelId,
-        request: formattedRequest,
-        tokenGrouping: request.tokenGrouping
-      });
-
-      const response = await (provider as any).bedrock.send(command);
-      
-      if (!response.body) {
-        throw new Error('No response body received from Bedrock');
-      }
-
-      yield* this.handleStreamingResponse(response, model.modelId, provider, request);
-    } catch (error) {
-      console.error('Error in Anthropic streaming:', {
-        error,
-        modelId: model.modelId,
-        request: formattedRequest
-      });
-      throw error;
-    }
   }
 
   processStreamChunk(chunk: unknown, modelId: string): { content: string; metadata?: Record<string, unknown> } | null {
@@ -63,11 +27,27 @@ export class AnthropicVendor extends AbstractVendor {
         }
       };
     } else if (chunkObj.type === 'message_stop') {
+      // Extract usage information correctly from Anthropic's format
+      const usage = chunkObj.usage as Record<string, unknown> | undefined;
+      const promptTokens = usage?.input_tokens || 0;
+      const completionTokens = usage?.output_tokens || 0;
+      
+      this.logger.debug('Stream completed, received usage data:', {
+        modelId,
+        usage,
+        promptTokens,
+        completionTokens
+      });
+      
       return {
         content: '',
         metadata: {
           model: modelId,
-          usage: chunkObj.usage,
+          usage: {
+            promptTokens,
+            completionTokens,
+            totalTokens: (promptTokens as number) + (completionTokens as number)
+          },
           isStreaming: false
         }
       };
@@ -83,11 +63,41 @@ export class AnthropicVendor extends AbstractVendor {
 
     const defaultSettings = this.getDefaultSettings();
     
+    // Extract system message if present
+    let systemPrompt = '';
+    const chatMessages = request.messages.filter(msg => {
+      if (msg.role === 'system') {
+        // Combine multiple system messages if they exist
+        systemPrompt += (systemPrompt ? '\n' : '') + msg.content;
+        return false;
+      }
+      return true;
+    });
+    
+    // Use explicit systemPrompt if provided (overrides system messages)
+    if (request.systemPrompt) {
+      systemPrompt = request.systemPrompt;
+    }
+    
     // Format messages according to Bedrock's requirements
-    const messages = request.messages.map(msg => ({
+    // Only include user and assistant messages
+    const messages = chatMessages.map(msg => ({
       role: msg.role,
       content: msg.content
     }));
+    
+    // Ensure the message array starts with a user message
+    if (messages.length > 0 && messages[0].role !== 'user') {
+      this.logger.warn('First message is not from user, adding empty user message', {
+        firstRole: messages[0].role
+      });
+      
+      // Add an empty user message at the beginning
+      messages.unshift({
+        role: 'user',
+        content: 'I need your help with the following conversation.'
+      });
+    }
     
     const requestBody: Record<string, unknown> = {
       messages,
@@ -98,14 +108,15 @@ export class AnthropicVendor extends AbstractVendor {
     };
 
     // Add system prompt if provided
-    if (request.systemPrompt) {
-      requestBody.system = request.systemPrompt;
+    if (systemPrompt) {
+      requestBody.system = systemPrompt;
     }
 
-    console.debug('AnthropicVendor formatRequest:', {
+    this.logger.debug('Formatting request for Claude model', {
       modelId,
-      requestBody,
-      systemPrompt: request.systemPrompt
+      messageCount: messages.length,
+      hasSystemPrompt: !!systemPrompt,
+      requestBody
     });
     
     return requestBody;
@@ -114,6 +125,43 @@ export class AnthropicVendor extends AbstractVendor {
   validateRequest(request: GatewayRequest): void {
     if (!request.messages || request.messages.length === 0) {
       throw new Error('Messages are required for Claude models');
+    }
+
+    this.logger.debug('Validating request for Claude model', {
+      messageCount: request.messages.length,
+      systemPrompt: !!request.systemPrompt,
+      messageRoles: request.messages.map(m => m.role)
+    });
+
+    // Get only non-system messages for alternation check
+    const nonSystemMessages = request.messages.filter(msg => msg.role !== 'system');
+    
+    // Single message is always valid, no need to check alternation
+    if (nonSystemMessages.length <= 1) {
+      return;
+    }
+    
+    // Check if roles alternate correctly between user and assistant
+    let lastRole = nonSystemMessages[0].role;
+    
+    for (let i = 1; i < nonSystemMessages.length; i++) {
+      const role = nonSystemMessages[i].role;
+      
+      // Check alternation
+      if (role === lastRole) {
+        // Two consecutive messages with the same role
+        this.logger.warn('Messages not alternating correctly', {
+          messageRoles: nonSystemMessages.map(m => m.role),
+          position: i,
+          role: role,
+          lastRole: lastRole,
+          fullMessages: request.messages
+        });
+        
+        throw new Error(`Messages must alternate between 'user' and 'assistant' roles. Found consecutive '${role}' roles.`);
+      }
+      
+      lastRole = role;
     }
   }
 
@@ -133,7 +181,7 @@ export class AnthropicVendor extends AbstractVendor {
     const responseObj = response as Record<string, unknown>;
     const content = responseObj.content as Array<{ text: string }> | undefined;
     
-    console.debug('AnthropicVendor formatResponse:', {
+    this.logger.debug('Formatting Claude response', {
       response: responseObj,
       content
     });

@@ -1,6 +1,6 @@
 {
     "environment": {
         "LLM_METRICS_ENABLED": true,
-        "LLM_METRICS_DESTINATION": "s3"
+        "LLM_METRICS_DESTINATION": "sqs"
   }
 }

@@ -6,7 +6,7 @@ import {
   ListConversationsOptions,
   ListConversationsResponse,
   ConversationMessage
-} from './ConversationTypes';
+} from '../../types/Conversation';
 
 /**
  * Interface for conversation repositories

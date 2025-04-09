@@ -7,8 +7,10 @@ import { GatewayModelState, GatewayModelAliases } from '../../types/GatewayState
 import { MetricsConfig, MetricsDestination } from '../../types/Metrics';
 import * as fs from 'fs/promises';
 import path from 'path';
-import { Logger } from '../../utils/logging/Logger';
+import { Logger, LogLevel } from '../../utils/logging/Logger';
 import { Resource } from 'sst';
+import { TextModalityHandler } from '../../core/modalities/TextModalityHandler';
+import { ModalityHandler } from '../../types/Modality';
 /**
  * ProvidersIndex interface for the providers.json file
  */
@@ -26,6 +28,7 @@ interface ProvidersIndex {
 export class LocalConfigLoader implements ConfigRepository {
   private logger: Logger;
   private configPath: string;
+  private modalityHandlerCache: Record<string, ModalityHandler> = {};
 
   /**
    * Constructor
@@ -224,6 +227,30 @@ export class LocalConfigLoader implements ConfigRepository {
   }
 
   /**
+   * Gets the logger configuration
+   */
+  async getLoggerConfig(): Promise<{ logLevel: LogLevel }> {
+    try {
+      const loggerPath = path.join(this.configPath, 'system', 'logger.json');
+      this.logger.info('Looking for logger config at:', { path: loggerPath });
+      
+      const configContent = await fs.readFile(loggerPath, 'utf-8');
+      const config = JSON.parse(configContent);
+      
+      // Extract log level with fallback to 'info'
+      const logLevel = (config.LogLevel || 'info').toLowerCase() as LogLevel;
+      
+      this.logger.info('Loaded logger configuration', { logLevel });
+      
+      return { logLevel };
+    } catch (error) {
+      this.logger.error('Failed to load logger config:', { error });
+      // Return default configuration if file not found or parsing error
+      return { logLevel: 'info' };
+    }
+  }
+
+  /**
    * Gets the metrics configuration
    */
   async getMetricsConfig(): Promise<MetricsConfig> {
@@ -271,5 +298,56 @@ export class LocalConfigLoader implements ConfigRepository {
         awsRegion: 'us-east-1'
       };
     }
+  }
+
+  /**
+   * Gets a modality handler for a specific model
+   * This encapsulates the logic of finding the right handler and
+   * providing it with all necessary configuration data
+   * @param model - The model configuration
+   */
+  async getModalityHandler(model: ModelConfig): Promise<ModalityHandler> {
+    // Create a cache key based on model identity
+    const cacheKey = `${model.provider}:${model.modelId}`;
+    
+    // Return cached handler if available
+    if (this.modalityHandlerCache[cacheKey]) {
+      return this.modalityHandlerCache[cacheKey];
+    }
+    
+    // Load all necessary configurations
+    const modalityConfigs = await this.loadAllModalityConfigs();
+    const providerConfig = await this.getProviderConfig(model.provider);
+    const vendorConfigs = await this.loadAllVendorConfigs();
+    
+    // Find a handler that supports the model's modalities
+    for (const config of modalityConfigs) {
+      let handler: ModalityHandler;
+      
+      // Create the appropriate handler based on modality
+      switch (config.name) {
+        case 'text-to-text':
+          handler = new TextModalityHandler(config, providerConfig, vendorConfigs);
+          break;
+        // Add other modality handlers here
+        default:
+          continue;
+      }
+      
+      // Check if the handler supports the model's modalities
+      if (handler.supportsModality(model)) {
+        // For text modality, we need to check if the model supports text input and output
+        if (config.name === 'text-to-text' && 
+            model.capabilities.modalities.input.includes('TEXT') && 
+            model.capabilities.modalities.output.includes('TEXT')) {
+          
+          // Cache the handler for future use
+          this.modalityHandlerCache[cacheKey] = handler;
+          return handler;
+        }
+      }
+    }
+    
+    throw new Error(`No modality handler found for model ${model.modelId}`);
   }
 } 

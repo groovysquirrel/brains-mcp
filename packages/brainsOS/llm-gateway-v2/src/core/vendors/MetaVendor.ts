@@ -4,8 +4,6 @@ import { VendorConfig } from '../../types/Vendor';
 import { ProviderConfig } from '../../types/Provider';
 import { ModelConfig } from '../../types/Model';
 import { GatewayResponse } from '../../types/Response';
-import { AbstractProvider } from '../providers/AbstractProvider';
-import { InvokeModelWithResponseStreamCommand } from '@aws-sdk/client-bedrock-runtime';
 
 export class MetaVendor extends AbstractVendor {
   constructor(config: VendorConfig, providerConfig: ProviderConfig) {
@@ -19,118 +17,131 @@ export class MetaVendor extends AbstractVendor {
 
     const defaultSettings = this.getDefaultSettings();
     
-    // Get the user's message content
-    const userMessage = request.messages.find(msg => msg.role === 'user');
-    if (!userMessage) {
-      throw new Error('User message is required');
-    }
-
-    // Format the prompt according to Llama 3's instruction format
-    let formattedPrompt = '';
+    // Format messages according to Llama's expectations
+    const promptMessages = [];
+    let systemPrompt = '';
     
-    // Add system prompt if provided
+    // Extract system prompt if present
+    for (const message of request.messages) {
+      if (message.role === 'system') {
+        systemPrompt = message.content;
+      } else {
+        promptMessages.push(message);
+      }
+    }
+    
+    // Override with explicit system prompt if provided
     if (request.systemPrompt) {
-      formattedPrompt += `<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n${request.systemPrompt}\n<|eot_id|>\n`;
-    } else {
-      formattedPrompt += `<|begin_of_text|>`;
+      systemPrompt = request.systemPrompt;
     }
     
-    // Add user message
-    formattedPrompt += `<|start_header_id|>user<|end_header_id|>\n${userMessage.content}\n<|eot_id|>\n`;
-    
-    // Add assistant header
-    formattedPrompt += `<|start_header_id|>assistant<|end_header_id|>\n`;
-    
-    console.debug('Formatted prompt for Llama:', {
-      modelId,
-      systemPrompt: request.systemPrompt,
-      formattedPrompt
-    });
-    
-    return {
-      prompt: formattedPrompt,
+    // Build the request body
+    const requestBody: Record<string, unknown> = {
+      prompt: this.formatMessages(promptMessages, systemPrompt),
       max_gen_len: request.maxTokens || defaultSettings.maxTokens,
       temperature: request.temperature || defaultSettings.temperature,
       top_p: request.topP || defaultSettings.topP
     };
+    
+    // Add any stop sequences
+    if (request.stopSequences && request.stopSequences.length > 0) {
+      requestBody.stop_sequences = request.stopSequences;
+    } else if (defaultSettings.stopSequences) {
+      requestBody.stop_sequences = defaultSettings.stopSequences;
+    }
+    
+    return requestBody;
+  }
+  
+  // Helper method to format messages in the expected format for Llama models
+  private formatMessages(messages: Array<{role: string; content: string}>, systemPrompt?: string): string {
+    let prompt = '';
+    
+    // Add system prompt if present
+    if (systemPrompt) {
+      prompt += `<|system|>\n${systemPrompt}\n`;
+    }
+    
+    // Add the conversation messages
+    for (const message of messages) {
+      const role = message.role === 'assistant' ? 'assistant' : 'user';
+      prompt += `<|${role}|>\n${message.content}\n`;
+    }
+    
+    // Add the final assistant marker to indicate it's the model's turn
+    prompt += '<|assistant|>\n';
+    
+    return prompt;
   }
 
   validateRequest(request: GatewayRequest): void {
-    if (!request.messages || request.messages.length === 0) {
-      throw new Error('At least one message is required');
+    if ((!request.messages || request.messages.length === 0) && !request.prompt) {
+      throw new Error('Either messages or prompt are required for Llama models');
     }
-
-    const validRoles = ['user', 'assistant', 'system'];
-    for (const message of request.messages) {
-      if (!validRoles.includes(message.role)) {
-        throw new Error(`Invalid message role: ${message.role}`);
+    
+    // If using messages format, ensure the roles are valid
+    if (request.messages) {
+      for (const message of request.messages) {
+        if (!['user', 'assistant', 'system'].includes(message.role)) {
+          throw new Error(`Invalid role "${message.role}" for Llama models. Must be one of: user, assistant, system`);
+        }
       }
     }
   }
 
   processStreamChunk(chunk: unknown, modelId: string): { content: string; metadata?: Record<string, unknown> } | null {
-    const chunkObj = chunk as Record<string, unknown>;
+    const chunkObj = chunk as { type?: string; generation?: string };
     
-    // Handle generation chunk
-    if (chunkObj.generation) {
-      const content = chunkObj.generation as string;
-      
-      // Skip empty content
-      if (!content.trim()) {
-        return null;
-      }
-      
+    // Check if this is a data chunk with a generation field
+    if (chunkObj.type === 'content_block_start' || chunkObj.type === 'content_block_delta') {
       return {
-        content,
+        content: '',
         metadata: {
           model: modelId,
           isStreaming: true
         }
       };
-    }
-    
-    // Handle final message with usage stats
-    if (chunkObj.usage) {
+    } else if (chunkObj.type === 'generation' && chunkObj.generation) {
+      return {
+        content: chunkObj.generation,
+        metadata: {
+          model: modelId,
+          isStreaming: true
+        }
+      };
+    } else if (chunkObj.type === 'message_stop') {
+      // Final chunk with usage information
       return {
         content: '',
         metadata: {
           model: modelId,
-          usage: chunkObj.usage,
           isStreaming: false
         }
       };
     }
     
-    // Handle error chunk
-    if (chunkObj.error) {
-      console.error('Received error chunk:', {
-        modelId,
-        error: chunkObj.error
-      });
-      
-      return null;
-    }
-    
+    // If it's not a recognized chunk type, return null to skip it
     return null;
   }
 
   getDefaultSettings() {
     return this.config.defaultSettings || {
-      maxTokens: 4096,
+      maxTokens: 512,
       temperature: 0.7,
-      topP: 1
+      topP: 0.9
     };
   }
 
   getApiFormat(modelId: string): string {
-    return 'prompt';
+    return 'chat';
   }
 
   formatResponse(response: unknown): { content: string; metadata?: Record<string, unknown> } {
     const responseObj = response as Record<string, unknown>;
+    const generation = responseObj.generation as string;
     
     return {
-      content: responseObj.generation as string,
+      content: generation || '',
       metadata: {
         model: responseObj.model,
         usage: responseObj.usage
@@ -140,39 +151,5 @@ export class MetaVendor extends AbstractVendor {
 
   async process(request: GatewayRequest, model: ModelConfig): Promise<GatewayResponse> {
     throw new Error('Method not implemented.');
-  }
-
-  async *streamProcess(request: GatewayRequest, model: ModelConfig, provider: AbstractProvider): AsyncGenerator<GatewayResponse> {
-    const formattedRequest = this.formatRequest(request, model.modelId);
-    
-    try {
-      const command = new InvokeModelWithResponseStreamCommand({
-        modelId: model.modelId,
-        contentType: 'application/json',
-        accept: 'application/json',
-        body: JSON.stringify(formattedRequest)
-      });
-
-      console.debug('Sending streaming request to Bedrock:', {
-        modelId: model.modelId,
-        request: formattedRequest,
-        tokenGrouping: request.tokenGrouping
-      });
-
-      const response = await (provider as any).bedrock.send(command);
-      
-      if (!response.body) {
-        throw new Error('No response body received from Bedrock');
-      }
-
-      yield* this.handleStreamingResponse(response, model.modelId, provider, request);
-    } catch (error) {
-      console.error('Error in Llama streaming:', {
-        error,
-        modelId: model.modelId,
-        request: formattedRequest
-      });
-      throw error;
-    }
   }
 } 

@@ -6,6 +6,7 @@ import { ModelConfig } from '../../types/Model';
 import { GatewayResponse } from '../../types/Response';
 import { AbstractProvider } from '../providers/AbstractProvider';
 import { InvokeModelWithResponseStreamCommand } from '@aws-sdk/client-bedrock-runtime';
+import { getBedrockClient } from '../../utils/aws/BedrockClient';
 
 export abstract class AbstractVendor {
   protected config: VendorConfig;
@@ -82,10 +83,29 @@ export abstract class AbstractVendor {
         const processedChunk = this.processStreamChunk(chunk, modelId);
         
         if (processedChunk) {
-          // Update token counts if available
-          if (chunk.usage) {
+          // Update token counts if available in the processed chunk
+          if (processedChunk.metadata?.usage) {
+            const usage = processedChunk.metadata.usage as Record<string, number>;
+            promptTokens = usage.promptTokens || 0;
+            completionTokens = usage.completionTokens || 0;
+            
+            this.logger.debug('Updated token counts from chunk', {
+              modelId,
+              promptTokens,
+              completionTokens,
+              totalTokens: promptTokens + completionTokens
+            });
+          } 
+          // Also check original chunk format
+          else if (chunk.usage) {
             promptTokens = chunk.usage.input_tokens || 0;
             completionTokens = chunk.usage.output_tokens || 0;
+            
+            this.logger.debug('Updated token counts from raw chunk', {
+              modelId,
+              promptTokens,
+              completionTokens
+            });
           }
 
           // Add content to current group
@@ -146,7 +166,7 @@ export abstract class AbstractVendor {
   ): Promise<any> {
     const formattedRequest = this.formatRequest(request, model.modelId);
     
-    console.debug('AbstractVendor sendStreamingRequest:', {
+    this.logger.debug('Sending streaming request to Bedrock', {
       modelId: model.modelId,
       formattedRequest
     });
@@ -158,9 +178,11 @@ export abstract class AbstractVendor {
       body: JSON.stringify(formattedRequest)
     });
 
-    const response = await (provider as any).bedrock.send(command);
+    // Use the shared Bedrock client
+    const bedrock = getBedrockClient();
+    const response = await bedrock.send(command);
     
-    console.debug('AbstractVendor received streaming response:', {
+    this.logger.debug('Received streaming response from Bedrock', {
       modelId: model.modelId,
       hasResponseBody: !!response.body
     });

@@ -1,4 +1,4 @@
-import { userData, systemData } from "../stacks/database";
+import { userData, systemData, BrainsOSAuroraRDS, BrainsOSRDSVpc } from "../stacks/database";
 import { brainsOS_API} from "../stacks/api";
 import { bedrockPermissions } from "../stacks/auth";
 import { brainsOS_wss } from "../stacks/websocket";
@@ -24,6 +24,17 @@ brainsOS_API.route("POST /llm-gateway/{action}", {
     handler: "packages/brainsOS/handlers/api/llm-gateway/gatewayHandler.handler",
     copyFiles: [{ from: "packages/brainsOS/llm-gateway-v2/config/", to: "config" }],
   });
+
+
+// Write metrics from the queue to the database
+  const writeMetricsFunction = new sst.aws.Function("writeMetricsFunction", {
+    handler: "packages/brainsOS/handlers/sqs/llm-gateway/metricsHandler.handler",
+    link: [BrainsOSAuroraRDS, BrainsOSMetricsQueue],
+    vpc: BrainsOSRDSVpc,
+    
+  });
+
+  BrainsOSMetricsQueue.subscribe(writeMetricsFunction.arn);
 
 
   

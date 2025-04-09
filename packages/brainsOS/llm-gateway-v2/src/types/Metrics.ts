@@ -3,6 +3,23 @@
  */
 
 /**
+ * Cost information for an LLM operation
+ */
+export interface CostInfo {
+  cost: number;
+  currency: string;
+  pricing?: {
+    input: number;
+    output: number;
+  };
+}
+
+/**
+ * Model connection type
+ */
+export type ConnectionType = 'ONDEMAND' | 'PROVISIONED';
+
+/**
  * Metadata for an LLM operation
  * Contains all the information needed for accounting and analysis
  */
@@ -13,6 +30,7 @@ export interface LLMUsageMetadata {
   promptId?: string;
   modelId: string;
   provider: string;
+  connectionType?: ConnectionType;  // Type of connection (ONDEMAND or PROVISIONED)
   tokensIn: number; 
   tokensOut: number;
   startTime: string;
@@ -22,6 +40,7 @@ export interface LLMUsageMetadata {
   tags?: string[];
   success: boolean;
   error?: string;
+  cost?: CostInfo; // Cost information based on token usage
 }
 
 /**

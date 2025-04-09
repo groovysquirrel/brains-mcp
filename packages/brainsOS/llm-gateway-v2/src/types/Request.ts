@@ -27,6 +27,9 @@ export interface GatewayRequest {
   // Streaming flag
   streaming?: boolean;
   
+  // Connection type (on-demand or provisioned)
+  connectionType?: 'ONDEMAND' | 'PROVISIONED';
+  
   // Token grouping for streaming responses
   tokenGrouping?: number;
   

@@ -5,6 +5,17 @@
 
 declare module "sst" {
   export interface Resource {
+    "BrainsOSAuroraRDS": {
+      "clusterArn": string
+      "database": string
+      "host": string
+      "password": string
+      "port": number
+      "reader": string
+      "secretArn": string
+      "type": "sst.aws.Aurora"
+      "username": string
+    }
     "BrainsOSBucket": {
       "name": string
       "type": "sst.aws.Bucket"
@@ -12,6 +23,10 @@ declare module "sst" {
     "BrainsOSMetricsQueue": {
       "type": "sst.aws.Queue"
       "url": string
+    }
+    "BrainsOSRDSVpc": {
+      "bastion": string
+      "type": "sst.aws.Vpc"
     }
     "EmailBucket": {
       "name": string
@@ -138,6 +153,10 @@ declare module "sst" {
     "userData": {
       "name": string
       "type": "sst.aws.Dynamo"
+    }
+    "writeMetricsFunction": {
+      "name": string
+      "type": "sst.aws.Function"
     }
   }
 }

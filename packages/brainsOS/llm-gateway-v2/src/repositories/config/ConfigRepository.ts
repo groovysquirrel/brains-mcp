@@ -1,9 +1,10 @@
 import { ProviderConfig } from '../../types/Provider';
 import { VendorConfig } from '../../types/Vendor';
 import { ModelConfig } from '../../types/Model';
-import { ModalityConfig } from '../../types/Modality';
+import { ModalityConfig, ModalityHandler } from '../../types/Modality';
 import { GatewayModelState, GatewayModelAliases } from '../../types/GatewayState';
 import { MetricsConfig } from '../../types/Metrics';
+import { LogLevel } from '../../utils/logging/Logger';
 
 /**
  * Interface that defines methods for loading various configurations
@@ -76,4 +77,17 @@ export interface ConfigRepository {
    * Gets the metrics configuration
    */
   getMetricsConfig(): Promise<MetricsConfig>;
+  
+  /**
+   * Gets the logger configuration
+   */
+  getLoggerConfig(): Promise<{ logLevel: LogLevel }>;
+  
+  /**
+   * Gets a modality handler for a specific model
+   * This encapsulates the logic of finding the right handler and
+   * providing it with all necessary configuration data
+   * @param model - The model configuration
+   */
+  getModalityHandler(model: ModelConfig): Promise<ModalityHandler>;
 } 

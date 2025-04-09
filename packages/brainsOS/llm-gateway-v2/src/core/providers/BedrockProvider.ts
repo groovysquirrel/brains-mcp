@@ -1,21 +1,23 @@
 import { AbstractProvider } from './AbstractProvider';
 import { GatewayRequest } from '../../types/Request';
 import { ModelConfig } from '../../types/Model';
-import { BedrockRuntimeClient, InvokeModelCommand, InvokeModelWithResponseStreamCommand } from '@aws-sdk/client-bedrock-runtime';
+import { InvokeModelCommand, InvokeModelWithResponseStreamCommand } from '@aws-sdk/client-bedrock-runtime';
 import { AbstractVendor } from '../vendors/AbstractVendor';
 import { ProviderConfig } from '../../types/Provider';
 import { VendorConfig } from '../../types/Vendor';
 import { AnthropicVendor } from '../vendors/AnthropicVendor';
 import { MetaVendor } from '../vendors/MetaVendor';
+import { getBedrockClient } from '../../utils/aws/BedrockClient';
+import { Logger } from '../../utils/logging/Logger';
 
 export class BedrockProvider extends AbstractProvider {
-  private bedrock: BedrockRuntimeClient;
   private vendorConfigs: Record<string, VendorConfig>;
+  protected logger: Logger;
 
   constructor(config: ProviderConfig, vendorConfigs: Record<string, VendorConfig>) {
     super(config);
-    this.bedrock = new BedrockRuntimeClient({});
     this.vendorConfigs = vendorConfigs;
+    this.logger = new Logger('BedrockProvider');
   }
 
   protected getVendor(modelId: string): AbstractVendor {
@@ -39,12 +41,15 @@ export class BedrockProvider extends AbstractProvider {
     const vendor = this.getVendor(model.modelId);
     const formattedRequest = vendor.formatRequest(request, model.modelId);
 
-    console.debug('Sending request to Bedrock:', {
+    this.logger.debug('Sending request to Bedrock:', {
       modelId: model.modelId,
       request: formattedRequest
     });
 
     try {
+      // Get the shared Bedrock client
+      const bedrock = getBedrockClient();
+      
       const command = new InvokeModelCommand({
         modelId: model.modelId,
         contentType: 'application/json',
@@ -52,9 +57,9 @@ export class BedrockProvider extends AbstractProvider {
         body: JSON.stringify(formattedRequest)
       });
 
-      const response = await this.bedrock.send(command);
+      const response = await bedrock.send(command);
       
-      console.debug('Received response from Bedrock:', {
+      this.logger.debug('Received response from Bedrock:', {
         modelId: model.modelId,
         response
       });
@@ -63,7 +68,7 @@ export class BedrockProvider extends AbstractProvider {
       const responseBody = new TextDecoder().decode(response.body);
       const parsedResponse = JSON.parse(responseBody);
 
-      console.debug('Parsed response from Bedrock:', {
+      this.logger.debug('Parsed response from Bedrock:', {
         modelId: model.modelId,
         parsedResponse
       });
@@ -73,7 +78,7 @@ export class BedrockProvider extends AbstractProvider {
         model: model.modelId
       });
     } catch (error) {
-      console.error('Error in Bedrock chat:', {
+      this.logger.error('Error in Bedrock chat:', {
         error,
         modelId: model.modelId,
         request: formattedRequest
@@ -84,35 +89,23 @@ export class BedrockProvider extends AbstractProvider {
 
   async *streamChat(request: GatewayRequest, model: ModelConfig): AsyncGenerator<{ content: string; metadata?: Record<string, unknown> }> {
     const vendor = this.getVendor(model.modelId);
-    const formattedRequest = vendor.formatRequest(request, model.modelId);
+    
+    // Validate the request
+    this.validateRequest(request, model);
+    vendor.validateRequest(request);
 
-    console.debug('Sending streaming request to Bedrock:', {
+    this.logger.debug('Starting streaming chat with Bedrock', {
       modelId: model.modelId,
-      request: formattedRequest
+      streaming: true
     });
 
     try {
-      const command = new InvokeModelWithResponseStreamCommand({
-        modelId: model.modelId,
-        contentType: 'application/json',
-        accept: 'application/json',
-        body: JSON.stringify(formattedRequest)
-      });
-
-      const response = await this.bedrock.send(command);
-      
-      if (!response.body) {
-        throw new Error('No response body received from Bedrock');
-      }
-
-      for await (const chunk of vendor.streamProcess(request, model, this)) {
-        yield chunk;
-      }
+      // Use the vendor's streamProcess method which now gets the Bedrock client correctly
+      yield* vendor.streamProcess(request, model, this);
     } catch (error) {
-      console.error('Error in Bedrock streamChat:', {
+      this.logger.error('Error in Bedrock streamChat:', {
         error,
-        modelId: model.modelId,
-        request: formattedRequest
+        modelId: model.modelId
       });
       throw error;
     }

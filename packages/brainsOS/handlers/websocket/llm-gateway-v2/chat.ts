@@ -13,7 +13,7 @@
  */
 
 import { Logger } from '../../shared/logging/logger';
-import { Gateway, ConversationOptions } from '../../../llm-gateway-v2/src/LLM-Gateway';
+import { Gateway, ConversationOptions } from '../../../llm-gateway-v2/src/Gateway';
 import { GatewayRequest } from '../../../llm-gateway-v2/src/types/Request';
 import { ConnectionManager } from './connectionManager';
 import { StreamHandler } from './streamHandler';
@@ -32,7 +32,7 @@ interface WebSocketEvent {
 }
 
 // Initialize logging and connection management
-const logger = new Logger('LLMGatewayV2Chat');
+const logger = new Logger('LLM-gateway-websocket-chat');
 const connectionManager = ConnectionManager.getInstance();
 const streamHandler = new StreamHandler();
 
@@ -243,6 +243,8 @@ export class LLMChatMessageHandler implements MessageHandler {
         maxTokens: data.maxTokens,
         temperature: data.temperature,
         systemPrompt: data.systemPrompt,
+        // Add the userId directly to the request for metrics
+        userId: data.userId,  
         metadata: {
           ...data.metadata,
           userId: data.userId,
@@ -282,7 +284,8 @@ export class LLMChatMessageHandler implements MessageHandler {
           connectionId,
           userId,
           undefined, // No conversation ID for prompt requests
-          { timestamp: new Date().toISOString() }
+          { timestamp: new Date().toISOString() },
+          request // Pass the request for token estimation
         ).catch(error => {
           logger.error('Error handling stream:', error);
         });
@@ -391,7 +394,8 @@ export class LLMChatMessageHandler implements MessageHandler {
           data.connectionId,
           data.userId,
           request.conversationId,
-          { timestamp: new Date().toISOString() }
+          { timestamp: new Date().toISOString() },
+          request // Pass the request for token estimation
         ).catch(error => {
           logger.error('Error handling stream:', error);
         });

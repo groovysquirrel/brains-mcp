@@ -26,6 +26,16 @@
           "access": {
             "onDemand": true,
             "provisionable": false
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.00001",
+              "output": "0.00003"
+            },
+            "provisioned": {
+              "input": "0.000008",
+              "output": "0.000024"
+            }
           }
         },
         {
@@ -54,6 +64,16 @@
           "access": {
             "onDemand": false,
             "provisionable": true
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.00001",
+              "output": "0.00003"
+            },
+            "provisioned": {
+              "input": "0.000008",
+              "output": "0.000024"
+            }
           }
         },
         {
@@ -80,6 +100,16 @@
           "access": {
             "onDemand": true,
             "provisionable": false
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.00001",
+              "output": "0.00003"
+            },
+            "provisioned": {
+              "input": "0.000008",
+              "output": "0.000024"
+            }
           }
         },
         {
@@ -108,6 +138,16 @@
           "access": {
             "onDemand": true,
             "provisionable": true
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.00001",
+              "output": "0.00003"
+            },
+            "provisioned": {
+              "input": "0.000008",
+              "output": "0.000024"
+            }
           }
         },
         {
@@ -133,6 +173,12 @@
           "access": {
             "onDemand": true,
             "provisionable": false
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.000013",
+              "output": "0.000039"
+            }
           }
         },
         {
@@ -160,6 +206,16 @@
           "access": {
             "onDemand": false,
             "provisionable": true
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.00001",
+              "output": "0.00003"
+            },
+            "provisioned": {
+              "input": "0.000008",
+              "output": "0.000024"
+            }
           }
         },
         {
@@ -189,6 +245,16 @@
           "access": {
             "onDemand": false,
             "provisionable": true
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.00001",
+              "output": "0.00003"
+            },
+            "provisioned": {
+              "input": "0.000008",
+              "output": "0.000024"
+            }
           }
         },
         {
@@ -216,6 +282,16 @@
           "access": {
             "onDemand": true,
             "provisionable": false
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.00001",
+              "output": "0.00003"
+            },
+            "provisioned": {
+              "input": "0.000008",
+              "output": "0.000024"
+            }
           }
         },
         {
@@ -243,6 +319,16 @@
           "access": {
             "onDemand": false,
             "provisionable": true
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.00001",
+              "output": "0.00003"
+            },
+            "provisioned": {
+              "input": "0.000008",
+              "output": "0.000024"
+            }
           }
         },
         {
@@ -273,6 +359,16 @@
           "access": {
             "onDemand": false,
             "provisionable": true
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.00001",
+              "output": "0.00003"
+            },
+            "provisioned": {
+              "input": "0.000008",
+              "output": "0.000024"
+            }
           }
         },
         {
@@ -300,6 +396,16 @@
           "access": {
             "onDemand": true,
             "provisionable": false
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.00001",
+              "output": "0.00003"
+            },
+            "provisioned": {
+              "input": "0.000008",
+              "output": "0.000024"
+            }
           }
         },
         {
@@ -328,6 +434,16 @@
           "access": {
             "onDemand": true,
             "provisionable": true
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.00001",
+              "output": "0.00003"
+            },
+            "provisioned": {
+              "input": "0.000008",
+              "output": "0.000024"
+            }
           }
         },
         {
@@ -354,6 +470,16 @@
           "access": {
             "onDemand": true,
             "provisionable": false
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.00001",
+              "output": "0.00003"
+            },
+            "provisioned": {
+              "input": "0.000008",
+              "output": "0.000024"
+            }
           }
         },
         {
@@ -379,6 +505,16 @@
           "access": {
             "onDemand": false,
             "provisionable": true
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.00001",
+              "output": "0.00003"
+            },
+            "provisioned": {
+              "input": "0.000008",
+              "output": "0.000024"
+            }
           }
         },
         {
@@ -407,6 +543,16 @@
           "access": {
             "onDemand": false,
             "provisionable": true
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.00001",
+              "output": "0.00003"
+            },
+            "provisioned": {
+              "input": "0.000008",
+              "output": "0.000024"
+            }
           }
         },
         {
@@ -432,6 +578,16 @@
           "access": {
             "onDemand": true,
             "provisionable": false
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.00001",
+              "output": "0.00003"
+            },
+            "provisioned": {
+              "input": "0.000008",
+              "output": "0.000024"
+            }
           }
         },
         {
@@ -457,6 +613,16 @@
           "access": {
             "onDemand": true,
             "provisionable": false
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.00001",
+              "output": "0.00003"
+            },
+            "provisioned": {
+              "input": "0.000008",
+              "output": "0.000024"
+            }
           }
         },
         {
@@ -485,6 +651,16 @@
           "access": {
             "onDemand": false,
             "provisionable": true
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.00001",
+              "output": "0.00003"
+            },
+            "provisioned": {
+              "input": "0.000008",
+              "output": "0.000024"
+            }
           }
         },
         {
@@ -510,6 +686,16 @@
           "access": {
             "onDemand": true,
             "provisionable": false
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.00001",
+              "output": "0.00003"
+            },
+            "provisioned": {
+              "input": "0.000008",
+              "output": "0.000024"
+            }
           }
         },
         {
@@ -538,6 +724,16 @@
           "access": {
             "onDemand": false,
             "provisionable": true
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.00001",
+              "output": "0.00003"
+            },
+            "provisioned": {
+              "input": "0.000008",
+              "output": "0.000024"
+            }
           }
         },
         {
@@ -563,6 +759,16 @@
           "access": {
             "onDemand": true,
             "provisionable": false
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.00001",
+              "output": "0.00003"
+            },
+            "provisioned": {
+              "input": "0.000008",
+              "output": "0.000024"
+            }
           }
         },
         {
@@ -588,6 +794,16 @@
           "access": {
             "onDemand": false,
             "provisionable": true
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.00001",
+              "output": "0.00003"
+            },
+            "provisioned": {
+              "input": "0.000008",
+              "output": "0.000024"
+            }
           }
         },
         {
@@ -613,6 +829,16 @@
           "access": {
             "onDemand": true,
             "provisionable": false
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.00001",
+              "output": "0.00003"
+            },
+            "provisioned": {
+              "input": "0.000008",
+              "output": "0.000024"
+            }
           }
         },
         {
@@ -638,6 +864,16 @@
           "access": {
             "onDemand": false,
             "provisionable": false
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.00001",
+              "output": "0.00003"
+            },
+            "provisioned": {
+              "input": "0.000008",
+              "output": "0.000024"
+            }
           }
         },
         {
@@ -663,6 +899,16 @@
           "access": {
             "onDemand": true,
             "provisionable": false
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.00001",
+              "output": "0.00003"
+            },
+            "provisioned": {
+              "input": "0.000008",
+              "output": "0.000024"
+            }
           }
         },
         {
@@ -691,6 +937,16 @@
           "access": {
             "onDemand": false,
             "provisionable": true
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.00001",
+              "output": "0.00003"
+            },
+            "provisioned": {
+              "input": "0.000008",
+              "output": "0.000024"
+            }
           }
         },
         {
@@ -717,6 +973,16 @@
           "access": {
             "onDemand": true,
             "provisionable": false
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.00001",
+              "output": "0.00003"
+            },
+            "provisioned": {
+              "input": "0.000008",
+              "output": "0.000024"
+            }
           }
         }
       ]
@@ -748,6 +1014,16 @@
           "access": {
             "onDemand": false,
             "provisionable": true
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.00001",
+              "output": "0.00003"
+            },
+            "provisioned": {
+              "input": "0.000008",
+              "output": "0.000024"
+            }
           }
         },
         {
@@ -774,6 +1050,16 @@
           "access": {
             "onDemand": true,
             "provisionable": false
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.00001",
+              "output": "0.00003"
+            },
+            "provisioned": {
+              "input": "0.000008",
+              "output": "0.000024"
+            }
           }
         }
       ]
@@ -804,6 +1090,16 @@
           "access": {
             "onDemand": true,
             "provisionable": false
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.00001",
+              "output": "0.00002"
+            },
+            "provisioned": {
+              "input": "0.000008",
+              "output": "0.000016"
+            }
           }
         },
         {
@@ -829,6 +1125,16 @@
           "access": {
             "onDemand": true,
             "provisionable": false
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.00001",
+              "output": "0.00002"
+            },
+            "provisioned": {
+              "input": "0.000008",
+              "output": "0.000016"
+            }
           }
         },
         {
@@ -854,6 +1160,16 @@
           "access": {
             "onDemand": true,
             "provisionable": false
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.00001",
+              "output": "0.00002"
+            },
+            "provisioned": {
+              "input": "0.000008",
+              "output": "0.000016"
+            }
           }
         }
       ]
@@ -884,6 +1200,16 @@
           "access": {
             "onDemand": false,
             "provisionable": true
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.00001",
+              "output": "0.00003"
+            },
+            "provisioned": {
+              "input": "0.000008",
+              "output": "0.000024"
+            }
           }
         },
         {
@@ -909,6 +1235,16 @@
           "access": {
             "onDemand": true,
             "provisionable": false
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.00001",
+              "output": "0.00003"
+            },
+            "provisioned": {
+              "input": "0.000008",
+              "output": "0.000024"
+            }
           }
         },
         {
@@ -934,6 +1270,16 @@
           "access": {
             "onDemand": false,
             "provisionable": true
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.00001",
+              "output": "0.00003"
+            },
+            "provisioned": {
+              "input": "0.000008",
+              "output": "0.000024"
+            }
           }
         },
         {
@@ -959,6 +1305,16 @@
           "access": {
             "onDemand": false,
             "provisionable": true
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.00001",
+              "output": "0.00003"
+            },
+            "provisioned": {
+              "input": "0.000008",
+              "output": "0.000024"
+            }
           }
         },
         {
@@ -984,6 +1340,16 @@
           "access": {
             "onDemand": false,
             "provisionable": true
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.00001",
+              "output": "0.00003"
+            },
+            "provisioned": {
+              "input": "0.000008",
+              "output": "0.000024"
+            }
           }
         },
         {
@@ -1009,6 +1375,16 @@
           "access": {
             "onDemand": false,
             "provisionable": true
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.00001",
+              "output": "0.00003"
+            },
+            "provisioned": {
+              "input": "0.000008",
+              "output": "0.000024"
+            }
           }
         },
         {
@@ -1034,6 +1410,16 @@
           "access": {
             "onDemand": true,
             "provisionable": false
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.00001",
+              "output": "0.00003"
+            },
+            "provisioned": {
+              "input": "0.000008",
+              "output": "0.000024"
+            }
           }
         },
         {
@@ -1059,6 +1445,16 @@
           "access": {
             "onDemand": true,
             "provisionable": false
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.00001",
+              "output": "0.00003"
+            },
+            "provisioned": {
+              "input": "0.000008",
+              "output": "0.000024"
+            }
           }
         },
         {
@@ -1085,6 +1481,16 @@
           "access": {
             "onDemand": false,
             "provisionable": true
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.000005",
+              "output": "0.000015"
+            },
+            "provisioned": {
+              "input": "0.000004",
+              "output": "0.000012"
+            }
           }
         },
         {
@@ -1111,6 +1517,16 @@
           "access": {
             "onDemand": false,
             "provisionable": true
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.00001",
+              "output": "0.00003"
+            },
+            "provisioned": {
+              "input": "0.000008",
+              "output": "0.000024"
+            }
           }
         },
         {
@@ -1137,6 +1553,12 @@
           "access": {
             "onDemand": true,
             "provisionable": false
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.000005",
+              "output": "0.000015"
+            }
           }
         },
         {
@@ -1163,6 +1585,16 @@
           "access": {
             "onDemand": false,
             "provisionable": true
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.0000025",
+              "output": "0.0000075"
+            },
+            "provisioned": {
+              "input": "0.00000104",
+              "output": "0.00000304"
+            }
           }
         },
         {
@@ -1189,6 +1621,16 @@
           "access": {
             "onDemand": false,
             "provisionable": true
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.00001",
+              "output": "0.00003"
+            },
+            "provisioned": {
+              "input": "0.000008",
+              "output": "0.000024"
+            }
           }
         },
         {
@@ -1215,6 +1657,12 @@
           "access": {
             "onDemand": true,
             "provisionable": false
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.00000125",
+              "output": "0.00000375"
+            }
           }
         },
         {
@@ -1241,6 +1689,16 @@
           "access": {
             "onDemand": false,
             "provisionable": true
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.00003",
+              "output": "0.00009"
+            },
+            "provisioned": {
+              "input": "0.000012",
+              "output": "0.000036"
+            }
           }
         },
         {
@@ -1267,6 +1725,16 @@
           "access": {
             "onDemand": false,
             "provisionable": true
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.00001",
+              "output": "0.00003"
+            },
+            "provisioned": {
+              "input": "0.000008",
+              "output": "0.000024"
+            }
           }
         },
         {
@@ -1293,6 +1761,16 @@
           "access": {
             "onDemand": false,
             "provisionable": true
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.00001",
+              "output": "0.00003"
+            },
+            "provisioned": {
+              "input": "0.000012",
+              "output": "0.000036"
+            }
           }
         },
         {
@@ -1319,6 +1797,12 @@
           "access": {
             "onDemand": false,
             "provisionable": false
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.000015",
+              "output": "0.000045"
+            }
           }
         },
         {
@@ -1345,6 +1829,12 @@
           "access": {
             "onDemand": true,
             "provisionable": false
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.000018",
+              "output": "0.000054"
+            }
           }
         },
         {
@@ -1371,6 +1861,16 @@
           "access": {
             "onDemand": false,
             "provisionable": false
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.00001",
+              "output": "0.00003"
+            },
+            "provisioned": {
+              "input": "0.000008",
+              "output": "0.000024"
+            }
           }
         },
         {
@@ -1397,6 +1897,12 @@
           "access": {
             "onDemand": false,
             "provisionable": false
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.0000125",
+              "output": "0.0000375"
+            }
           }
         },
         {
@@ -1423,6 +1929,16 @@
           "access": {
             "onDemand": false,
             "provisionable": false
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.00001",
+              "output": "0.00003"
+            },
+            "provisioned": {
+              "input": "0.000008",
+              "output": "0.000024"
+            }
           }
         }
       ]
@@ -1455,6 +1971,16 @@
           "access": {
             "onDemand": false,
             "provisionable": true
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.00001",
+              "output": "0.000015"
+            },
+            "provisioned": {
+              "input": "0.000008",
+              "output": "0.000012"
+            }
           }
         },
         {
@@ -1480,6 +2006,16 @@
           "access": {
             "onDemand": true,
             "provisionable": false
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.00001",
+              "output": "0.000015"
+            },
+            "provisioned": {
+              "input": "0.000008",
+              "output": "0.000012"
+            }
           }
         },
         {
@@ -1505,6 +2041,16 @@
           "access": {
             "onDemand": true,
             "provisionable": false
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.00001",
+              "output": "0.000015"
+            },
+            "provisioned": {
+              "input": "0.000008",
+              "output": "0.000012"
+            }
           }
         },
         {
@@ -1530,6 +2076,16 @@
           "access": {
             "onDemand": true,
             "provisionable": false
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.00001",
+              "output": "0.000015"
+            },
+            "provisioned": {
+              "input": "0.000008",
+              "output": "0.000012"
+            }
           }
         },
         {
@@ -1557,6 +2113,16 @@
           "access": {
             "onDemand": false,
             "provisionable": true
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.00001",
+              "output": "0.000015"
+            },
+            "provisioned": {
+              "input": "0.000008",
+              "output": "0.000012"
+            }
           }
         },
         {
@@ -1582,6 +2148,12 @@
           "access": {
             "onDemand": true,
             "provisionable": false
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.00001",
+              "output": "0.00003"
+            }
           }
         },
         {
@@ -1607,6 +2179,16 @@
           "access": {
             "onDemand": false,
             "provisionable": true
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.00001",
+              "output": "0.000015"
+            },
+            "provisioned": {
+              "input": "0.000008",
+              "output": "0.000012"
+            }
           }
         },
         {
@@ -1632,6 +2214,16 @@
           "access": {
             "onDemand": true,
             "provisionable": false
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.00001",
+              "output": "0.000015"
+            },
+            "provisioned": {
+              "input": "0.000008",
+              "output": "0.000012"
+            }
           }
         },
         {
@@ -1657,6 +2249,16 @@
           "access": {
             "onDemand": false,
             "provisionable": true
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.00001",
+              "output": "0.000015"
+            },
+            "provisioned": {
+              "input": "0.000008",
+              "output": "0.000012"
+            }
           }
         },
         {
@@ -1682,6 +2284,16 @@
           "access": {
             "onDemand": true,
             "provisionable": false
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.00001",
+              "output": "0.000015"
+            },
+            "provisioned": {
+              "input": "0.000008",
+              "output": "0.000012"
+            }
           }
         }
       ]
@@ -1712,6 +2324,16 @@
           "access": {
             "onDemand": false,
             "provisionable": false
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.00001",
+              "output": "0.00003"
+            },
+            "provisioned": {
+              "input": "0.000008",
+              "output": "0.000024"
+            }
           }
         }
       ]
@@ -1742,6 +2364,12 @@
           "access": {
             "onDemand": true,
             "provisionable": false
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.00000035",
+              "output": "0.0000007"
+            }
           }
         },
         {
@@ -1767,6 +2395,12 @@
           "access": {
             "onDemand": true,
             "provisionable": false
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.0000035",
+              "output": "0.000007"
+            }
           }
         },
         {
@@ -1792,6 +2426,16 @@
           "access": {
             "onDemand": false,
             "provisionable": false
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.00001",
+              "output": "0.00002"
+            },
+            "provisioned": {
+              "input": "0.000008",
+              "output": "0.000016"
+            }
           }
         },
         {
@@ -1817,6 +2461,16 @@
           "access": {
             "onDemand": false,
             "provisionable": false
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.00001",
+              "output": "0.00002"
+            },
+            "provisioned": {
+              "input": "0.000008",
+              "output": "0.000016"
+            }
           }
         },
         {
@@ -1843,6 +2497,16 @@
           "access": {
             "onDemand": false,
             "provisionable": false
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.00001",
+              "output": "0.00002"
+            },
+            "provisioned": {
+              "input": "0.000008",
+              "output": "0.000016"
+            }
           }
         },
         {
@@ -1869,6 +2533,12 @@
           "access": {
             "onDemand": false,
             "provisionable": false
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.000009",
+              "output": "0.000018"
+            }
           }
         },
         {
@@ -1894,6 +2564,16 @@
           "access": {
             "onDemand": false,
             "provisionable": false
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.00001",
+              "output": "0.00002"
+            },
+            "provisioned": {
+              "input": "0.000008",
+              "output": "0.000016"
+            }
           }
         },
         {
@@ -1919,6 +2599,16 @@
           "access": {
             "onDemand": false,
             "provisionable": false
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.00001",
+              "output": "0.00002"
+            },
+            "provisioned": {
+              "input": "0.000008",
+              "output": "0.000016"
+            }
           }
         },
         {
@@ -1944,6 +2634,16 @@
           "access": {
             "onDemand": false,
             "provisionable": false
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.00001",
+              "output": "0.00002"
+            },
+            "provisioned": {
+              "input": "0.000008",
+              "output": "0.000016"
+            }
           }
         }
       ]
@@ -1974,6 +2674,16 @@
           "access": {
             "onDemand": true,
             "provisionable": false
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.00001",
+              "output": "0.00002"
+            },
+            "provisioned": {
+              "input": "0.000008",
+              "output": "0.000016"
+            }
           }
         },
         {
@@ -1999,6 +2709,16 @@
           "access": {
             "onDemand": true,
             "provisionable": false
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.00001",
+              "output": "0.00002"
+            },
+            "provisioned": {
+              "input": "0.000008",
+              "output": "0.000016"
+            }
           }
         },
         {
@@ -2024,6 +2744,12 @@
           "access": {
             "onDemand": true,
             "provisionable": false
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.000004",
+              "output": "0.000008"
+            }
           }
         },
         {
@@ -2049,6 +2775,12 @@
           "access": {
             "onDemand": true,
             "provisionable": false
+          },
+          "costPerToken": {
+            "onDemand": {
+              "input": "0.000001",
+              "output": "0.000002"
+            }
           }
         }
       ]
