@@ -1,8 +1,8 @@
 
-export const BrainsOSBucket = new sst.aws.Bucket("BrainsOSBucket");
+export const brainsOS_bucket_logs = new sst.aws.Bucket("brainsOS_bucket_logs");
   
-export const emailBucket = new sst.aws.Bucket("EmailBucket");
-emailBucket.notify({
+export const brainsOS_bucket_email = new sst.aws.Bucket("brainsOS_bucket_email");
+brainsOS_bucket_email.notify({
   notifications: [
     {
       name: "EmailBucketNotifications",

@@ -6,54 +6,45 @@ import config from "../config";
 
 interface NavbarProps {
   isAuthenticated: boolean;
-  handleLogout: () => void;
+  onLogout: () => void;
 }
 
-export default function Navbar({ isAuthenticated, handleLogout }: NavbarProps) {
+export default function Navbar({ isAuthenticated, onLogout }: NavbarProps) {
   const filterMenuItem = (item: string) => {
     return config.allowedMenuItems.includes(item);
   };
 
   return (
-    <BsNavbar collapseOnSelect bg="light" expand="md" className="mb-3 px-3">
+    <BsNavbar collapseOnSelect bg="light" expand="md" className="px-3 py-0">
       <LinkContainer to="/">
-        <BsNavbar.Brand className="font-weight-bold text-muted">
-          Brains
+        <BsNavbar.Brand className="font-weight-bold text-muted navbar-brand">
+          brains OS
         </BsNavbar.Brand>
       </LinkContainer>
       <BsNavbar.Toggle />
       <BsNavbar.Collapse>
         <Nav className="me-auto">
-          {isAuthenticated && filterMenuItem('Prompt') && (
-            <LinkContainer to="/prompt">
-              <Nav.Link>Prompt</Nav.Link>
-            </LinkContainer>
-          )}
-          {isAuthenticated && filterMenuItem('Visualize') && (
-            <LinkContainer to="/visualize">
-              <Nav.Link>Visualize</Nav.Link>
-            </LinkContainer>
-          )}
+          
           {isAuthenticated && filterMenuItem('Console') && (
-            <LinkContainer to="/operate">
+            <LinkContainer to="/console">
               <Nav.Link>Console</Nav.Link>
             </LinkContainer>
           )}
-          {isAuthenticated && filterMenuItem('Help') && (
-            <LinkContainer to="/help">
-              <Nav.Link>Help</Nav.Link>
+          {isAuthenticated && filterMenuItem('Cost Manager') && (
+            <LinkContainer to="/cost-manager">
+              <Nav.Link>Cost Manager</Nav.Link>
             </LinkContainer>
           )}
-          {isAuthenticated && filterMenuItem('Editor') && (
-            <LinkContainer to="/floweditor">
-              <Nav.Link>Editor</Nav.Link>
+          {isAuthenticated && filterMenuItem('Prompt Studio') && (
+            <LinkContainer to="/prompt-studio">
+              <Nav.Link>Prompt Studio</Nav.Link>
             </LinkContainer>
           )}
-          {isAuthenticated && filterMenuItem('MCP') && (
-            <LinkContainer to="/mcp">
-              <Nav.Link>MCP</Nav.Link>
-            </LinkContainer>
-          )}
+
+          <LinkContainer to="/about">
+            <Nav.Link>About</Nav.Link>
+          </LinkContainer>
+
         </Nav>
         <Nav>
           {!isAuthenticated ? (
@@ -66,7 +57,7 @@ export default function Navbar({ isAuthenticated, handleLogout }: NavbarProps) {
               </LinkContainer>
             </>
           ) : (
-            <Nav.Link onClick={handleLogout}>Logout</Nav.Link>
+            <Nav.Link onClick={onLogout}>Logout</Nav.Link>
           )}
         </Nav>
       </BsNavbar.Collapse>

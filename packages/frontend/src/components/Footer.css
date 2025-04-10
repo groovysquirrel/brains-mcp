@@ -89,3 +89,19 @@ div.App .footer {
   gap: 1.5rem;
   font-size: 0.85rem;
 }
+
+.footer .github-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: white;
+  font-weight: 500;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+  margin-left: 10px;
+}
+
+.footer .github-button:hover {
+  opacity: 1;
+  text-decoration: underline;
+}

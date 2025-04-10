@@ -17,12 +17,25 @@ const config = {
     IDENTITY_POOL_ID: import.meta.env.VITE_IDENTITY_POOL_ID,
   },
   isDemo: isDemoMode,
-  allowedRoutes: isDemoMode 
-    ? ['/', '/prompt', '/visualize', '/operate', '/help', '/login', '/test', '/floweditor', '/signup', '/mcp']
-    : ['/', '/prompt', '/visualize', '/operate', '/help', '/login', '/signup', '/test', '/floweditor', '/mcp'],
-  allowedMenuItems: isDemoMode
-    ? ['Prompt', 'Visualize', 'Console', 'Help', 'Editor', 'MCP']
-    : ['Prompt', 'Visualize', 'Console', 'Help', 'Editor', 'MCP']
+  allowedRoutes: [
+    "/",
+    "/about",
+    "/console",
+    "/cost-manager",
+    "/prompt-studio",
+    "/help",
+    "/login",
+    "/signup"
+  ],
+  allowedMenuItems: [
+    "Console",
+    "Cost Manager",
+    "Prompt Studio",
+    "Help"
+  ],
+  api: {
+    websocket: import.meta.env.VITE_WEBSOCKET_URL || 'wss://api.your-domain.com/ws'
+  }
 };
 
 export default config;

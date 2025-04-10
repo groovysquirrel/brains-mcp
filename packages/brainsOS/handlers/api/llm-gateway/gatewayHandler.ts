@@ -12,9 +12,38 @@
  * - Error Handling: Comprehensive error handling with proper logging and HTTP status codes
  */
 
+
+
+
+
+/*
+
+list models
+
+get model information (e.g. pricing, capabilities, etc.)
+
+list providers
+
+get provider models
+
+get vendor models 
+
+get status
+
+
+
+
+
+*/
+
+
+
+
+
+
 import { Logger } from '../../shared/logging/logger';
-import { Gateway, ConversationOptions } from '../../../llm-gateway-v2/src/Gateway';
-import { GatewayRequest } from '../../../llm-gateway-v2/src/types/Request';
+import { Gateway, ConversationOptions } from '../../../modules/llm-gateway/src/Gateway';
+import { GatewayRequest } from '../../../modules/llm-gateway/src/types/Request';
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 
 // Initialize logging

@@ -13,7 +13,7 @@ export default function AppLayout({ children, isAuthenticated, onLogout }: AppLa
     <div style={{
       display: 'flex',
       flexDirection: 'column',
-      minHeight: '100vh',
+      height: '100vh',
       overflow: 'hidden'
     }}>
       <Navbar isAuthenticated={isAuthenticated} onLogout={onLogout} />
@@ -21,7 +21,7 @@ export default function AppLayout({ children, isAuthenticated, onLogout }: AppLa
         flex: 1,
         display: 'flex',
         flexDirection: 'column',
-        overflow: 'hidden',
+        overflow: 'auto',
         position: 'relative'
       }}>
         {children}

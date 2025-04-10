@@ -5,33 +5,6 @@
 
 declare module "sst" {
   export interface Resource {
-    "BrainsOSAuroraRDS": {
-      "clusterArn": string
-      "database": string
-      "host": string
-      "password": string
-      "port": number
-      "reader": string
-      "secretArn": string
-      "type": "sst.aws.Aurora"
-      "username": string
-    }
-    "BrainsOSBucket": {
-      "name": string
-      "type": "sst.aws.Bucket"
-    }
-    "BrainsOSMetricsQueue": {
-      "type": "sst.aws.Queue"
-      "url": string
-    }
-    "BrainsOSRDSVpc": {
-      "bastion": string
-      "type": "sst.aws.Vpc"
-    }
-    "EmailBucket": {
-      "name": string
-      "type": "sst.aws.Bucket"
-    }
     "LoadDefault": {
       "type": "sst.sst.Linkable"
       "value": {
@@ -96,9 +69,52 @@ declare module "sst" {
       "name": string
       "type": "sst.aws.Function"
     }
+    "brainsOS_API": {
+      "type": "sst.aws.ApiGatewayV2"
+      "url": string
+    }
+    "brainsOS_RDS_Aurora": {
+      "clusterArn": string
+      "database": string
+      "host": string
+      "password": string
+      "port": number
+      "reader": string
+      "secretArn": string
+      "type": "sst.aws.Aurora"
+      "username": string
+    }
+    "brainsOS_RDS_Vpc": {
+      "bastion": string
+      "type": "sst.aws.Vpc"
+    }
+    "brainsOS_bucket_email": {
+      "name": string
+      "type": "sst.aws.Bucket"
+    }
+    "brainsOS_bucket_logs": {
+      "name": string
+      "type": "sst.aws.Bucket"
+    }
+    "brainsOS_frontend": {
+      "type": "sst.aws.StaticSite"
+      "url": string
+    }
     "brainsOS_identityPool": {
       "id": string
       "type": "sst.aws.CognitoIdentityPool"
+    }
+    "brainsOS_queue_metrics": {
+      "type": "sst.aws.Queue"
+      "url": string
+    }
+    "brainsOS_systemData": {
+      "name": string
+      "type": "sst.aws.Dynamo"
+    }
+    "brainsOS_userData": {
+      "name": string
+      "type": "sst.aws.Dynamo"
     }
     "brainsOS_userPool": {
       "id": string
@@ -109,15 +125,7 @@ declare module "sst" {
       "secret": string
       "type": "sst.aws.CognitoUserPoolClient"
     }
-    "brains_latest": {
-      "type": "sst.aws.StaticSite"
-      "url": string
-    }
-    "brainsos_api": {
-      "type": "sst.aws.ApiGatewayV2"
-      "url": string
-    }
-    "brainsos_wss": {
+    "brainsOS_wss": {
       "managementEndpoint": string
       "type": "sst.aws.ApiGatewayWebSocket"
       "url": string
@@ -143,18 +151,6 @@ declare module "sst" {
       "type": "sst.aws.Function"
     }
     "gwchatFunction": {
-      "name": string
-      "type": "sst.aws.Function"
-    }
-    "systemData": {
-      "name": string
-      "type": "sst.aws.Dynamo"
-    }
-    "userData": {
-      "name": string
-      "type": "sst.aws.Dynamo"
-    }
-    "writeMetricsFunction": {
       "name": string
       "type": "sst.aws.Function"
     }

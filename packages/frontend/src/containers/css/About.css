@@ -1,0 +1,146 @@
+.About {
+  padding: 40px 0 80px;
+  overflow-y: auto;
+  background-color: #f8f9fa;
+  min-height: 100%;
+}
+
+.About .about-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 30px 40px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  width: 90%; /* Ensure it's not 100% width */
+}
+
+.About h1 {
+  margin-bottom: 30px;
+  text-align: center;
+  color: #333;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.About h2 {
+  margin-top: 40px;
+  margin-bottom: 20px;
+  color: #2c3e50;
+  font-weight: 600;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.About h3 {
+  margin-top: 25px;
+  margin-bottom: 15px;
+  color: #3498db;
+  font-weight: 500;
+}
+
+.About .lead {
+  font-size: 1.25rem;
+  line-height: 1.7;
+  color: #495057;
+  margin-bottom: 30px;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  border-left: 4px solid #3498db;
+}
+
+.About .about-section {
+  margin-bottom: 50px;
+}
+
+.About ul {
+  padding-left: 20px;
+}
+
+.About li {
+  margin-bottom: 10px;
+  line-height: 1.6;
+  position: relative;
+}
+
+.About .feature-group {
+  background-color: #f8f9fa;
+  padding: 25px 30px;
+  border-radius: 8px;
+  margin-bottom: 30px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  border-left: 4px solid #3498db;
+}
+
+.About .feature-group:last-child {
+  border-left: 4px solid #e74c3c;
+}
+
+.About .architecture-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  padding-left: 0;
+  list-style: none;
+  margin-top: 20px;
+}
+
+.About .architecture-list li {
+  background-color: #e9ecef;
+  padding: 15px 20px;
+  border-radius: 6px;
+  flex: 1 1 calc(50% - 15px);
+  min-width: 200px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease;
+}
+
+.About .architecture-list li:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 768px) {
+  .About {
+    padding: 20px 0 60px;
+  }
+  
+  .About .about-container {
+    padding: 20px;
+    width: 95%;
+  }
+  
+  .About .architecture-list li {
+    flex: 1 1 100%;
+  }
+}
+
+.About .goals {
+  background-color: #fff8f0;
+  padding: 20px 25px;
+  border-radius: 8px;
+  margin: 20px 0;
+  border-left: 4px solid #f39c12;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.About .goals ul {
+  list-style-type: none;
+  padding-left: 0;
+  margin-bottom: 0;
+}
+
+.About .goals li {
+  padding-left: 30px;
+  position: relative;
+  margin-bottom: 12px;
+}
+
+.About .goals li:before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: #27ae60;
+  font-weight: bold;
+} 

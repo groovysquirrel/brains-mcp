@@ -1,0 +1,134 @@
+/* Overall Resources Container */
+.resources {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #ffffff;
+    color: rgb(0, 0, 0);
+    padding: 2rem;
+    box-sizing: border-box;
+    width: 100%;
+    overflow-y: auto;
+    margin-bottom: 0;
+    max-width: 1200px;
+    margin: 0 auto;
+    min-height: calc(100vh - 64px); /* Account for navbar height */
+    flex: 1 0 auto; /* Allow content to grow but not shrink */
+}
+  
+  /* Header Container */
+  .resource-header-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+  
+  .header-content {
+    max-width: 600px;
+  }
+  
+  .header-content h1 {
+    font-size: 1.8rem;
+    color: #0056b3;
+    margin: 0 0 10px;
+  }
+  
+  .header-content p {
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #555;
+  }
+  
+  /* Navigation Links for Model Types */
+  .model-links {
+    display: flex;
+    gap: 2rem;
+    list-style: none;
+    padding: 0;
+    margin-bottom: 3rem;
+  }
+  
+  .model-links li {
+    margin-right: 15px;
+  }
+  
+  .model-links a {
+    color: #5c7cfa;
+    text-decoration: none;
+    font-weight: 500;
+  }
+  
+  .model-links a:hover {
+    text-decoration: underline;
+  }
+  
+  /* Individual Model Sections */
+  .model-section {
+    width: 100%;
+    max-width: 800px;
+    margin-top: 30px;
+    border-top: 1px solid #ddd;
+    padding-top: 10px;
+    margin-bottom: 3rem;
+    padding: 2rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+  }
+  
+  .model-section h4 {
+    font-size: 1.5rem;
+    color: #2c3e50;
+    margin-bottom: 1rem;
+  }
+  
+  .model-section p {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+    color: #495057;
+  }
+  
+  .model-section ul {
+    margin-left: 20px;
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+  
+  .model-section ul li {
+    margin-bottom: 5px;
+  }
+  
+  /* Link Styling for Additional Resources */
+  .resources a {
+    color: #007acc;
+    text-decoration: none;
+  }
+  
+  .resources a:hover {
+    text-decoration: underline;
+  }
+  
+  .model-uses {
+    list-style: disc;
+    padding-left: 1.5rem;
+    color: #495057;
+  }
+  
+  .model-uses li {
+    margin-bottom: 0.5rem;
+  }
+  
+  .title {
+    font-size: 2rem;
+    color: #2c3e50;
+    margin-bottom: 1rem;
+  }
+  
+  .intro {
+    font-size: 1.1rem;
+    color: #6c757d;
+    max-width: 800px;
+    line-height: 1.6;
+  }

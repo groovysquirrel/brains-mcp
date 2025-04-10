@@ -5,7 +5,7 @@ export default $config({
   // Base sst app settings
   app(input) {
     return {
-      name: "brainsos",
+      name: "brainsOS",
       removal: input?.stage === "production" ? "retain" : "remove",
       home: "aws",
       providers: {        
@@ -39,15 +39,15 @@ export default $config({
     
     return {
       REGION: aws.getRegionOutput().name,
-      IDENTITY_POOL_ID: auth.userPool.id,
-      USER_POOL_ID: auth.identityPool.id,
-      APP_CLIENT_ID: auth.userPoolClient.id,
+      IDENTITY_POOL_ID: auth.brainsOS_identityPool.id,
+      USER_POOL_ID: auth.brainsOS_userPool.id,
+      APP_CLIENT_ID: auth.brainsOS_userPoolClient.id,
       
       api_url: api.brainsOS_API.url,
-      frontend_url: frontend.latest_brains.url,
+      frontend_url: frontend.brainsOS_frontend.url,
       wss_url: websocket.brainsOS_wss.url,
-      brainsosbucket: storage.BrainsOSBucket.name,
-      queue_url: queues.BrainsOSMetricsQueue.url      
+      brainsosbucket: storage.brainsOS_bucket_logs.name,
+      queue_url: queues.brainsOS_queue_metrics.url      
     };
    
     

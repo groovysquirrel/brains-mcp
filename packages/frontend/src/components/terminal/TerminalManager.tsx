@@ -41,7 +41,6 @@ export class TerminalManager {
       },
       fontSize: 14,
       fontFamily: 'Menlo, Monaco, "Courier New", monospace',
-      allowProposedApi: true,
     });
 
     this.fitAddon = new FitAddon();
@@ -110,7 +109,7 @@ export class TerminalManager {
         if (this._isExecuting) return;
         this._isExecuting = true;
 
-        const result = await FrontendExecutor.execute(input, this.mode, "content");
+        const result = await FrontendExecutor.execute(input, this.mode);
         
         if (result.data) {
           if (result.data.clearScreen) {
@@ -136,7 +135,7 @@ export class TerminalManager {
     }
     
     this.commandBuffer.current = '';
-    this.term.write('\n' + this.prompt);
+    this.term.write(this.prompt);
   }
 
   private navigateHistory(direction: 'up' | 'down') {
@@ -166,10 +165,8 @@ export class TerminalManager {
     this.term.write(newLine);
   }
 
-  
-
   private writeWelcomeMessage(welcomeMessage?: string) {
-    const version = import.meta.env.VITE_BRAINSOS_VERSION;
+    const version = "0.1.0"; // Use environment variable in production
     const consoleTitle = `BRAINS OS v${version}`;
     
     if (welcomeMessage) {
@@ -197,19 +194,6 @@ export class TerminalManager {
     });
   }
 
-//   private writeJson(data: any) {
-//     try {
-//       const formattedJson = JSON.stringify(data, null, 2);
-//       formattedJson.split('\n').forEach(line => {
-//         const trimmedLine = line.trimStart();
-//         const indentation = ' '.repeat(line.length - trimmedLine.length);
-//         this.term.writeln(` ${indentation}${trimmedLine}`);
-//       });
-//     } catch (error) {
-//       this.writeError('Error formatting JSON response');
-//     }
-//   }
-
   public fit() {
     requestAnimationFrame(() => {
       try {
@@ -220,4 +204,4 @@ export class TerminalManager {
       }
     });
   }
-}
+} 

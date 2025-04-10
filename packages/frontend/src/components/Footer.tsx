@@ -1,4 +1,5 @@
 import "./Footer.css";
+import { FaGithub } from 'react-icons/fa';
 
 export default function Footer() {
   return (
@@ -13,9 +14,16 @@ export default function Footer() {
           </p>
         </div>
         <div className="footer-links">
-          <a href="#" className="footer-link">Terms & Conditions</a>
+         
           <span className="footer-separator"> - </span>
-          <a href="#" className="footer-link">Privacy Policy</a>
+          <a 
+            href="https://github.com/groovysquirrel/brains-mcp" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="github-button"
+          >
+            <FaGithub /> View on GitHub
+          </a>
         </div>
       </div>
     </footer>

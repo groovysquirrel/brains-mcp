@@ -1,0 +1,154 @@
+/* Container styles */
+.mosaic-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+}
+
+/* Window toolbar styles */
+.window-manager {
+  position: fixed;
+  bottom: 8px;
+  right: 8px;
+  z-index: 2500;
+  display: flex;
+  gap: 8px;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.7);
+  border-radius: 4px;
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+  transition-delay: 0s;
+  pointer-events: none;
+}
+
+/* Button styles */
+.window-manager button {
+  padding: 8px 12px !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  line-height: 1.2;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: white !important;
+}
+
+.window-manager button:hover {
+  background: rgba(255, 255, 255, 0.2) !important;
+}
+
+.window-manager button.bp5-active {
+  background: #007bff !important;
+}
+
+/* Button text alignment */
+.window-manager button .bp5-button-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+/* Window styles */
+.mosaic-window {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Window title styles */
+.mosaic-window-title {
+  background: #007bff !important;
+  color: white !important;
+  font-weight: 500;
+  font-size: 12px !important;
+  letter-spacing: 0.3px;
+  opacity: 1 !important;
+  padding: 8px !important;
+  text-align: left !important;
+  line-height: 1.4;
+  min-height: 24px;
+  margin-left: 0 !important;
+  flex: 1;
+}
+
+/* Window toolbar styles */
+.mosaic-window-toolbar.draggable {
+  background: #f8f9fa !important;
+  height: 24px !important;
+  display: flex;
+  align-items: center;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: none !important;
+}
+
+/* Container for the title and controls */
+.mosaic-window-toolbar.draggable {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.mosaic-window-body {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+.mosaic-window-controls {
+  display: flex;
+  align-items: center;
+  padding: 0;
+  margin: 0;
+}
+
+/* Mosaic split styles */
+.mosaic-split {
+  background: #a2a2a2a2 !important;
+}
+
+.mosaic-split:hover {
+  background: #007bff !important;
+}
+
+/* Blueprint button overrides */
+.bp5-button.bp5-minimal:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+.bp5-button.bp5-minimal:active {
+  background: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Create a hover area */
+.window-manager-area {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  width: 600px;  /* Increased width to ensure coverage */
+  height: 100px;
+  z-index: 2500;
+}
+
+/* Show window manager when hovering over the area */
+.window-manager-area:hover .window-manager {
+  opacity: 1;
+  pointer-events: all;
+  transition-delay: 0s;
+}
+
+/* Add this new rule for the fade-out delay */
+.window-manager-area:not(:hover) .window-manager {
+  transition-delay: 0.5s;
+}

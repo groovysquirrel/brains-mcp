@@ -6,12 +6,11 @@ import NotFound from "./containers/NotFound";
 import Login from "./containers/Login";
 import Signup from "./containers/Signup";
 import Help from "./containers/Help";
-import Operate from "./containers/Operate";
+import About from "./containers/About";
+import ConsoleContainer from "./containers/ConsoleContainer";
+import CostManager from "./containers/CostManager";
+import PromptStudio from "./containers/PromptStudio";
 import config from "./config";
-import Prompt from "./containers/PromptTest";
-import VisualizeContainer from "./brains/containers/VisualizeContainer";
-import FlowContainer from "./brains/containers/FlowContainer";
-import MCPContainer from "./mcp/client/containers/MCPContainer";
 
 export default function Links() {
   const filterRoute = (path: string) => {
@@ -21,14 +20,13 @@ export default function Links() {
 
   const routes = [
     { path: "/", element: <Home /> },
+    { path: "/about", element: <About /> },
     { path: "/login", element: <UnauthenticatedRoute><Login /></UnauthenticatedRoute> },
     { path: "/signup", element: <UnauthenticatedRoute><Signup /></UnauthenticatedRoute> },
-    { path: "/prompt", element: <AuthenticatedRoute><Prompt /></AuthenticatedRoute> },
-    { path: "/visualize", element: <AuthenticatedRoute><VisualizeContainer /></AuthenticatedRoute> },
-    { path: "/operate", element: <AuthenticatedRoute><Operate /></AuthenticatedRoute> },
+    { path: "/console", element: <AuthenticatedRoute><ConsoleContainer /></AuthenticatedRoute> },
+    { path: "/cost-manager", element: <AuthenticatedRoute><CostManager /></AuthenticatedRoute> },
+    { path: "/prompt-studio", element: <AuthenticatedRoute><PromptStudio /></AuthenticatedRoute> },
     { path: "/help", element: <AuthenticatedRoute><Help /></AuthenticatedRoute> },
-    { path: "/floweditor", element: <AuthenticatedRoute><FlowContainer /></AuthenticatedRoute> },
-    { path: "/mcp", element: <AuthenticatedRoute><MCPContainer /></AuthenticatedRoute> },
     { path: "*", element: <NotFound /> }
   ].filter(route => filterRoute(route.path));
 

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
 import { TerminalManager } from './terminal/TerminalManager';
 import 'xterm/css/xterm.css';
-import styles from './Console.module.css';
+import './Console.css';
 
 interface ConsoleProps {
   theme?: 'dark' | 'light' | 'green';
@@ -44,7 +44,7 @@ const Console = forwardRef<ConsoleRef, ConsoleProps>((props, ref) => {
     }
   }));
 
-  return <div ref={containerRef} className={`${styles.console} ${styles[props.theme || 'dark']}`} style={props.style} />;
+  return <div ref={containerRef} className={`console ${props.theme || 'dark'}`} style={props.style} />;
 });
 
-export default Console;
+export default Console; 

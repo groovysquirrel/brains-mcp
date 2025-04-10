@@ -1,7 +1,7 @@
 import { getDomainName } from "../config";
 import { authFunction} from "./auth";
 
-export const brainsOS_wss = new sst.aws.ApiGatewayWebSocket("brainsos_wss", {
+export const brainsOS_wss = new sst.aws.ApiGatewayWebSocket("brainsOS_wss", {
   domain: {
     name: getDomainName('websocket', 'latest', $app.stage)
   }

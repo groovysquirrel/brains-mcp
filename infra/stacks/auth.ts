@@ -14,16 +14,17 @@ const region = aws.getRegionOutput().name;
 
 
 
-export const userPool = new sst.aws.CognitoUserPool("brainsOS_userPool", {
+export const brainsOS_userPool = new sst.aws.CognitoUserPool("brainsOS_userPool", {
   usernames: ["email"],
 });
 
-export const userPoolClient = userPool.addClient("brainsOS_userPoolClient", {
+export const brainsOS_userPoolClient = brainsOS_userPool.addClient("brainsOS_userPoolClient", {
   transform: {
     client: (args) => {
       args.explicitAuthFlows = [
         "ALLOW_USER_PASSWORD_AUTH",
-        "ALLOW_REFRESH_TOKEN_AUTH"
+        "ALLOW_REFRESH_TOKEN_AUTH",
+        "ALLOW_USER_SRP_AUTH"
       ];
       
       // Set explicit token validity periods (in minutes)
@@ -39,12 +40,12 @@ export const userPoolClient = userPool.addClient("brainsOS_userPoolClient", {
   }
 });
 
-export const identityPool = new sst.aws.CognitoIdentityPool("brainsOS_identityPool", {
+export const brainsOS_identityPool = new sst.aws.CognitoIdentityPool("brainsOS_identityPool", {
   userPools: [
     {
       
-      userPool: userPool.id,
-      client: userPoolClient.id,
+      userPool: brainsOS_userPool.id,
+      client: brainsOS_userPoolClient.id,
     },
   ],
   permissions: {
@@ -76,6 +77,6 @@ export const identityPool = new sst.aws.CognitoIdentityPool("brainsOS_identityPo
 
 export const authFunction = new sst.aws.Function("authFunction", {
   handler: "packages/brainsOS/handlers/auth/authorizer.handler",
-  link: [userPool, userPoolClient],
+  link: [brainsOS_userPool, brainsOS_userPoolClient],
 });
 

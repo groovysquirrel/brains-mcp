@@ -1,9 +1,9 @@
 /* Base navbar styles */
 .navbar {
   background-color: #fff;
-  padding: 1rem 0;
+  padding: 0.5rem 0;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  height: 64px;
+  height: 50px;
   width: 100%;
 }
 
@@ -53,7 +53,7 @@
 
 .dropdown > a {
   display: block;
-  padding: 10px;
+  padding: 8px;
   color: #666;
 }
 
@@ -78,7 +78,7 @@
 }
 
 .dropdown-content a {
-  padding: 12px 16px;
+  padding: 10px 16px;
   display: block;
   white-space: nowrap;
 }
@@ -87,7 +87,7 @@
 .nav-links a {
   color: #666;
   text-decoration: none;
-  padding: 0.5rem;
+  padding: 0.4rem;
   transition: all 0.2s ease;
   cursor: pointer;
   position: relative;
@@ -101,11 +101,12 @@
 .nav-links a.active {
   color: #92b6dc;
   font-weight: 500;
-  border-bottom: 4px solid #92b6dc;
+  border-bottom: 3px solid #92b6dc;
 }
 
 .nav-links a:hover {
   color: #333;
+  text-decoration: none;
 }
 
 .dropdown-content a.active {
@@ -155,7 +156,7 @@
 }
 
 #prompt-nav-dropdown {
-  padding: 8px;
+  padding: 6px;
   color: #666;
   text-decoration: none;
 }
@@ -166,5 +167,28 @@
 
 #prompt-nav-dropdown.active {
   color: #92b6dc;
-  border-bottom: 4px solid #92b6dc;
+  border-bottom: 3px solid #92b6dc;
+}
+
+/* Add styles for navbar brand to prevent blue highlight */
+.navbar-brand {
+  color: #333 !important;
+  text-decoration: none !important;
+  outline: none !important;
+}
+
+.navbar-brand:hover, 
+.navbar-brand:focus,
+.navbar-brand:active {
+  color: #333 !important;
+  text-decoration: none !important;
+  outline: none !important;
+}
+
+/* Also remove outline from all navbar elements when focused */
+.nav-links a:focus,
+.navbar a:focus,
+.nav-link:focus {
+  outline: none !important;
+  box-shadow: none !important;
 }
