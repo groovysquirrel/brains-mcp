@@ -30,7 +30,7 @@ async function ensureMoneyManagerInitialized(): Promise<MoneyManager> {
       logger,
       dbConfig: {
         user: Resource.brainsOS_RDS_Aurora.username,
-        password: Resource.brainsOS_RDS_Aurora.password,
+        password: Resource.AuroraPassword.value,
         database: Resource.brainsOS_RDS_Aurora.database,
         host: Resource.brainsOS_RDS_Aurora.host,
         port: Resource.brainsOS_RDS_Aurora.port
@@ -73,7 +73,7 @@ export const handler = async (event: SQSEvent, context: Context): Promise<void> 
   
   try {
     // Initialize Money Manager
-    const moneyManager = await ensureMoneyManagerInitialized();
+    moneyManager = await ensureMoneyManagerInitialized();
     
     // Process each record in the batch
     for (const record of event.Records) {

@@ -1,0 +1,175 @@
+/* Terminal container styles */
+.terminal-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  background-color: #1e1e1e;
+  overflow: hidden;
+  border: none;
+}
+
+/* Terminal header styles */
+.terminal-header {
+  padding: 8px 16px;
+  background-color: #e3f2fd;
+  border-bottom: 1px solid #90caf9;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  color: #1e3a5f;
+}
+
+/* System info styles */
+.system-info {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  overflow: hidden;
+}
+
+.system-info-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.system-info-label {
+  font-weight: 500;
+  white-space: nowrap;
+  color: #1e3a5f;
+}
+
+.system-info-value {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  background: rgba(255, 255, 255, 0.7);
+  padding: 2px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 300px;
+  font-size: 11px;
+  border: 1px solid #90caf9;
+  color: #1e3a5f;
+  font-weight: 600;
+}
+
+/* Connection status styles */
+.connection-status {
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  white-space: nowrap;
+  margin-left: 16px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.connection-status::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.status-connected {
+  background-color: #ecfdf5;
+  color: #059669;
+  border: 1px solid #34d399;
+}
+
+.status-connected::before {
+  background-color: #059669;
+  animation: pulse 2s infinite;
+}
+
+.status-connecting {
+  background-color: #fffbeb;
+  color: #b45309;
+  border: 1px solid #fbbf24;
+}
+
+.status-connecting::before {
+  background-color: #b45309;
+  animation: spin 1s linear infinite;
+}
+
+.status-disconnected {
+  background-color: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #f87171;
+}
+
+.status-disconnected::before {
+  background-color: #dc2626;
+}
+
+.status-failed {
+  background-color: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #f87171;
+}
+
+.status-failed::before {
+  background-color: #dc2626;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Terminal wrapper styles */
+.terminal-wrapper {
+  flex: 1;
+  overflow: hidden;
+  background-color: #1e1e1e;
+  display: flex;
+}
+
+/* Override any xterm.js padding */
+.terminal-wrapper .xterm {
+  padding: 0;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Scrollbar optimizations */
+.terminal-wrapper .xterm-viewport {
+  width: 100% !important;
+  height: 100% !important;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-gutter: stable;
+}
+
+/* Webkit scrollbar styles */
+.terminal-wrapper .xterm-viewport::-webkit-scrollbar {
+  width: 8px;
+}
+
+.terminal-wrapper .xterm-viewport::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.terminal-wrapper .xterm-viewport::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+.terminal-wrapper .xterm-viewport::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+} 

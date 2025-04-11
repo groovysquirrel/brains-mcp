@@ -20,7 +20,7 @@ export const initializeS3Client = (awsRegion?: string): void => {
     
     // Get bucket name from SST resources
     // @ts-ignore
-    bucketName = Resource.BrainsOSBucket.name;
+    bucketName = Resource.brainsOS_bucket_logs.name;
     
     // Reset client to force recreation with new settings
     s3ClientInstance = null;

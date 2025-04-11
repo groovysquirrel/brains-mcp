@@ -21,12 +21,17 @@ export const brainsOS_userData = new sst.aws.Dynamo("brainsOS_userData", {
   });
     
 export const brainsOS_RDS_Vpc = new sst.aws.Vpc("brainsOS_RDS_Vpc", { bastion: true, nat: "ec2" });
-export const brainsOS_RDS_Aurora = new sst.aws.Aurora("brainsOS_RDS_Aurora", {
-    engine: "postgres",
-    dataApi: true,
-    vpc: brainsOS_RDS_Vpc,
-    scaling: {
-      min: "0 ACU",
-      max: "2 ACU"
-    },
-  });
+
+// Create the Aurora password secret
+export const auroraPassword = new sst.Secret("AuroraPassword");
+
+// export const brainsOS_RDS_Aurora = new sst.aws.Aurora("brainsOS_RDS_Aurora", {
+//     engine: "postgres",
+//     dataApi: true,
+//     vpc: brainsOS_RDS_Vpc,
+//     scaling: {
+//       min: "0 ACU",
+//       max: "2 ACU"
+//     },
+//     password: auroraPassword.value
+//   });

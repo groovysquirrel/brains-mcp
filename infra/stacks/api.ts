@@ -48,33 +48,33 @@ brainsOS_API.addAuthorizer({
 });
 // brainsOS system data API
 
-brainsOS_API.route("POST /latest/commands", {
-  link: [brainsOS_systemData], //add these links here... not in API area. Might be a bug.
-  handler: "packages/brainsOS/functions/api/command/commandHandler.handler",
-  permissions: [ bedrockPermissions ]
-});
+// brainsOS_API.route("POST /latest/commands", {
+//   link: [brainsOS_systemData], //add these links here... not in API area. Might be a bug.
+//   handler: "packages/brainsOS/functions/api/command/commandHandler.handler",
+//   permissions: [ bedrockPermissions ]
+// });
 
-brainsOS_API.route("POST /latest/services/transform/{objectType}/{fromView}/{toView}", {
-  handler: "packages/brainsOS/functions/api/services/transform/transformHandler.handler",
-  link: [brainsOS_systemData],
-});
+// brainsOS_API.route("POST /latest/services/transform/{objectType}/{fromView}/{toView}", {
+//   handler: "packages/brainsOS/functions/api/services/transform/transformHandler.handler",
+//   link: [brainsOS_systemData],
+// });
 
 
-brainsOS_API.route("POST /latest/services/prompt/{promptType}", {
-  permissions: [ bedrockPermissions ],
-  link: [brainsOS_userData],
-  timeout: "3 minutes", 
-  handler: "packages/brainsOS/functions/api/services/prompt/promptHandler.handler",
-  nodejs: {
-    loader: {
-     ".md": "text"
-      }
-    }
-});
+// brainsOS_API.route("POST /latest/services/prompt/{promptType}", {
+//   permissions: [ bedrockPermissions ],
+//   link: [brainsOS_userData],
+//   timeout: "3 minutes", 
+//   handler: "packages/brainsOS/functions/api/services/prompt/promptHandler.handler",
+//   nodejs: {
+//     loader: {
+//      ".md": "text"
+//       }
+//     }
+// });
 
-brainsOS_API.route("GET /latest/services/prompt/{promptType}", {
-  permissions: [ bedrockPermissions ],
-  handler: "packages/brainsOS/functions/api/services/prompt/promptHandler.handler",
-});
+// brainsOS_API.route("GET /latest/services/prompt/{promptType}", {
+//   permissions: [ bedrockPermissions ],
+//   handler: "packages/brainsOS/functions/api/services/prompt/promptHandler.handler",
+// });
 
 

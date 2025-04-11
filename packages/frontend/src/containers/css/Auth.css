@@ -1,5 +1,5 @@
 .auth-container {
-  position: fixed;
+  position: fixed; 
   top: 64px; /* Match navbar height */
   left: 0;
   right: 0;

@@ -4,26 +4,26 @@ import { brainsOS_wss } from "../stacks/websocket";
 
 // MCP Endpoints
 brainsOS_API.route("POST /latest/mcp/{type}/{name}", {
-    handler: "packages/brainsOS/mcp/mcpHandler.handler",
+    handler: "packages/brainsOS/handlers/api/mcp-server/mcp.handler",
     link: [brainsOS_systemData],
   });
   
   brainsOS_API.route("POST /latest/mcp/index", {
-    handler: "packages/brainsOS/mcp/mcpHandler.handler",
+    handler: "packages/brainsOS/handlers/api/mcp-server/mcp.handler",
     link: [brainsOS_systemData],
   });
   
   brainsOS_API.route("POST /latest/mcp/index/{type}", {
-    handler: "packages/brainsOS/mcp/mcpHandler.handler",
+    handler: "packages/brainsOS/handlers/api/mcp-server/mcp.handler",
     link: [brainsOS_systemData],
   });
 
   const controllerPromptFunction = new sst.aws.Function("controllerPromptFunction", {
-    handler: "packages/brainsOS/handlers/websocket/controller/prompt.handler",
+    handler: "packages/brainsOS/handlers/api/mcp-server/mcp.handler",
   });
   
 const controllerMcpFunction = new sst.aws.Function("controllerMcpFunction", {
-    handler: "packages/brainsOS/handlers/websocket/controller/mcp.handler",
+    handler: "packages/brainsOS/handlers/api/mcp-server/mcp.handler",
   });
 
   // Controller routes

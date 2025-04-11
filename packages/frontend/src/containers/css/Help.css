@@ -1,6 +1,6 @@
 /* Overall Resources Container */
 .resources {
-    display: flex;
+    display: flex; 
     flex-direction: column;
     align-items: center;
     background-color: #ffffff;

@@ -62,27 +62,3 @@ createRoot(document.getElementById('root')!).render(
     </StyledEngineProvider>
   </React.StrictMode>
 )
-
-// Handle signOut as a Promise
-// signOut({ global: true })
-//   .then(() => {
-//     console.log('🔓 User signed out successfully');
-//     createRoot(document.getElementById('root')!).render(
-//       <React.StrictMode>
-//         <StyledEngineProvider injectFirst>
-//           <ThemeProvider theme={theme}>
-//             <CssBaseline />
-//             <BrowserRouter>
-//               <Authenticator.Provider>
-//                 <App />
-//               </Authenticator.Provider>
-//             </BrowserRouter>
-//           </ThemeProvider>
-//         </StyledEngineProvider>
-//       </React.StrictMode>
-//     )
-//   })
-//   .catch(error => {
-//     console.error('❌ Sign out failed:', error);
-//     throw error;
-//   })

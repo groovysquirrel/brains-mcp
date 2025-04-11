@@ -1,4 +1,3 @@
-import React from 'react';
 import { Navbar as BsNavbar, Nav } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import "./Navbar.css";
@@ -25,9 +24,9 @@ export default function Navbar({ isAuthenticated, onLogout }: NavbarProps) {
       <BsNavbar.Collapse>
         <Nav className="me-auto">
           
-          {isAuthenticated && filterMenuItem('Console') && (
-            <LinkContainer to="/console">
-              <Nav.Link>Console</Nav.Link>
+          {isAuthenticated && filterMenuItem('Terminal') && (
+            <LinkContainer to="/terminal">
+              <Nav.Link>Terminal</Nav.Link>
             </LinkContainer>
           )}
           {isAuthenticated && filterMenuItem('Cost Manager') && (
@@ -49,9 +48,11 @@ export default function Navbar({ isAuthenticated, onLogout }: NavbarProps) {
         <Nav>
           {!isAuthenticated ? (
             <>
-              <LinkContainer to="/signup">
-                <Nav.Link>Signup</Nav.Link>
-              </LinkContainer>
+              {!config.isDemo && (
+                <LinkContainer to="/signup">
+                  <Nav.Link>Signup</Nav.Link>
+                </LinkContainer>
+              )}
               <LinkContainer to="/login">
                 <Nav.Link>Login</Nav.Link>
               </LinkContainer>
@@ -63,5 +64,5 @@ export default function Navbar({ isAuthenticated, onLogout }: NavbarProps) {
       </BsNavbar.Collapse>
     </BsNavbar>
   );
-} 
+}
 

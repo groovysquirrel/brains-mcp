@@ -1,5 +1,5 @@
-import { LLMGateway } from '../modules/llm-gateway/llmGateway';
-import { conversationRepository } from '../system/repositories/conversation/conversationRepository';
+import { Gateway } from '../../llm-gateway/src/Gateway';
+import { conversationRepository } from '../../../system/repositories/conversation/conversationRepository';
 
 interface MCPCommand {
     type: 'tool_call' | 'resource_access';
@@ -14,11 +14,11 @@ interface MCPResponse {
 }
 
 export class ModelController {
-    private llmGateway: LLMGateway;
+    private llmGateway: Gateway;
     private conversationRepo: typeof conversationRepository;
 
     constructor(
-        llmGateway: LLMGateway,
+        llmGateway: Gateway,
         conversationRepo: typeof conversationRepository
     ) {
         this.llmGateway = llmGateway;
@@ -28,47 +28,47 @@ export class ModelController {
     /**
      * Process a message from a WebSocket connection
      */
-    async processMessage(connectionId: string, message: string): Promise<string> {
-        try {
-            // Store message in conversation history
-            await this.conversationRepo.addMessage({
-                connectionId,
-                content: message,
-                role: 'user',
-                timestamp: Date.now()
-            });
+    // async processMessage(connectionId: string, message: string): Promise<string> {
+    //     try {
+    //         // Store message in conversation history
+    //         await this.conversationRepo.getInstance().addMessage({
+    //             connectionId,
+    //             content: message,
+    //             role: 'user',
+    //             timestamp: Date.now()
+    //         });
 
-            // Get LLM response
-            const llmResponse = await this.llmGateway.chat({
-                messages: [{
-                    role: 'user',
-                    content: message
-                }],
-                conversation: await this.conversationRepo.getConversation(connectionId)
-            });
+    //         // Get LLM response
+    //         const llmResponse = await this.llmGateway.chat({
+    //             messages: [{
+    //                 role: 'user',
+    //                 content: message
+    //             }],
+    //             conversation: await this.conversationRepo.getConversation(connectionId)
+    //         });
 
-            // Process any MCP commands in the response
-            const mcpCommands = this.extractMCPCommands(llmResponse);
-            const mcpResults = await this.executeMCPCommands(mcpCommands);
+    //         // Process any MCP commands in the response
+    //         const mcpCommands = this.extractMCPCommands(llmResponse);
+    //         const mcpResults = await this.executeMCPCommands(mcpCommands);
 
-            // Generate final response incorporating MCP results
-            const finalResponse = await this.generateFinalResponse(llmResponse, mcpResults);
+    //         // Generate final response incorporating MCP results
+    //         const finalResponse = await this.generateFinalResponse(llmResponse, mcpResults);
 
-            // Store response in conversation history
-            await this.conversationRepo.addMessage({
-                connectionId,
-                content: finalResponse,
-                role: 'assistant',
-                timestamp: Date.now()
-            });
+    //         // Store response in conversation history
+    //         await this.conversationRepo.addMessage({
+    //             connectionId,
+    //             content: finalResponse,
+    //             role: 'assistant',
+    //             timestamp: Date.now()
+    //         });
 
-            return finalResponse;
+    //         return finalResponse;
 
-        } catch (error) {
-            console.error('Error processing message:', error);
-            throw error;
-        }
-    }
+    //     } catch (error) {
+    //         console.error('Error processing message:', error);
+    //         throw error;
+    //     }
+    // }
 
     /**
      * Extracts MCP commands from LLM response
@@ -142,6 +142,6 @@ export class ModelController {
             }]
         });
 
-        return finalResponse;
+        return ;
     }
 } 

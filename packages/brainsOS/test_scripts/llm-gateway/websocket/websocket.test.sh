@@ -66,7 +66,8 @@ cleanup() {
 trap cleanup SIGINT SIGTERM
 
 # Connect and keep the connection open, passing token as both query param and header
-websocat -v "$WS_URL" -H "Authorization: Bearer $ID_TOKEN"
+websocat -v "$WS_URL"
+# -H "Authorization: Bearer $ID_TOKEN"
 
 # Note: websocat will keep the connection open and allow interactive input
 # You can type messages in JSON format like the examples above

@@ -33,6 +33,7 @@ export class WebSocketService {
         const wsUrl = this.token 
           ? `${this.url}${this.url.includes('?') ? '&' : '?'}token=${this.token}`
           : this.url;
+
         
         this.socket = new WebSocket(wsUrl);
         
@@ -94,21 +95,27 @@ export class WebSocketService {
     }
   }
 
-  sendMessage(action: string, data: any = {}) {
+  public sendMessage(message: any): void {
     if (!this.socket || this.socket.readyState !== WebSocket.OPEN) {
       console.error('WebSocket is not connected');
-      return false;
+      return;
     }
-    
-    // Format message according to the expected backend format
-    const message = { action, data };
-    
+
     try {
-      this.socket.send(JSON.stringify(message));
-      return true;
+      // Ensure message has required fields
+      const formattedMessage = {
+        type: message.type || 'default',
+        data: {
+          ...message.data,
+          timestamp: new Date().toISOString(),
+          source: 'frontend'
+        }
+      };
+
+      console.log('Sending WebSocket message:', formattedMessage); // Debug log
+      this.socket.send(JSON.stringify(formattedMessage));
     } catch (error) {
-      console.error('Error sending message:', error);
-      return false;
+      console.error('Error sending WebSocket message:', error);
     }
   }
 

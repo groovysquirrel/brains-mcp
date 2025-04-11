@@ -77,7 +77,7 @@ export const domains: DomainConfig = {
   },
   frontend: {
     latest: {
-      prod: `live.${baseDomain}`,
+      prod: `www.${baseDomain}`,
       demo: `demo.${baseDomain}`,
       dev: `dev.${baseDomain}`
     }

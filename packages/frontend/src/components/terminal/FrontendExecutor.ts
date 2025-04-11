@@ -2,6 +2,9 @@ import { WebSocketService, WebSocketOptions } from '../../lib/websocket';
 import { fetchAuthSession } from 'aws-amplify/auth';
 import config from '../../config';
 
+/**
+ * Represents the result of a command execution
+ */
 export interface ExecutionResult {
   success: boolean;
   message?: string;
@@ -10,6 +13,10 @@ export interface ExecutionResult {
   isLocalCommand?: boolean;
 }
 
+/**
+ * FrontendExecutor handles command execution and WebSocket communication
+ * It manages local commands and remote command execution through WebSocket
+ */
 export class FrontendExecutor {
   private static websocket: WebSocketService | null = null;
   private static pendingCommands: Map<string, { 
@@ -17,31 +24,117 @@ export class FrontendExecutor {
     reject: (reason: any) => void,
     timeoutId: NodeJS.Timeout
   }> = new Map();
+  private static isConnecting: boolean = false;
+  private static connectionStatus: 'disconnected' | 'connecting' | 'connected' = 'disconnected';
+  private static statusObservers: ((status: 'disconnected' | 'connecting' | 'connected') => void)[] = [];
 
-  private static LOCAL_COMMANDS = {
-    clear: (): ExecutionResult => ({ success: true, isLocalCommand: true, data: { clearScreen: true } }),
-    cls: (): ExecutionResult => ({ success: true, isLocalCommand: true, data: { clearScreen: true } }),
-    connect: (args: string[]): ExecutionResult => {
-      const url = args[0] || this.getDefaultWebSocketUrl();
-      this.setupWebSocket(url);
-      return { 
-        success: true, 
-        isLocalCommand: true, 
-        data: { 
-          message: `Connecting to WebSocket at ${url}...` 
-        } 
-      };
-    },
-    disconnect: (): ExecutionResult => {
-      if (this.websocket) {
-        this.websocket.disconnect();
-        this.websocket = null;
+  /**
+   * Subscribe to connection status changes
+   */
+  public static onConnectionStatusChange(callback: (status: 'disconnected' | 'connecting' | 'connected') => void): () => void {
+    this.statusObservers.push(callback);
+    // Immediately call with current status
+    callback(this.connectionStatus);
+    // Return unsubscribe function
+    return () => {
+      this.statusObservers = this.statusObservers.filter(cb => cb !== callback);
+    };
+  }
+
+  /**
+   * Update connection status and notify observers
+   */
+  private static setConnectionStatus(status: 'disconnected' | 'connecting' | 'connected'): void {
+    if (this.connectionStatus !== status) {
+      this.connectionStatus = status;
+      this.statusObservers.forEach(observer => observer(status));
+    }
+  }
+
+  /**
+   * Get current connection status
+   */
+  public static getConnectionStatus(): 'disconnected' | 'connecting' | 'connected' {
+    return this.connectionStatus;
+  }
+
+  /**
+   * Automatically connect to WebSocket server
+   */
+  public static async autoConnect(): Promise<void> {
+    if (this.websocket?.isConnected() || this.isConnecting) {
+      return;
+    }
+
+    this.setConnectionStatus('connecting');
+    const url = this.getDefaultWebSocketUrl();
+    await this.setupWebSocket(url);
+  }
+
+  /**
+   * Local commands that can be executed without WebSocket connection
+   */
+  private static LOCAL_COMMANDS: Record<string, ((args: string[]) => ExecutionResult | Promise<ExecutionResult>)> = {
+    clear: (): ExecutionResult => ({ 
+      success: true, 
+      isLocalCommand: true, 
+      data: { clearScreen: true } 
+    }),
+    cls: (): ExecutionResult => ({ 
+      success: true, 
+      isLocalCommand: true, 
+      data: { clearScreen: true } 
+    }),
+    connect: async (args: string[]): Promise<ExecutionResult> => {
+      const url = args[0] || FrontendExecutor.getDefaultWebSocketUrl();
+      
+      if (FrontendExecutor.isConnecting) {
+        return { 
+          success: false, 
+          isLocalCommand: true, 
+          error: 'Already attempting to connect to WebSocket server.' 
+        };
+      }
+
+      if (FrontendExecutor.websocket?.isConnected()) {
+        return { 
+          success: false, 
+          isLocalCommand: true, 
+          error: 'Already connected to WebSocket server.' 
+        };
+      }
+
+      FrontendExecutor.connectionStatus = 'connecting';
+      FrontendExecutor.isConnecting = true;
+      
+      try {
+        await FrontendExecutor.setupWebSocket(url);
+        FrontendExecutor.connectionStatus = 'connected';
         return { 
           success: true, 
           isLocalCommand: true, 
-          data: { 
-            message: 'Disconnected from WebSocket server.' 
-          } 
+          data: { message: 'Connected to WebSocket server.' } 
+        };
+      } catch (error: unknown) {
+        FrontendExecutor.connectionStatus = 'disconnected';
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+        return { 
+          success: false, 
+          isLocalCommand: true, 
+          error: `Failed to connect to WebSocket: ${errorMessage}` 
+        };
+      } finally {
+        FrontendExecutor.isConnecting = false;
+      }
+    },
+    disconnect: (): ExecutionResult => {
+      if (FrontendExecutor.websocket) {
+        FrontendExecutor.websocket.disconnect();
+        FrontendExecutor.websocket = null;
+        return { 
+          success: true, 
+          isLocalCommand: true, 
+          data: { message: 'Disconnected from WebSocket server.' } 
         };
       }
       return { 
@@ -59,6 +152,7 @@ export class FrontendExecutor {
           '  clear, cls               - Clear terminal',
           '  connect [url]            - Connect to WebSocket server',
           '  disconnect               - Disconnect from WebSocket server',
+          '  mode <mode>             - Switch display mode (raw/content/source)',
           '  status                   - Show connection status',
           '  help                     - Show this help message',
           '',
@@ -70,25 +164,56 @@ export class FrontendExecutor {
         ].join('\n')
       }
     }),
-    status: (): ExecutionResult => {
-      const isConnected = this.websocket?.isConnected() || false;
+    mode: (args: string[]): ExecutionResult => {
+      const validModes = ['raw', 'content', 'source'];
+      const newMode = args[0];
+      
+      if (!newMode) {
+        return {
+          success: false,
+          isLocalCommand: true,
+          error: 'Please specify a mode: raw, content, or source'
+        };
+      }
+
+      if (!validModes.includes(newMode)) {
+        return {
+          success: false,
+          isLocalCommand: true,
+          error: `Invalid mode: ${newMode}. Valid modes are: raw, content, source`
+        };
+      }
+
       return {
         success: true,
         isLocalCommand: true,
         data: {
-          message: isConnected 
-            ? 'Connected to WebSocket server.' 
-            : 'Not connected to WebSocket server.'
+          command: `mode ${newMode}`,
+          message: `Display mode changed to: ${newMode}`
         }
       };
-    }
+    },
+    status: (): ExecutionResult => ({
+      success: true,
+      isLocalCommand: true,
+      data: {
+        message: FrontendExecutor.websocket?.isConnected() 
+          ? 'Connected to WebSocket server.' 
+          : 'Not connected to WebSocket server.'
+      }
+    })
   };
 
+  /**
+   * Gets the default WebSocket URL from config
+   */
   private static getDefaultWebSocketUrl(): string {
-    // Use config or environment variable
     return config.api.websocket;
   }
 
+  /**
+   * Gets the authentication token from AWS Amplify
+   */
   private static async getAuthToken(): Promise<string | null> {
     try {
       const session = await fetchAuthSession();
@@ -99,150 +224,177 @@ export class FrontendExecutor {
     }
   }
 
+  /**
+   * Sets up WebSocket connection with authentication
+   */
   private static async setupWebSocket(url: string) {
-    if (this.websocket) {
-      this.websocket.disconnect();
+    if (FrontendExecutor.websocket) {
+      FrontendExecutor.websocket.disconnect();
     }
     
     try {
-      // Get JWT token from Cognito
-      const token = await this.getAuthToken();
+      const token = await FrontendExecutor.getAuthToken();
       
       if (!token) {
         throw new Error('Failed to get authentication token. Please log in again.');
       }
       
-      const options: WebSocketOptions = {
-        url,
-        token
-      };
+      const options: WebSocketOptions = { url, token };
+      FrontendExecutor.websocket = new WebSocketService(options);
       
-      this.websocket = new WebSocketService(options);
-      
-      this.websocket.onMessage((message) => {
-        console.log('WebSocket message received:', message);
-        
-        // Handle different message types from the server
-        if (message.type === 'response' || message.type === 'error') {
-          const pendingCommand = this.pendingCommands.get(message.data?.commandId);
-          if (pendingCommand) {
-            clearTimeout(pendingCommand.timeoutId);
-            this.pendingCommands.delete(message.data.commandId);
-            
-            if (message.type === 'error') {
-              pendingCommand.resolve({
-                success: false,
-                error: message.data.message || 'Unknown error occurred'
-              });
-            } else {
-              pendingCommand.resolve({
-                success: true,
-                data: {
-                  message: message.data.content || message.data.message || 'Command executed successfully.',
-                  ...message.data
-                }
-              });
-            }
-          }
-        }
+      // Set up connection change handler
+      FrontendExecutor.websocket.onConnectionChange((isConnected) => {
+        FrontendExecutor.setConnectionStatus(isConnected ? 'connected' : 'disconnected');
       });
-      
-      this.websocket.onConnectionChange((isConnected) => {
-        if (!isConnected) {
-          // Reject all pending commands if connection is lost
-          this.pendingCommands.forEach((pendingCommand, commandId) => {
-            clearTimeout(pendingCommand.timeoutId);
-            pendingCommand.reject(new Error('WebSocket connection lost'));
-          });
-          this.pendingCommands.clear();
-        }
-      });
-      
-      await this.websocket.connect();
+
+      FrontendExecutor.setupWebSocketHandlers();
+      await FrontendExecutor.websocket.connect();
     } catch (error) {
+      FrontendExecutor.setConnectionStatus('disconnected');
       console.error('Failed to connect to WebSocket:', error);
       throw error;
     }
   }
 
+  /**
+   * Sets up WebSocket message and connection change handlers
+   */
+  private static setupWebSocketHandlers() {
+    if (!FrontendExecutor.websocket) return;
+
+    // Set up message handler
+    FrontendExecutor.websocket.onMessage((message) => {
+      console.log('Received WebSocket message:', message);
+
+      // Update connection status on first message
+      if (FrontendExecutor.websocket?.isConnected()) {
+        FrontendExecutor.connectionStatus = 'connected';
+      }
+
+      // Handle different message types
+      if (message.type === 'terminal' || message.type === 'error') {
+        const commandId = message.data?.commandId;
+        const pendingCommand = commandId ? FrontendExecutor.pendingCommands.get(commandId) : null;
+
+        if (pendingCommand) {
+          clearTimeout(pendingCommand.timeoutId);
+          FrontendExecutor.pendingCommands.delete(commandId);
+          
+          if (message.type === 'error') {
+            pendingCommand.resolve({
+              success: false,
+              error: message.data.content || 'Unknown error occurred'
+            });
+          } else {
+            // Handle terminal responses
+            pendingCommand.resolve({
+              success: true,
+              data: {
+                type: message.type,
+                data: {
+                  content: message.data.content,
+                  source: message.data.source || 'unknown',
+                  timestamp: message.data.timestamp
+                }
+              }
+            });
+          }
+        } else {
+          // Handle messages without a commandId
+          const result: ExecutionResult = {
+            success: true,
+            data: {
+              type: message.type,
+              data: {
+                content: message.data.content,
+                source: message.data.source || 'unknown',
+                timestamp: message.data.timestamp
+              }
+            }
+          };
+          
+          // If there are any pending commands, resolve the first one
+          if (FrontendExecutor.pendingCommands.size > 0) {
+            const [firstCommandId] = FrontendExecutor.pendingCommands.keys();
+            const pendingCommand = FrontendExecutor.pendingCommands.get(firstCommandId);
+            if (pendingCommand) {
+              clearTimeout(pendingCommand.timeoutId);
+              FrontendExecutor.pendingCommands.delete(firstCommandId);
+              pendingCommand.resolve(result);
+            }
+          }
+        }
+      }
+    });
+  }
+
+  /**
+   * Executes a command either locally or through WebSocket
+   * @param input The command to execute
+   * @param mode The execution mode (command or prompt)
+   */
   static async execute(input: string, mode: 'command' | 'prompt'): Promise<ExecutionResult> {
     const trimmedInput = input.trim();
-    
-    if (!trimmedInput) {
-      return { success: true, data: null };
-    }
+    if (!trimmedInput) return { success: true, data: null };
 
-    // Split input into command and arguments
     const [command, ...args] = trimmedInput.split(/\s+/);
     
     // Check for local commands first
-    const localCommandFn = this.LOCAL_COMMANDS[command as keyof typeof this.LOCAL_COMMANDS];
+    const localCommandFn = FrontendExecutor.LOCAL_COMMANDS[command as keyof typeof FrontendExecutor.LOCAL_COMMANDS];
     if (localCommandFn) {
-      return localCommandFn.call(this, args);
+      const result = localCommandFn.call(FrontendExecutor, args);
+      return result instanceof Promise ? await result : result;
     }
 
-    // If not a local command and we have a websocket connection, send command to server
-    if (this.websocket?.isConnected()) {
-      const commandId = Date.now().toString();
-      
-      // Format the message according to the backend expectations
-      let action = 'console/command';  // Default action type
-      let data: any = {};
-
-      // Handle special commands for LLM interaction
-      if (trimmedInput.startsWith('llm/prompt')) {
-        action = 'llm/prompt';
-        const message = trimmedInput.substring('llm/prompt'.length).trim();
-        data = {
-          messages: [{ role: 'user', content: message }],
-          provider: 'bedrock',
-          modality: 'text'
-        };
-      } else if (trimmedInput.startsWith('llm/conversation')) {
-        action = 'llm/conversation';
-        const message = trimmedInput.substring('llm/conversation'.length).trim();
-        data = {
-          messages: [{ role: 'user', content: message }],
-          provider: 'bedrock',
-          modality: 'text',
-          title: 'Console Conversation',
-          tags: ['console', 'brainsos']
-        };
-      } else {
-        // Default to sending the command as is
-        data = {
-          commandId,
-          command: trimmedInput,
-          mode
-        };
-      }
-      
-      return new Promise<ExecutionResult>((resolve, reject) => {
-        const timeoutId = setTimeout(() => {
-          this.pendingCommands.delete(commandId);
-          reject(new Error('Command execution timed out'));
-        }, 10000); // 10 second timeout
-        
-        this.pendingCommands.set(commandId, { resolve, reject, timeoutId });
-        
-        const success = this.websocket!.sendMessage(action, data);
-        
-        if (!success) {
-          clearTimeout(timeoutId);
-          this.pendingCommands.delete(commandId);
-          reject(new Error('Failed to send command to server'));
-        }
-      })
-      .catch(error => ({
-        success: false,
-        error: `Error executing command: ${error.message}`
-      }));
+    // Execute remote command if WebSocket is connected
+    if (FrontendExecutor.websocket?.isConnected()) {
+      return FrontendExecutor.executeRemoteCommand(trimmedInput, mode);
     }
 
-    // Not connected to websocket
     return {
       success: false,
       error: 'Not connected to WebSocket server. Use "connect" to establish a connection.'
     };
+  }
+
+  /**
+   * Executes a command through WebSocket
+   */
+  private static async executeRemoteCommand(input: string, _mode: 'command' | 'prompt'): Promise<ExecutionResult> {
+    const commandId = Date.now().toString();
+    
+    return new Promise<ExecutionResult>((resolve, reject) => {
+      const timeoutId = setTimeout(() => {
+        FrontendExecutor.pendingCommands.delete(commandId);
+        reject(new Error('Command execution timed out'));
+      }, 30000);
+      
+      FrontendExecutor.pendingCommands.set(commandId, { resolve, reject, timeoutId });
+      
+      try {
+        // Send only the input string as rawData
+        const message = {
+          action: 'terminal',
+          data: {
+            rawData: input,
+            requestStreaming: false,
+            commandId,
+            timestamp: new Date().toISOString(),
+            source: 'terminal'
+          }
+        };
+        
+        console.log('Sending WebSocket message:', message); // Debug log
+        FrontendExecutor.websocket!.sendMessage(message);
+      } catch (error) {
+        clearTimeout(timeoutId);
+        FrontendExecutor.pendingCommands.delete(commandId);
+        reject(new Error('Failed to send command to server'));
+      }
+    })
+    .catch(error => ({
+      success: false,
+      error: `Error executing command: ${error.message}`
+    }));
   }
 } 

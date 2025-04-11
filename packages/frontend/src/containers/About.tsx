@@ -9,7 +9,7 @@ const About: React.FC = () => {
         
         <div className="about-section">
           <p className="lead">
-            The Broad Range AI Node System (B.R.A.I.N.S.) leverages a series of interconnected and specialized nodes to decompose complexity into manageable components. The BRAINS Operating System uses abstract programming concepts and the Model Control Protocol (MCP) paradigm systematically manage and interconnect individual noodes.
+            The Broad Range AI Node System (B.R.A.I.N.S.) leverages a series of interconnected and specialized nodes to decompose complexity into manageable components. The BRAINS Operating System uses abstract programming concepts and the Model Control Protocol (MCP) paradigm systematically manage and interconnect individual nodes.
             <b> This approach leverages the non-deterministic nature of LLMs while minimizing the risk of unintended behavior and hallucinations.</b>
           </p>
           

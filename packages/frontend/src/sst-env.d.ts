@@ -10,6 +10,8 @@ interface ImportMetaEnv {
   readonly VITE_USER_POOL_CLIENT_ID: string
   readonly VITE_BRAINSOS_VERSION: string
   readonly VITE_STAGE: string
+  readonly VITE_WEBSOCKET_URL: string
+  readonly VITE_WEBSOCKET_GATEWAY_URL: string
 }
 interface ImportMeta {
   readonly env: ImportMetaEnv

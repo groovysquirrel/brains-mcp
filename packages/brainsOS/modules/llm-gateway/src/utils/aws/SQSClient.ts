@@ -20,7 +20,7 @@ export const initializeSQSClient = (awsRegion?: string): void => {
     
     // Get queue URL from SST resources
     // @ts-ignore
-    queueUrl = Resource.BrainsOSMetricsQueue.url;
+    queueUrl = Resource.brainsOS_queue_metrics.url;
     
     // Reset client to force recreation with new settings
     sqsClientInstance = null;

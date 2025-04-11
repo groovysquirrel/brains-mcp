@@ -35,20 +35,62 @@ const Slider: React.FC<SliderProps> = ({ images }) => {
     return () => clearInterval(interval);
   }, [images.length]);
 
+  // Create custom indicators to ensure correct count
+  const renderIndicators = () => {
+    return (
+      <div className="carousel-indicators">
+        {images.map((_, i) => (
+          <button
+            key={i}
+            type="button"
+            onClick={() => setIndex(i)}
+            className={i === index ? "active" : ""}
+            aria-current={i === index ? "true" : "false"}
+            aria-label={`Slide ${i + 1}`}
+          />
+        ))}
+      </div>
+    );
+  };
+
   return (
     <div className="slider-container">
-      <Carousel activeIndex={index} onSelect={handleSelect} interval={null} indicators={true} controls={true}>
+      <Carousel 
+        activeIndex={index} 
+        onSelect={handleSelect} 
+        interval={null} 
+        indicators={false}
+        controls={false}
+        className="h-100 position-static"
+      >
         {images.map((image) => (
-          <Carousel.Item key={image.filename}>
-            <img
-              className="d-block w-100 slider-image"
-              src={image.src}
-              alt={image.alt}
-              onClick={() => openLightbox(image)}
-              style={{ cursor: 'pointer' }}
-            />
+          <Carousel.Item key={image.filename} className="h-100">
+            <div className="d-flex align-items-center justify-content-center h-100">
+              <img
+                className="slider-image"
+                src={image.src}
+                alt={image.alt}
+                onClick={() => openLightbox(image)}
+                style={{ cursor: 'pointer' }}
+              />
+            </div>
           </Carousel.Item>
         ))}
+        <a className="carousel-control-prev" role="button" tabIndex={0} onClick={(e) => {
+          e.preventDefault();
+          setIndex((prevIndex) => (prevIndex - 1 + images.length) % images.length);
+        }}>
+          <span className="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span className="visually-hidden">Previous</span>
+        </a>
+        <a className="carousel-control-next" role="button" tabIndex={0} onClick={(e) => {
+          e.preventDefault();
+          setIndex((prevIndex) => (prevIndex + 1) % images.length);
+        }}>
+          <span className="carousel-control-next-icon" aria-hidden="true"></span>
+          <span className="visually-hidden">Next</span>
+        </a>
+        {renderIndicators()}
       </Carousel>
 
       {/* Lightbox Modal */}

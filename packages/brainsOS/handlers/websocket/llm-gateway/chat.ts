@@ -15,21 +15,11 @@
 import { Logger } from '../../shared/logging/logger';
 import { Gateway, ConversationOptions } from '../../../modules/llm-gateway/src/Gateway';
 import { GatewayRequest } from '../../../modules/llm-gateway/src/types/Request';
-import { ConnectionManager } from './connectionManager';
+import { ConnectionManager } from '../util/connectionManager';
 import { StreamHandler } from './streamHandler';
 import { Resource } from 'sst';
+import { WebSocketEvent } from '../websocketTypes';
 
-// Define the structure of a WebSocket event
-// This matches the format provided by AWS API Gateway WebSocket events
-interface WebSocketEvent {
-  requestContext: {
-    connectionId: string;  // Unique ID for this WebSocket connection
-    authorizer?: {
-      userId: string;     // User ID if authentication is enabled
-    };
-  };
-  body?: string;          // The actual message content
-}
 
 // Initialize logging and connection management
 const logger = new Logger('LLM-gateway-websocket-chat');
@@ -110,7 +100,7 @@ const handleWebSocketEvent = async (event: WebSocketEvent, handler: MessageHandl
 const initializeGateway = async () => {
   try {
     logger.info('Initializing Gateway', {
-      websocketEndpoint: Resource.brainsos_wss.url
+      websocketEndpoint: Resource.brainsOS_wss.url
     });
 
     gateway = new Gateway();
@@ -154,11 +144,9 @@ initializationPromise = initializeGateway().catch(error => {
  * Processes WebSocket messages for LLM chat interactions
  */
 export class LLMChatMessageHandler implements MessageHandler {
-  private gateway: Gateway;
   private streamHandler: StreamHandler;
 
   constructor() {
-    this.gateway = new Gateway();
     this.streamHandler = new StreamHandler();
   }
 
@@ -276,7 +264,7 @@ export class LLMChatMessageHandler implements MessageHandler {
       // Handle streaming request
       if (request.streaming) {
         // Set up stream handler
-        const stream = this.gateway.streamChat(request);
+        const stream = gateway.streamChat(request);
         
         // Process the stream (this is asynchronous)
         this.streamHandler.handleStream(
@@ -305,7 +293,7 @@ export class LLMChatMessageHandler implements MessageHandler {
       }
       
       // Handle non-streaming request
-      const response = await this.gateway.chat(request);
+      const response = await gateway.chat(request);
       
       return {
         type: 'chat',
@@ -386,7 +374,7 @@ export class LLMChatMessageHandler implements MessageHandler {
       // Handle streaming vs non-streaming using gateway's conversation methods
       if (request.streaming) {
         // Set up stream handler with the gateway's conversation stream method
-        const stream = this.gateway.conversationStreamChat(request);
+        const stream = gateway.conversationStreamChat(request);
         
         // Process the stream (this is asynchronous)
         this.streamHandler.handleStream(
@@ -441,7 +429,7 @@ export class LLMChatMessageHandler implements MessageHandler {
         };
       } else {
         // Handle non-streaming with gateway's conversation chat method
-        const response = await this.gateway.conversationChat(request);
+        const response = await gateway.conversationChat(request);
         
         return {
           type: 'chat',

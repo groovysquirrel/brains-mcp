@@ -5,6 +5,10 @@
 
 declare module "sst" {
   export interface Resource {
+    "AuroraPassword": {
+      "type": "sst.sst.Secret"
+      "value": string
+    }
     "LoadDefault": {
       "type": "sst.sst.Linkable"
       "value": {
@@ -151,6 +155,10 @@ declare module "sst" {
       "type": "sst.aws.Function"
     }
     "gwchatFunction": {
+      "name": string
+      "type": "sst.aws.Function"
+    }
+    "writeMetricsFunction": {
       "name": string
       "type": "sst.aws.Function"
     }

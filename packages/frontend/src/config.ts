@@ -17,24 +17,40 @@ const config = {
     IDENTITY_POOL_ID: import.meta.env.VITE_IDENTITY_POOL_ID,
   },
   isDemo: isDemoMode,
-  allowedRoutes: [
-    "/",
-    "/about",
-    "/console",
-    "/cost-manager",
-    "/prompt-studio",
-    "/help",
-    "/login",
-    "/signup"
-  ],
+  allowedRoutes: isDemoMode
+    ? [
+      "/",
+      "/about",
+      "/terminal",
+      "/cost-manager",
+      "/prompt-studio",
+      "/help",
+      "/login",
+      "/signup",
+      "/about"
+    ]
+    : [
+      "/",
+      "/about",
+      "/terminal",
+      "/cost-manager",
+      "/prompt-studio",
+      "/help",
+      "/login",
+      "/signup",
+      "/about"
+    ],
   allowedMenuItems: [
-    "Console",
+    "Terminal",
     "Cost Manager",
     "Prompt Studio",
-    "Help"
+    "Help",
+    "About",
+    "Login",
+    "Signup"
   ],
   api: {
-    websocket: import.meta.env.VITE_WEBSOCKET_URL || 'wss://api.your-domain.com/ws'
+    websocket: import.meta.env.VITE_WEBSOCKET_URL
   }
 };
 

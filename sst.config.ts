@@ -32,11 +32,13 @@ export default $config({
     const storage = await import("./infra/stacks/storage");
     const queues = await import("./infra/stacks/queues");
 
-    // Import the apps
+    // Import the components
     const llmGateway = await import("./infra/apps/llm-gateway");
     const mcpServer = await import("./infra/apps/mcp-server");
     const library = await import("./infra/apps/library");
-    
+    const controller = await import("./infra/apps/controller");
+    const moneyManager = await import("./infra/apps/money-manager");
+
     return {
       REGION: aws.getRegionOutput().name,
       IDENTITY_POOL_ID: auth.brainsOS_identityPool.id,
