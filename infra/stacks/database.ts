@@ -25,13 +25,13 @@ export const brainsOS_RDS_Vpc = new sst.aws.Vpc("brainsOS_RDS_Vpc", { bastion: t
 // Create the Aurora password secret
 export const auroraPassword = new sst.Secret("AuroraPassword");
 
-// export const brainsOS_RDS_Aurora = new sst.aws.Aurora("brainsOS_RDS_Aurora", {
-//     engine: "postgres",
-//     dataApi: true,
-//     vpc: brainsOS_RDS_Vpc,
-//     scaling: {
-//       min: "0 ACU",
-//       max: "2 ACU"
-//     },
-//     password: auroraPassword.value
-//   });
+export const brainsOS_RDS_Aurora = new sst.aws.Aurora("brainsOS_RDS_Aurora", {
+    engine: "postgres",
+    dataApi: true,
+    vpc: brainsOS_RDS_Vpc,
+    scaling: {
+      min: "0 ACU",
+      max: "2 ACU"
+    },
+    password: auroraPassword.value
+  });

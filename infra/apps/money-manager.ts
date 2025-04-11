@@ -1,11 +1,11 @@
 // Write metrics from the queue to the database
 import { brainsOS_queue_metrics } from "../stacks/queues";
-import { brainsOS_RDS_Vpc, auroraPassword } from "../stacks/database";
+import { brainsOS_RDS_Vpc, auroraPassword, brainsOS_RDS_Aurora } from "../stacks/database";
 import { brainsOS_API } from "../stacks/api";
 
 const writeMetricsFunction = new sst.aws.Function("writeMetricsFunction", {
     handler: "packages/brainsOS/handlers/sqs/metricsHandler.handler",
-    //link: [brainsOS_RDS_Aurora, brainsOS_queue_metrics, auroraPassword],
+    link: [brainsOS_RDS_Aurora, brainsOS_queue_metrics, auroraPassword],
     vpc: brainsOS_RDS_Vpc,
     
   });
@@ -15,5 +15,5 @@ const writeMetricsFunction = new sst.aws.Function("writeMetricsFunction", {
   // API for money manager status
   brainsOS_API.route("GET /money-manager/status", {
     handler: "packages/brainsOS/handlers/api/money-manager/statusHandler.handler",
-    //link: [brainsOS_RDS_Aurora]
+    link: [brainsOS_RDS_Aurora]
   });
