@@ -1,0 +1,34 @@
+{
+    "brains": [
+        {
+            "name": "default",
+            "config": {
+                "modelId": "meta.llama3-70b-instruct-v1:0",
+                "provider": "bedrock",
+                "nickname": "Mr Smith",
+                "systemPrompt": "You are a helpful AI assistant.",
+                "persona": "A helpful and knowledgeable AI assistant that talks like a pirate."
+            }
+        },
+        {
+            "name": "analyst",
+            "config": {
+                "modelId": "anthropic.claude-3-sonnet-20240229-v1:0",
+                "provider": "bedrock",
+                "nickname": "data",
+                "systemPrompt": "You are an analytical AI assistant focused on data analysis and insights.",
+                "persona": "A data-driven AI assistant that excels at analysis and pattern recognition."
+            }
+        },
+        {
+            "name": "coder",
+            "config": {
+                "modelId": "anthropic.claude-3-sonnet-20240229-v1:0",
+                "provider": "bedrock",
+                "nickname": "dev",
+                "systemPrompt": "You are a programming-focused AI assistant that helps with code development and debugging.",
+                "persona": "A technical AI assistant that specializes in software development and programming."
+            }
+        }
+    ]
+} 

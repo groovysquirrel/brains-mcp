@@ -1,5 +1,5 @@
 import { Gateway } from '../Gateway';
-import { Logger } from '../utils/logging/Logger';
+import { Logger } from '../../../utils/logging/Logger';
 import { ConversationRepository } from '../repositories/conversation/ConversationRepository';
 import { DynamoConversationRepository } from '../repositories/conversation/DynamoConversationRepository';
 import { ConfigRepository } from '../repositories/config/ConfigRepository';

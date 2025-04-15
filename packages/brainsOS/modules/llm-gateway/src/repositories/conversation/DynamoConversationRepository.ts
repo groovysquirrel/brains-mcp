@@ -6,7 +6,7 @@ import {
   GetItemCommand
 } from '@aws-sdk/client-dynamodb';
 import { v4 as uuidv4 } from 'uuid';
-import { Logger } from '../../utils/logging/Logger';
+import { Logger } from '../../../../utils/logging/Logger';
 import { ConversationRepository } from './ConversationRepository';
 import {
   Conversation,
@@ -17,7 +17,7 @@ import {
   ListConversationsResponse,
   ConversationMessage
 } from '../../types/Conversation';
-import { getDynamoClient, getServerName } from '../../utils/aws/DynamoClient';
+import { getDynamoClient, getServerName } from '../../../../utils/aws/DynamoClient';
 import { Resource } from 'sst';
 
 /**

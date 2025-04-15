@@ -2,7 +2,7 @@ import { GatewayRequest } from '../../types/Request';
 import { GatewayResponse } from '../../types/Response';
 import { ModelConfig } from '../../types/Model';
 import { ProviderConfig } from '../../types/Provider';
-import { Logger } from '../../utils/logging/Logger';
+import { Logger } from '../../../../utils/logging/Logger';
 
 export abstract class AbstractProvider {
   protected config: ProviderConfig;

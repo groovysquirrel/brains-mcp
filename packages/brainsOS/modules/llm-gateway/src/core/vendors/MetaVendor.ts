@@ -43,13 +43,6 @@ export class MetaVendor extends AbstractVendor {
       top_p: request.topP || defaultSettings.topP
     };
     
-    // Add any stop sequences
-    if (request.stopSequences && request.stopSequences.length > 0) {
-      requestBody.stop_sequences = request.stopSequences;
-    } else if (defaultSettings.stopSequences) {
-      requestBody.stop_sequences = defaultSettings.stopSequences;
-    }
-    
     return requestBody;
   }
   

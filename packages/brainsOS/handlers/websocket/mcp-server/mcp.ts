@@ -1,89 +1,177 @@
-// import { ApiGatewayManagementApi } from 'aws-sdk';
-// import { ModelController } from '../../../modules/controller/ModelController';
-// import { LLMGateway } from '../../../modules/llm-gateway/Gateway';
-// import { conversationRepository } from '../../../system/repositories/conversation/conversationRepository';
+/**
+ * MCP WebSocket Handler
+ * 
+ * This module handles WebSocket connections and requests for the MCP (Model Control Protocol) server.
+ * It manages tool execution, tool listing, and error handling through WebSocket connections.
+ */
 
+import { Logger } from '../../shared/logging/logger';
+import { MCPServer } from '../../../modules/mcp-server/src/MCPServer';
+import { ConnectionManager } from '../util/connectionManager';
 import { WebSocketEvent } from '../websocketTypes';
 
-export const handler = async (event: WebSocketEvent) => {
-    return {
-        statusCode: 200,
-        body: 'MCP command processed'
-    };
+/**
+ * Custom error type for MCP WebSocket errors
+ */
+interface MCPWebSocketError extends Error {
+  code?: string;
 }
 
-// /**
-//  * Handler for controller/mcp WebSocket route
-//  * Processes MCP commands through the ModelController
-//  */
-// export const handler = async (event: WebSocketEvent) => {
-//     try {
-//         // Parse message
-//         const body = JSON.parse(event.body || '{}');
-        
-//         // Validate message format
-//         if (!body.command) {
-//             throw new Error('Invalid message format. Expected {command: MCPCommand}');
-//         }
+/**
+ * Interface for WebSocket message structure
+ */
+interface WebSocketMessage {
+  action: string;
+  data: {
+    type: string;
+    action: string;
+    toolName?: string;
+    parameters?: Record<string, any>;
+    requestId?: string;
+  };
+}
 
-//         // Initialize controller
-//         const llmGateway = new LLMGateway({
-//             bedrock: {}
-//         });
-//         const controller = new ModelController(llmGateway, conversationRepository);
+// Initialize logging and connection management
+const logger = new Logger('MCP-server-websocket');
+const connectionManager = ConnectionManager.getInstance();
 
-//         // Process MCP command
-//         const response = await controller.processMessage(
-//             event.requestContext.connectionId,
-//             body.command
-//         );
+// Initialize MCP server instance
+let mcpServer: MCPServer;
 
-//         // Send response back through WebSocket
-//         const { domainName, stage, connectionId } = event.requestContext;
-//         const endpoint = `https://${domainName}/${stage}`;
-//         const gatewayApi = new ApiGatewayManagementApi({ endpoint });
+/**
+ * Initializes the MCP server
+ * This is called once when the module is loaded
+ */
+async function initializeMCPServer(): Promise<void> {
+  try {
+    mcpServer = await MCPServer.create();
+    await mcpServer.initialize();
+    logger.info('MCP server initialized successfully');
+  } catch (error) {
+    logger.error('Failed to initialize MCP server:', error);
+    throw error; // Re-throw to be handled by the handler
+  }
+}
 
-//         await gatewayApi.postToConnection({
-//             ConnectionId: connectionId,
-//             Data: JSON.stringify({
-//                 type: 'mcp_response',
-//                 result: response,
-//                 timestamp: new Date().toISOString()
-//             })
-//         }).promise();
+/**
+ * Validates the incoming WebSocket message structure
+ * @param body - The parsed message body
+ * @throws Error if the message is invalid
+ */
+function validateMessage(body: any): void {
+  if (!body.action || !body.data) {
+    throw new Error('Missing required fields: action, data');
+  }
 
-//         return {
-//             statusCode: 200,
-//             body: 'MCP command processed'
-//         };
+  if (body.action !== 'mcp/request') {
+    throw new Error(`Unsupported action: ${body.action}`);
+  }
 
-//     } catch (error) {
-//         console.error('Controller MCP handler error:', error);
-        
-//         // Try to send error message back to client
-//         try {
-//             const { domainName, stage, connectionId } = event.requestContext;
-//             const endpoint = `https://${domainName}/${stage}`;
-//             const gatewayApi = new ApiGatewayManagementApi({ endpoint });
+  const { type, action: toolAction } = body.data;
+  if (!type || !toolAction) {
+    throw new Error('Missing required fields in data: type, action');
+  }
+}
 
-//             await gatewayApi.postToConnection({
-//                 ConnectionId: connectionId,
-//                 Data: JSON.stringify({
-//                     type: 'error',
-//                     message: error.message || 'Error processing MCP command',
-//                     timestamp: new Date().toISOString()
-//                 })
-//             }).promise();
-//         } catch (sendError) {
-//             console.error('Failed to send error message:', sendError);
-//         }
+/**
+ * Handles tool-related requests
+ * @param toolAction - The specific tool action to perform
+ * @param data - The request data
+ * @returns The response data
+ */
+async function handleToolRequest(toolAction: string, data: WebSocketMessage['data']): Promise<any> {
+  switch (toolAction) {
+    case 'list':
+      return await mcpServer.listTools();
 
-//         return {
-//             statusCode: 500,
-//             body: JSON.stringify({
-//                 message: 'Internal server error',
-//                 error: error.message
-//             })
-//         };
-//     }
-// }; 
+    case 'execute':
+      const { toolName, parameters } = data;
+      if (!toolName || !parameters) {
+        throw new Error('Missing required fields: toolName, parameters');
+      }
+      return await mcpServer.processRequest({
+        toolName,
+        parameters,
+        requestId: data.requestId || crypto.randomUUID()
+      });
+
+    default:
+      throw new Error(`Unsupported tool action: ${toolAction}`);
+  }
+}
+
+/**
+ * Sends an error response to the client
+ * @param connectionId - The WebSocket connection ID
+ * @param error - The error to send
+ */
+async function sendErrorResponse(connectionId: string, error: MCPWebSocketError): Promise<void> {
+  await connectionManager.sendMessage(connectionId, {
+    type: 'error',
+    data: {
+      message: error.message,
+      code: error.code || 'INTERNAL_ERROR'
+    }
+  });
+}
+
+/**
+ * Main WebSocket handler function
+ * Processes incoming WebSocket messages and routes them to appropriate handlers
+ */
+export const handler = async (event: WebSocketEvent) => {
+  const connectionId = event.requestContext.connectionId;
+  const userId = event.requestContext.authorizer?.userId;
+
+  // Register this connection with the connection manager
+  connectionManager.addConnection(connectionId);
+
+  logger.info('Processing MCP request', {
+    connectionId,
+    userId,
+    body: event.body
+  });
+
+  try {
+    // Ensure MCP server is initialized
+    if (!mcpServer) {
+      await initializeMCPServer();
+    }
+
+    // Parse and validate the incoming request
+    const body = JSON.parse(event.body || '{}') as WebSocketMessage;
+    validateMessage(body);
+
+    const { type, action: toolAction } = body.data;
+    let response;
+
+    // Route the request based on type
+    switch (type) {
+      case 'tool':
+        response = await handleToolRequest(toolAction, body.data);
+        break;
+
+      default:
+        throw new Error(`Unsupported request type: ${type}`);
+    }
+
+    // Send success response to client
+    await connectionManager.sendMessage(connectionId, {
+      type: 'mcp/response',
+      data: response
+    });
+
+    return { statusCode: 200 };
+  } catch (error: any) {
+    logger.error('Failed to process WebSocket event:', {
+      error,
+      connectionId,
+      userId
+    });
+    
+    // Send error response to client
+    await sendErrorResponse(connectionId, error as MCPWebSocketError);
+
+    return { statusCode: 500 };
+  }
+};

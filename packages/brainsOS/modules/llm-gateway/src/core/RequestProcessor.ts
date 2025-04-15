@@ -1,4 +1,4 @@
-import { Logger } from '../utils/logging/Logger';
+import { Logger } from '../../../utils/logging/Logger';
 import { GatewayRequest } from '../types/Request';
 
 // Global variables for Lambda reuse

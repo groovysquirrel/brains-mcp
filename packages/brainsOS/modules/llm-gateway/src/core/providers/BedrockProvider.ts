@@ -7,8 +7,8 @@ import { ProviderConfig } from '../../types/Provider';
 import { VendorConfig } from '../../types/Vendor';
 import { AnthropicVendor } from '../vendors/AnthropicVendor';
 import { MetaVendor } from '../vendors/MetaVendor';
-import { getBedrockClient } from '../../utils/aws/BedrockClient';
-import { Logger } from '../../utils/logging/Logger';
+import { getBedrockClient } from '../../../../utils/aws/BedrockClient';
+import { Logger } from '../../../../utils/logging/Logger';
 
 export class BedrockProvider extends AbstractProvider {
   private vendorConfigs: Record<string, VendorConfig>;

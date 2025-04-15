@@ -7,7 +7,7 @@ import { GatewayModelState, GatewayModelAliases } from '../../types/GatewayState
 import { MetricsConfig, MetricsDestination } from '../../types/Metrics';
 import * as fs from 'fs/promises';
 import path from 'path';
-import { Logger, LogLevel } from '../../utils/logging/Logger';
+import { Logger, LogLevel } from '../../../../utils/logging/Logger';
 import { Resource } from 'sst';
 import { TextModalityHandler } from '../../core/modalities/TextModalityHandler';
 import { ModalityHandler } from '../../types/Modality';
@@ -36,7 +36,7 @@ export class LocalConfigLoader implements ConfigRepository {
    */
   constructor(configPath?: string) {
     this.logger = new Logger('LocalConfigLoader');
-    this.configPath = configPath || `${process.cwd()}/config`;
+    this.configPath = configPath || `${process.cwd()}/llm-gateway/config`;
   }
 
   /**
@@ -231,7 +231,7 @@ export class LocalConfigLoader implements ConfigRepository {
    */
   async getLoggerConfig(): Promise<{ logLevel: LogLevel }> {
     try {
-      const loggerPath = path.join(this.configPath, 'system', 'logger.json');
+      const loggerPath = path.join(this.configPath, 'module', 'logger.json');
       this.logger.info('Looking for logger config at:', { path: loggerPath });
       
       const configContent = await fs.readFile(loggerPath, 'utf-8');
@@ -257,7 +257,7 @@ export class LocalConfigLoader implements ConfigRepository {
     try {
       // For testing, we're only getting the region from the metrics.json file
       // The actual resources will be accessed directly from SST Resource object
-      const metricsPath = path.join(this.configPath, 'system', 'metrics.json');
+      const metricsPath = path.join(this.configPath, 'module', 'metrics.json');
       this.logger.info('Looking for metrics config at:', { path: metricsPath });
       
       const configContent = await fs.readFile(metricsPath, 'utf-8');

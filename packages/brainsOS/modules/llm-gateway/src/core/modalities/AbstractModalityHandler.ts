@@ -4,7 +4,7 @@ import { GatewayResponse } from '../../types/Response';
 import { ModelConfig } from '../../types/Model';
 import { ProviderConfig } from '../../types/Provider';
 import { VendorConfig } from '../../types/Vendor';
-import { Logger } from '../../utils/logging/Logger';
+import { Logger } from '../../../../utils/logging/Logger';
 
 export abstract class AbstractModalityHandler implements ModalityHandler {
   protected config: ModalityConfig;

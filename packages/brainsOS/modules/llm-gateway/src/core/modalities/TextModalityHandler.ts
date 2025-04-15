@@ -2,7 +2,7 @@ import { AbstractModalityHandler } from './AbstractModalityHandler';
 import { GatewayRequest } from '../../types/Request';
 import { GatewayResponse } from '../../types/Response';
 import { ModelConfig } from '../../types/Model';
-import { Logger } from '../../utils/logging/Logger';
+import { Logger } from '../../../../utils/logging/Logger';
 import { BedrockProvider } from '../providers/BedrockProvider';
 import { ProviderConfig } from '../../types/Provider';
 import { VendorConfig } from '../../types/Vendor';

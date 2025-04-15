@@ -73,6 +73,10 @@ declare module "sst" {
       "name": string
       "type": "sst.aws.Function"
     }
+    "brainsControllerHandlerFunction": {
+      "name": string
+      "type": "sst.aws.Function"
+    }
     "brainsOS_API": {
       "type": "sst.aws.ApiGatewayV2"
       "url": string
@@ -138,23 +142,15 @@ declare module "sst" {
       "name": string
       "type": "sst.aws.Function"
     }
-    "controllerMcpFunction": {
-      "name": string
-      "type": "sst.aws.Function"
-    }
-    "controllerPromptFunction": {
-      "name": string
-      "type": "sst.aws.Function"
-    }
-    "defaultHandlerFunction": {
-      "name": string
-      "type": "sst.aws.Function"
-    }
     "disconnectHandlerFunction": {
       "name": string
       "type": "sst.aws.Function"
     }
     "gwchatFunction": {
+      "name": string
+      "type": "sst.aws.Function"
+    }
+    "mcpServerWebSocketFunction": {
       "name": string
       "type": "sst.aws.Function"
     }

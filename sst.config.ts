@@ -33,11 +33,11 @@ export default $config({
     const queues = await import("./infra/stacks/queues");
 
     // Import the components
-    const llmGateway = await import("./infra/apps/llm-gateway");
-    const mcpServer = await import("./infra/apps/mcp-server");
-    const library = await import("./infra/apps/library");
-    const controller = await import("./infra/apps/controller");
-    const moneyManager = await import("./infra/apps/money-manager");
+    const llmGateway = await import("./infra/modules/llm-gateway");
+    const mcpServer = await import("./infra/modules/mcp-server");
+    const library = await import("./infra/modules/library");
+    const brainsController = await import("./infra/modules/brains-controller");
+    const moneyManager = await import("./infra/modules/money-manager");
 
     return {
       REGION: aws.getRegionOutput().name,

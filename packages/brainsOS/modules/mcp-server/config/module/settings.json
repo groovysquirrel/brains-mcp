@@ -1,0 +1,4 @@
+{
+  "maxConcurrentRequests": 10,
+  "requestTimeout": 30000
+} 

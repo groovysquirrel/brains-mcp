@@ -1,4 +1,4 @@
-import { Logger } from './utils/logging/Logger';
+import { Logger } from '../../utils/logging/Logger';
 import { GatewayRequest } from './types/Request';
 import { GatewayResponse } from './types/Response';
 import { ModelConfig } from './types/Model';
@@ -8,7 +8,7 @@ import { ConversationRepository } from './repositories/conversation/Conversation
 import { DynamoConversationRepository } from './repositories/conversation/DynamoConversationRepository';
 import { Conversation, ListConversationsResponse } from './types/Conversation';
 import { MetricsConfig, MetricsDestination } from './types/Metrics';
-import { initializeMetricsCollector } from './utils/logging/MetricsCollector';
+import { initializeMetricsCollector } from '../../utils/logging/MetricsCollector';
 import * as ConversationManager from './core/ConversationManager';
 import * as MetricsManager from './core/MetricsManager';
 import * as RequestProcessor from './core/RequestProcessor';

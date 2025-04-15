@@ -1,12 +1,12 @@
 import { GatewayRequest } from '../../types/Request';
 import { VendorConfig } from '../../types/Vendor';
-import { Logger } from '../../utils/logging/Logger';
+import { Logger } from '../../../../utils/logging/Logger';
 import { ProviderConfig } from '../../types/Provider';
 import { ModelConfig } from '../../types/Model';
 import { GatewayResponse } from '../../types/Response';
 import { AbstractProvider } from '../providers/AbstractProvider';
 import { InvokeModelWithResponseStreamCommand } from '@aws-sdk/client-bedrock-runtime';
-import { getBedrockClient } from '../../utils/aws/BedrockClient';
+import { getBedrockClient } from '../../../../utils/aws/BedrockClient';
 
 export abstract class AbstractVendor {
   protected config: VendorConfig;

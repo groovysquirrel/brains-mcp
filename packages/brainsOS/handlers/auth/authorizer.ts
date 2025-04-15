@@ -126,7 +126,7 @@ export const handler = async (
   event: CustomWebsocketEvent,
   context: any
 ): Promise<AuthResponse> => {
-  console.log('[Authorizer] Handler called with event:', JSON.stringify(event, null, 2));
+  //console.log('[Authorizer] Handler called with event:', JSON.stringify(event, null, 2));
 
   // Step 1: Check for token in query parameters
   const token = event.queryStringParameters?.token;
@@ -138,7 +138,7 @@ export const handler = async (
   try {
     // Step 2: Verify the ID token
     const payload = await jwtVerifier.verify(token);
-    console.log('[Authorizer] Token verified, payload:', JSON.stringify(payload, null, 2));
+    console.log('[Authorizer] Token verified');
 
     // Step 3: Extract user information from the token
     const username = payload['cognito:username'];
@@ -153,7 +153,7 @@ export const handler = async (
 
     // Step 4: Generate and return the allow policy
     const response = generateAllow(username, event.methodArn, email);
-    console.log('[Authorizer] Returning response:', JSON.stringify(response, null, 2));
+    //console.log('[Authorizer] Returning response:', JSON.stringify(response, null, 2));
     return response;
   } catch (error) {
     console.error('[Authorizer] Error verifying token:', error);

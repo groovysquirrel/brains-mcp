@@ -1,0 +1,6 @@
+{
+    "environment": {
+        "LLM_METRICS_ENABLED": false,
+        "LLM_METRICS_DESTINATION": "none"
+  }
+}

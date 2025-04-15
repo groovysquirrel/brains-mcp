@@ -1,6 +1,0 @@
-{
-    "environment": {
-        "LLM_METRICS_ENABLED": true,
-        "LLM_METRICS_DESTINATION": "sqs"
-  }
-}
