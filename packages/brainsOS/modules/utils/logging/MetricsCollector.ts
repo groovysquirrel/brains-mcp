@@ -1,7 +1,7 @@
 import { Logger } from './Logger';
 import { initializeSQSClient, sendMetricsToSQS } from '../aws/SQSClient';
 import { initializeS3Client, storeMetricsInS3 } from '../aws/S3Client';
-import { LLMUsageMetadata, MetricsDestination, MetricsConfig } from '../../llm-gateway/src/types/Metrics';
+import { LLMUsageMetadata, MetricsDestination, MetricsConfig } from '../types/Metrics';
 
 // Logger for metrics tracking
 const logger = new Logger('MetricsCollector');

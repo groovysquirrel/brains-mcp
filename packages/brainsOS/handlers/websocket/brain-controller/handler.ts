@@ -7,8 +7,8 @@
  * 4. Handling errors and providing appropriate responses
  */
 
-import { Logger } from '../../shared/logging/logger';
-import { ConnectionManager } from '../util/connectionManager';
+import { Logger } from '../../../utils/logging/logger';
+import { ConnectionManager } from '../utils/connectionManager';
 import { WebSocketEvent } from '../websocketTypes';
 import { BrainController } from '../../../modules/brain-controller/src/BrainController';
 import { BrainMessage, BrainResponse, isBrainMessage } from './messagesTypes';

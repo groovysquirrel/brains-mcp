@@ -3,7 +3,7 @@ import { VendorConfig } from '../../types/Vendor';
 import { ModelConfig } from '../../types/Model';
 import { ModalityConfig, ModalityHandler } from '../../types/Modality';
 import { GatewayModelState, GatewayModelAliases } from '../../types/GatewayState';
-import { MetricsConfig } from '../../types/Metrics';
+import { MetricsConfig } from '../../../../utils/types/Metrics';
 import { LogLevel } from '../../../../utils/logging/Logger';
 
 /**

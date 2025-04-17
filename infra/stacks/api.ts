@@ -1,16 +1,4 @@
-import { brainsOS_userData, brainsOS_systemData, loadDefaultData } from "./database";
 import { getDomainName, getCorsOrigins } from "../config";
-import { brainsOS_userPoolClient, brainsOS_userPool } from "./auth";
-import {  } from "./auth";  
-
-const bedrockPermissions = {
-  actions: [
-    'bedrock:ListFoundationModels',
-    'bedrock:InvokeModel',
-    'bedrock:GetFoundationModel'
-  ],
-  resources: ['*']
-}; 
 
 export const brainsOS_API = new sst.aws.ApiGatewayV2("brainsOS_API", {
   cors: {
@@ -27,13 +15,6 @@ export const brainsOS_API = new sst.aws.ApiGatewayV2("brainsOS_API", {
     allowCredentials: true,
     maxAge: `300 seconds`
   },
-  // transform: {
-  //   route: {
-  //     handler: {
-  //       link: [userData, systemData, loadDefaultData],
-  //     },
-  //   }
-  // },
   domain: {
     name: getDomainName('api', 'latest', $app.stage)
   },
@@ -46,35 +27,6 @@ brainsOS_API.addAuthorizer({
     function: "packages/brainsOS/handlers/auth/authorizer.handler"
   }
 });
-// brainsOS system data API
 
-// brainsOS_API.route("POST /latest/commands", {
-//   link: [brainsOS_systemData], //add these links here... not in API area. Might be a bug.
-//   handler: "packages/brainsOS/functions/api/command/commandHandler.handler",
-//   permissions: [ bedrockPermissions ]
-// });
-
-// brainsOS_API.route("POST /latest/services/transform/{objectType}/{fromView}/{toView}", {
-//   handler: "packages/brainsOS/functions/api/services/transform/transformHandler.handler",
-//   link: [brainsOS_systemData],
-// });
-
-
-// brainsOS_API.route("POST /latest/services/prompt/{promptType}", {
-//   permissions: [ bedrockPermissions ],
-//   link: [brainsOS_userData],
-//   timeout: "3 minutes", 
-//   handler: "packages/brainsOS/functions/api/services/prompt/promptHandler.handler",
-//   nodejs: {
-//     loader: {
-//      ".md": "text"
-//       }
-//     }
-// });
-
-// brainsOS_API.route("GET /latest/services/prompt/{promptType}", {
-//   permissions: [ bedrockPermissions ],
-//   handler: "packages/brainsOS/functions/api/services/prompt/promptHandler.handler",
-// });
 
 

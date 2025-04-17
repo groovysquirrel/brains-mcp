@@ -1,7 +1,7 @@
 import { Logger, LogLevel } from '../../../utils/logging/Logger';
 import { GatewayRequest } from '../types/Request';
 import { GatewayResponse } from '../types/Response';
-import { LLMUsageMetadata, ConnectionType } from '../types/Metrics';
+import { LLMUsageMetadata, ConnectionType } from '../../../utils/types/Metrics';
 import { recordLLMMetrics } from '../../../utils/logging/MetricsCollector';
 import { v4 as uuidv4 } from 'uuid';
 import { ModelConfig, CostPerToken } from '../types/Model';

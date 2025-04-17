@@ -12,39 +12,11 @@
  * - Error Handling: Comprehensive error handling with proper logging and HTTP status codes
  */
 
-
-
-
-
-/*
-
-list models
-
-get model information (e.g. pricing, capabilities, etc.)
-
-list providers
-
-get provider models
-
-get vendor models 
-
-get status
-
-
-
-
-
-*/
-
-
-
-
-
-
-import { Logger } from '../../shared/logging/logger';
+import { Logger } from '../../../utils/logging/logger';
 import { Gateway, ConversationOptions } from '../../../modules/llm-gateway/src/Gateway';
 import { GatewayRequest } from '../../../modules/llm-gateway/src/types/Request';
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
+import { extractUserId as extractUserIdFromAuth, requireUserId } from '../../auth/authUtils';
 
 // Initialize logging
 const logger = new Logger('LLMGatewayAPIHandler');
@@ -127,99 +99,20 @@ const createResponse = (statusCode: number, body: any): APIGatewayProxyResult =>
  * @returns User ID or throws error if not found
  */
 const extractUserId = (event: APIGatewayProxyEvent): string => {
-  // Log the context to understand what's available
-  logger.info('Request context:', {
-    authorizer: event.requestContext.authorizer,
-    headers: event.headers
-  });
-  
-  let userId: string | undefined;
-  
-  // First check the Authorization header - most reliable for Cognito
-  if (event.headers.Authorization || event.headers.authorization) {
-    const authHeader = event.headers.Authorization || event.headers.authorization;
-    userId = extractUserIdFromToken(authHeader);
-    
-    if (userId && userId.trim() !== '') {
-      logger.info('Extracted user ID from JWT token', { userId });
-      return userId;
-    }
-  }
-  
-  // Try to get from authorizer context if present
-  if (event.requestContext.authorizer) {
-    userId = event.requestContext.authorizer.userId || 
-             event.requestContext.authorizer.claims?.sub;
-    
-    if (userId && userId.trim() !== '') {
-      logger.info('Extracted user ID from authorizer context', { userId });
-      return userId;
-    }
-  }
-  
-  // Try from headers
-  userId = event.headers['x-user-id'];
-  if (userId && userId.trim() !== '') {
-    logger.info('Extracted user ID from x-user-id header', { userId });
-    return userId;
-  }
-  
-  // Try from body if all else fails - THIS IS DEPRECATED AND WILL BE REMOVED IN THE FUTURE
-  // Should only be used for development and testing purposes
-  if (event.body) {
-    try {
-      const body = JSON.parse(event.body);
-      if (body.userId && body.userId.trim() !== '') {
-        logger.warn('DEPRECATED: Using userId from request body', { userId: body.userId });
-        return body.userId;
-      }
-    } catch (error) {
-      logger.error('Failed to parse request body', { error });
-    }
-  }
-  
-  // No user ID found or extracted userId is empty
-  logger.error('Could not extract valid non-empty user ID from request', {
-    authorizerKeys: event.requestContext.authorizer ? Object.keys(event.requestContext.authorizer) : 'none',
-    headerKeys: Object.keys(event.headers)
-  });
-  
-  throw new Error('Valid non-empty user ID is required. Authentication required or provide a non-empty userId.');
-};
-
-/**
- * Attempts to extract the user ID from a JWT token
- * @param authHeader The Authorization header value
- * @returns The user ID if found, undefined otherwise
- */
-const extractUserIdFromToken = (authHeader: string): string | undefined => {
   try {
-    if (!authHeader.startsWith('Bearer ')) {
-      return undefined;
+    // Use the central auth utility function
+    const userId = extractUserIdFromAuth(event, logger);
+    
+    if (!userId) {
+      logger.warn('No user ID found in request');
+      throw new Error('Valid non-empty user ID is required. Authentication required or provide a non-empty userId.');
     }
     
-    const token = authHeader.substring(7); // Remove 'Bearer ' prefix
-    const tokenParts = token.split('.');
-    
-    if (tokenParts.length !== 3) {
-      return undefined; // Not a valid JWT
-    }
-    
-    // Decode the payload (second part)
-    const payloadBase64 = tokenParts[1];
-    const payload = JSON.parse(Buffer.from(payloadBase64, 'base64').toString());
-    
-    logger.info('JWT Payload:', { 
-      sub: payload.sub,
-      username: payload['cognito:username'],
-      email: payload.email
-    });
-    
-    // For Cognito, the user ID is in the sub claim
-    return payload.sub;
+    logger.info('Extracted user ID', { userId });
+    return userId;
   } catch (error) {
-    logger.error('Failed to extract user ID from token', { error });
-    return undefined;
+    logger.error('Failed to extract valid user ID', { error });
+    throw new Error('Valid non-empty user ID is required. Authentication required or provide a non-empty userId.');
   }
 };
 

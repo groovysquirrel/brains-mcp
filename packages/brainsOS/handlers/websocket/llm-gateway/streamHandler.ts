@@ -13,8 +13,8 @@
  * - State Management: Tracking active streams
  */
 
-import { Logger } from '../../shared/logging/logger';
-import { ConnectionManager } from '../util/connectionManager';
+import { Logger } from '../../../utils/logging/logger';
+import { ConnectionManager } from '../utils/connectionManager';
 import { GatewayResponse } from '../../../modules/llm-gateway/src/types/Response';
 
 const logger = new Logger('StreamHandler');

@@ -7,7 +7,7 @@ import { LocalConfigLoader } from './repositories/config/LocalLoader';
 import { ConversationRepository } from './repositories/conversation/ConversationRepository';
 import { DynamoConversationRepository } from './repositories/conversation/DynamoConversationRepository';
 import { Conversation, ListConversationsResponse } from './types/Conversation';
-import { MetricsConfig, MetricsDestination } from './types/Metrics';
+import { MetricsConfig, MetricsDestination } from '../../utils/types/Metrics';
 import { initializeMetricsCollector } from '../../utils/logging/MetricsCollector';
 import * as ConversationManager from './core/ConversationManager';
 import * as MetricsManager from './core/MetricsManager';

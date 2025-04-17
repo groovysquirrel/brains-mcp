@@ -4,7 +4,7 @@ import { VendorConfig } from '../../types/Vendor';
 import { ModelConfig } from '../../types/Model';
 import { ModalityConfig } from '../../types/Modality';
 import { GatewayModelState, GatewayModelAliases } from '../../types/GatewayState';
-import { MetricsConfig, MetricsDestination } from '../../types/Metrics';
+import { MetricsConfig, MetricsDestination } from '../../../../utils/types/Metrics';
 import * as fs from 'fs/promises';
 import path from 'path';
 import { Logger, LogLevel } from '../../../../utils/logging/Logger';

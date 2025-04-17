@@ -5,6 +5,6 @@ export * from './Response';
 export * from './Vendor';
 export * from './Provider';
 export * from './GatewayState';
-export * from './Metrics'; 
+export * from '../../../utils/types/Metrics'; 
 export * from './Conversation';
 

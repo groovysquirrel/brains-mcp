@@ -32,10 +32,6 @@ export const brainsOS_userPoolClient = brainsOS_userPool.addClient("brainsOS_use
       args.idTokenValidity = 1;     // 1 hour
       args.refreshTokenValidity = 1440; // 1 day
       
-      // Or if you need to remove token validity settings completely
-      // delete args.accessTokenValidity;
-      // delete args.idTokenValidity;
-      // delete args.refreshTokenValidity;
     }
   }
 });
@@ -48,30 +44,31 @@ export const brainsOS_identityPool = new sst.aws.CognitoIdentityPool("brainsOS_i
       client: brainsOS_userPoolClient.id,
     },
   ],
-  permissions: {
-    authenticated: [
+  // Is this handled by the authorizer?
+  // permissions: {
+  //   authenticated: [
 
-      {
-        actions: [
-          "execute-api:*",
-        ],
-        resources: [
-          $concat(
-            "arn:aws:execute-api:",
-            region,
-            ":",
-            aws.getCallerIdentityOutput({}).accountId,
-            ":",
-            brainsOS_API.nodes.api.id,
-            "/*/*/*"
-          ),
-        ],
+  //     {
+  //       actions: [
+  //         "execute-api:*",
+  //       ],
+  //       resources: [
+  //         $concat(
+  //           "arn:aws:execute-api:",
+  //           region,
+  //           ":",
+  //           aws.getCallerIdentityOutput({}).accountId,
+  //           ":",
+  //           brainsOS_API.nodes.api.id,
+  //           "/*/*/*"
+  //         ),
+  //       ],
 
 
-      },
+  //     },
 
-    ],
-  },
+  //   ],
+  // },
 });
 
 

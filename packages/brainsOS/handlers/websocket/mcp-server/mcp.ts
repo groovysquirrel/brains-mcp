@@ -5,17 +5,19 @@
  * It manages tool execution, tool listing, and error handling through WebSocket connections.
  */
 
-import { Logger } from '../../shared/logging/logger';
+import { Logger } from '../../../utils/logging/logger';
 import { MCPServer } from '../../../modules/mcp-server/src/MCPServer';
-import { ConnectionManager } from '../util/connectionManager';
+import { ConnectionManager } from '../utils/connectionManager';
 import { WebSocketEvent } from '../websocketTypes';
-
-/**
- * Custom error type for MCP WebSocket errors
- */
-interface MCPWebSocketError extends Error {
-  code?: string;
-}
+import {
+  ToolRequest,
+  ToolResponse,
+  ToolInfo,
+  TransformerRequest,
+  TransformerResult,
+  TransformerInfo,
+  MCPErrorCode
+} from '../../../modules/mcp-server/src/types';
 
 /**
  * Interface for WebSocket message structure
@@ -23,11 +25,26 @@ interface MCPWebSocketError extends Error {
 interface WebSocketMessage {
   action: string;
   data: {
-    type: string;
-    action: string;
+    type: 'tool' | 'transformer';
+    action: 'list' | 'execute';
     toolName?: string;
     parameters?: Record<string, any>;
+    objectType?: string;
+    fromView?: string;
+    toView?: string;
+    input?: any;
     requestId?: string;
+  };
+}
+
+/**
+ * Interface for WebSocket response structure
+ */
+interface WebSocketResponse {
+  type: 'mcp/response' | 'error';
+  data: ToolResponse | TransformerResult | ToolInfo[] | TransformerInfo[] | {
+    message: string;
+    code: MCPErrorCode;
   };
 }
 
@@ -58,7 +75,7 @@ async function initializeMCPServer(): Promise<void> {
  * @param body - The parsed message body
  * @throws Error if the message is invalid
  */
-function validateMessage(body: any): void {
+function validateMessage(body: any): asserts body is WebSocketMessage {
   if (!body.action || !body.data) {
     throw new Error('Missing required fields: action, data');
   }
@@ -67,9 +84,17 @@ function validateMessage(body: any): void {
     throw new Error(`Unsupported action: ${body.action}`);
   }
 
-  const { type, action: toolAction } = body.data;
-  if (!type || !toolAction) {
+  const { type, action } = body.data;
+  if (!type || !action) {
     throw new Error('Missing required fields in data: type, action');
+  }
+
+  if (type !== 'tool' && type !== 'transformer') {
+    throw new Error(`Unsupported type: ${type}`);
+  }
+
+  if (action !== 'list' && action !== 'execute') {
+    throw new Error(`Unsupported action: ${action}`);
   }
 }
 
@@ -79,7 +104,7 @@ function validateMessage(body: any): void {
  * @param data - The request data
  * @returns The response data
  */
-async function handleToolRequest(toolAction: string, data: WebSocketMessage['data']): Promise<any> {
+async function handleToolRequest(toolAction: string, data: WebSocketMessage['data']): Promise<ToolResponse | ToolInfo[]> {
   switch (toolAction) {
     case 'list':
       return await mcpServer.listTools();
@@ -90,6 +115,7 @@ async function handleToolRequest(toolAction: string, data: WebSocketMessage['dat
         throw new Error('Missing required fields: toolName, parameters');
       }
       return await mcpServer.processRequest({
+        requestType: 'tool',
         toolName,
         parameters,
         requestId: data.requestId || crypto.randomUUID()
@@ -101,18 +127,48 @@ async function handleToolRequest(toolAction: string, data: WebSocketMessage['dat
 }
 
 /**
+ * Handles transformer-related requests
+ * @param transformerAction - The specific transformer action to perform
+ * @param data - The request data
+ * @returns The response data
+ */
+async function handleTransformerRequest(transformerAction: string, data: WebSocketMessage['data']): Promise<TransformerResult | TransformerInfo[]> {
+  switch (transformerAction) {
+    case 'list':
+      return await mcpServer.listTransformers();
+
+    case 'execute':
+      const { objectType, fromView, toView, input } = data;
+      if (!objectType || !fromView || !toView || !input) {
+        throw new Error('Missing required fields: objectType, fromView, toView, input');
+      }
+      return await mcpServer.processTransformerRequest({
+        requestType: 'transformer',
+        objectType,
+        fromView,
+        toView,
+        input,
+        requestId: data.requestId || crypto.randomUUID()
+      });
+
+    default:
+      throw new Error(`Unsupported transformer action: ${transformerAction}`);
+  }
+}
+
+/**
  * Sends an error response to the client
  * @param connectionId - The WebSocket connection ID
  * @param error - The error to send
  */
-async function sendErrorResponse(connectionId: string, error: MCPWebSocketError): Promise<void> {
+async function sendErrorResponse(connectionId: string, error: Error): Promise<void> {
   await connectionManager.sendMessage(connectionId, {
     type: 'error',
     data: {
       message: error.message,
-      code: error.code || 'INTERNAL_ERROR'
+      code: MCPErrorCode.INTERNAL_ERROR
     }
-  });
+  } as WebSocketResponse);
 }
 
 /**
@@ -139,16 +195,20 @@ export const handler = async (event: WebSocketEvent) => {
     }
 
     // Parse and validate the incoming request
-    const body = JSON.parse(event.body || '{}') as WebSocketMessage;
+    const body = JSON.parse(event.body || '{}');
     validateMessage(body);
 
-    const { type, action: toolAction } = body.data;
+    const { type, action } = body.data;
     let response;
 
     // Route the request based on type
     switch (type) {
       case 'tool':
-        response = await handleToolRequest(toolAction, body.data);
+        response = await handleToolRequest(action, body.data);
+        break;
+
+      case 'transformer':
+        response = await handleTransformerRequest(action, body.data);
         break;
 
       default:
@@ -159,10 +219,10 @@ export const handler = async (event: WebSocketEvent) => {
     await connectionManager.sendMessage(connectionId, {
       type: 'mcp/response',
       data: response
-    });
+    } as WebSocketResponse);
 
     return { statusCode: 200 };
-  } catch (error: any) {
+  } catch (error) {
     logger.error('Failed to process WebSocket event:', {
       error,
       connectionId,
@@ -170,7 +230,7 @@ export const handler = async (event: WebSocketEvent) => {
     });
     
     // Send error response to client
-    await sendErrorResponse(connectionId, error as MCPWebSocketError);
+    await sendErrorResponse(connectionId, error instanceof Error ? error : new Error('Unknown error'));
 
     return { statusCode: 500 };
   }

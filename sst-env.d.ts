@@ -73,7 +73,7 @@ declare module "sst" {
       "name": string
       "type": "sst.aws.Function"
     }
-    "brainsControllerHandlerFunction": {
+    "brainsControllerWebsocketHandlerFunction": {
       "name": string
       "type": "sst.aws.Function"
     }
@@ -112,6 +112,10 @@ declare module "sst" {
       "id": string
       "type": "sst.aws.CognitoIdentityPool"
     }
+    "brainsOS_mcpServerRequestQueue": {
+      "type": "sst.aws.Queue"
+      "url": string
+    }
     "brainsOS_queue_metrics": {
       "type": "sst.aws.Queue"
       "url": string
@@ -147,6 +151,10 @@ declare module "sst" {
       "type": "sst.aws.Function"
     }
     "gwchatFunction": {
+      "name": string
+      "type": "sst.aws.Function"
+    }
+    "mcpServerRequestQueueFunction": {
       "name": string
       "type": "sst.aws.Function"
     }

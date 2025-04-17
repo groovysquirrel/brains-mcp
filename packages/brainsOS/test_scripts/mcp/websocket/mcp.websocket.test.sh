@@ -41,17 +41,26 @@ echo ""
 echo "3. CALCULATOR: Multiply two numbers:"
 echo '{"action": "mcp/request", "data": {"type": "tool", "action": "execute", "toolName": "calculator", "parameters": {"operation": "multiply", "a": 4, "b": 6}}}'
 echo ""
-echo "4. RANDOM NUMBER: Generate a random integer:"
-echo '{"action": "mcp/request", "data": {"type": "tool", "action": "execute", "toolName": "randomNumber", "parameters": {"min": 1, "max": 100, "type": "integer"}}}'
+echo "4. LIST TRANSFORMERS: Get all available transformers:"
+echo '{"action": "mcp/request", "data": {"type": "transformer", "action": "list"}}'
 echo ""
-echo "5. RANDOM NUMBER: Generate a random float:"
-echo '{"action": "mcp/request", "data": {"type": "tool", "action": "execute", "toolName": "randomNumber", "parameters": {"min": 0, "max": 1, "type": "float"}}}'
+echo "5. TABLE CONVERTER: Convert CSV to JSON:"
+echo '{"action": "mcp/request", "data": {"type": "transformer", "action": "execute", "objectType": "DataTable", "fromView": "csv", "toView": "json", "input": "name,age\nJohn,30\nJane,25"}}'
 echo ""
-echo "6. TABLE CONVERTER: Convert CSV to JSON:"
-echo '{"action": "mcp/request", "data": {"type": "tool", "action": "execute", "toolName": "tableConverter", "parameters": {"input": "name,age\nJohn,30\nJane,25", "format": "csv", "outputFormat": "json"}}}'
+echo "6. TABLE CONVERTER: Convert JSON to Markdown:"
+echo '{"action": "mcp/request", "data": {"type": "transformer", "action": "execute", "objectType": "DataTable", "fromView": "json", "toView": "markdown", "input": "[{\"name\":\"John\",\"age\":30},{\"name\":\"Jane\",\"age\":25}]"}}'
 echo ""
-echo "7. TABLE CONVERTER: Convert JSON to Markdown:"
-echo '{"action": "mcp/request", "data": {"type": "tool", "action": "execute", "toolName": "tableConverter", "parameters": {"input": "[{\"name\":\"John\",\"age\":30},{\"name\":\"Jane\",\"age\":25}]", "format": "json", "outputFormat": "markdown"}}}'
+echo "7. ITRG-BRA: Convert Markdown to Object:"
+echo '{"action": "mcp/request", "data": {"type": "transformer", "action": "execute", "objectType": "itrg-bra", "fromView": "markdown", "toView": "object", "input": "# Title\n\n- Item 1\n- Item 2"}}'
+echo ""
+echo "8. ITRG-BRA: Convert Object to DOT Graph:"
+echo '{"action": "mcp/request", "data": {"type": "transformer", "action": "execute", "objectType": "itrg-bra", "fromView": "object", "toView": "dot", "input": {"title": "Title", "items": ["Item 1", "Item 2"]}}}'
+echo ""
+echo "9. ERROR CASE: Invalid transformer format:"
+echo '{"action": "mcp/request", "data": {"type": "transformer", "action": "execute", "objectType": "table", "fromView": "invalid", "toView": "json", "input": "some data"}}'
+echo ""
+echo "10. ERROR CASE: Missing required fields:"
+echo '{"action": "mcp/request", "data": {"type": "transformer", "action": "execute", "objectType": "table", "fromView": "csv"}}'
 echo ""
 echo "To exit gracefully, press Ctrl+C"
 echo "----------------------------------------"

@@ -12,10 +12,10 @@
  * - Error Handling: Comprehensive error handling with proper logging
  */
 
-import { Logger } from '../../shared/logging/logger';
+import { Logger } from '../../../utils/logging/logger';
 import { Gateway, ConversationOptions } from '../../../modules/llm-gateway/src/Gateway';
 import { GatewayRequest } from '../../../modules/llm-gateway/src/types/Request';
-import { ConnectionManager } from '../util/connectionManager';
+import { ConnectionManager } from '../utils/connectionManager';
 import { StreamHandler } from './streamHandler';
 import { Resource } from 'sst';
 import { WebSocketEvent } from '../websocketTypes';

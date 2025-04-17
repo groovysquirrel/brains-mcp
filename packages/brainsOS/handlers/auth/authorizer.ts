@@ -161,4 +161,3 @@ export const handler = async (
   }
 };
 
-/// TO DO: Validate the token with Cognito and return the user id

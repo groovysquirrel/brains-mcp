@@ -1,5 +1,5 @@
 import { AbstractRepository } from './BaseRepository';
-import { Tool } from '../../core/built-in/tools/ToolTypes';
+import { Tool } from '../../types/core/Tool';
 import { Logger } from '../../../../utils/logging/Logger';
 
 export class ToolRepository extends AbstractRepository<Tool> {
