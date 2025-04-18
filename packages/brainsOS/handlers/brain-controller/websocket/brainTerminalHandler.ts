@@ -8,11 +8,11 @@
  */
 
 import { Logger } from '../../../utils/logging/logger';
-import { ConnectionManager } from '../utils/connectionManager';
-import { WebSocketEvent } from '../websocketTypes';
+import { ConnectionManager } from '../../system/websocket/connectionManager';
+import { WebSocketEvent } from '../../system/websocket/websocketTypes';
 import { BrainController } from '../../../modules/brain-controller/src/BrainController';
 import { BrainMessage, BrainResponse, isBrainMessage } from './messagesTypes';
-import { TerminalMessage, isTerminalMessage } from '../controller/messagesTypes';
+import { TerminalMessage, isTerminalMessage } from './messagesTypes';
 
 // Initialize logging and connection management
 const logger = new Logger('BrainControllerWebSocket');

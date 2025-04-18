@@ -8,6 +8,7 @@
 import { Logger } from '../../../utils/logging/logger';
 import { BrainController } from '../../../modules/brain-controller/src/BrainController';
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
+import { extractUserId as extractUserIdFromAuth } from '../../system/auth/authUtils';
 
 // Initialize logging
 const logger = new Logger('BrainControllerAPIHandler');
@@ -76,6 +77,8 @@ const createResponse = (statusCode: number, body: any): APIGatewayProxyResult =>
     statusCode,
     headers: {
       'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Credentials': true,
     },
     body: JSON.stringify(body)
   };
@@ -84,23 +87,20 @@ const createResponse = (statusCode: number, body: any): APIGatewayProxyResult =>
 /**
  * Extracts and validates the user ID from the request
  * @param event API Gateway event
- * @returns User ID from the authorizer
+ * @returns User ID from auth utilities
  */
 const extractUserId = (event: APIGatewayProxyEvent): string => {
   try {
-    // Extract user ID from the authorizer context 
-    if (event.requestContext.authorizer) {
-      const userId = event.requestContext.authorizer.userId;
-      
-      if (userId && userId.trim() !== '') {
-        logger.info('Extracted user ID from authorizer context', { userId });
-        return userId;
-      }
+    // Use the central auth utility function
+    const userId = extractUserIdFromAuth(event, logger);
+    
+    if (!userId) {
+      logger.warn('No user ID found in request');
+      throw new Error('User authentication required');
     }
     
-    // Log if we couldn't extract a user ID
-    logger.warn('Could not extract user ID from authorizer context');
-    throw new Error('User authentication required');
+    logger.info('Extracted user ID', { userId });
+    return userId;
   } catch (error) {
     logger.error('Error extracting user ID:', error);
     throw new Error('User authentication required');
@@ -474,6 +474,144 @@ const handleGetMCPCommandStatus = async (event: APIGatewayProxyEvent): Promise<A
 };
 
 /**
+ * Handles requests to get brain configuration
+ * @param event API Gateway event
+ * @param brainName The name of the brain
+ * @returns API Gateway response
+ */
+const handleGetBrainConfig = async (event: APIGatewayProxyEvent, brainName: string): Promise<APIGatewayProxyResult> => {
+  try {
+    // Extract user ID - will throw if not present
+    const userId = extractUserId(event);
+    logger.info('Handling request to get brain config', { userId, brainName });
+    
+    // For now, just return some default config from the brain
+    // In a full implementation, we would fetch this from the repository
+    const config = {
+      brainName: brainName || 'default',
+      modelId: "meta.llama3-70b-instruct-v1:0",
+      provider: "bedrock",
+      nickname: "Mr Smith",
+      systemPrompt: "You are a helpful AI assistant.",
+      persona: "A helpful and knowledgeable AI assistant that talks like a pirate."
+    };
+    
+    logger.info('Successfully retrieved brain configuration', { 
+      userId,
+      brainName 
+    });
+    
+    return createResponse(200, {
+      config,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    logger.error('Error getting brain config:', error);
+    
+    // If this is an authentication error, return 401
+    if (error instanceof Error && error.message === 'User authentication required') {
+      return createResponse(401, {
+        error: 'Authentication required',
+        timestamp: new Date().toISOString()
+      });
+    }
+    
+    // Otherwise, return a 500 error
+    return createResponse(500, {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      timestamp: new Date().toISOString()
+    });
+  }
+};
+
+/**
+ * Handles generic tool execution requests
+ * This allows direct tool invocation without knowing tool-specific details
+ * @param event API Gateway event
+ * @returns API Gateway response
+ */
+const handleUseToolRequest = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+  try {
+    // Extract user ID - will throw if not present
+    const userId = extractUserId(event);
+    
+    // Parse request body
+    const body = JSON.parse(event.body || '{}');
+    const { toolName, parameters } = body;
+    
+    logger.info('Handling request to use tool', { 
+      userId,
+      toolName,
+      parameters
+    });
+    
+    // Validate required fields
+    if (!toolName) {
+      return createResponse(400, {
+        error: 'Missing required field: toolName',
+        timestamp: new Date().toISOString()
+      });
+    }
+    
+    if (!parameters || typeof parameters !== 'object') {
+      return createResponse(400, {
+        error: 'Missing or invalid parameters: must be an object',
+        timestamp: new Date().toISOString()
+      });
+    }
+    
+    // Generate a connection ID for API requests
+    const connectionId = `api_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    
+    // Generate request ID
+    const requestId = body.requestId || `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    
+    // Send the MCP request through the brain controller
+    await brainController.sendMCPRequest(
+      {
+        requestType: 'tool',
+        requestId,
+        toolName,
+        parameters
+      },
+      connectionId,
+      userId,
+      body.conversationId
+    );
+    
+    logger.info('Successfully queued tool request', { 
+      requestId,
+      toolName,
+      userId
+    });
+    
+    // Return success response with the request ID
+    return createResponse(202, {
+      requestId,
+      status: 'queued',
+      message: `Tool request '${toolName}' queued for processing`,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    logger.error('Error executing tool request:', error);
+    
+    // If this is an authentication error, return 401
+    if (error instanceof Error && error.message === 'User authentication required') {
+      return createResponse(401, {
+        error: 'Authentication required',
+        timestamp: new Date().toISOString()
+      });
+    }
+    
+    // Otherwise, return a 500 error
+    return createResponse(500, {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      timestamp: new Date().toISOString()
+    });
+  }
+};
+
+/**
  * Main Lambda handler for processing API Gateway requests
  * @param event API Gateway event
  * @returns API Gateway response
@@ -483,43 +621,110 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
     // Ensure controller is initialized
     await ensureInitialized();
     
-    // Extract action from path parameter
+    // Extract path parameters
+    const brainName = event.pathParameters?.name || 'default';
     const action = event.pathParameters?.action || '';
+    const noun = event.pathParameters?.noun || '';
     
-    logger.info('Received request', {
-      action,
-      path: event.path,
-      method: event.httpMethod
+    // Detailed event logging for troubleshooting
+    logger.info('Raw API Gateway event structure', { 
+      eventKeys: Object.keys(event),
+      hasRequestContext: !!event.requestContext,
+      requestContextKeys: event.requestContext ? Object.keys(event.requestContext) : [],
+      hasHeaders: !!event.headers,
+      hasPathParameters: !!event.pathParameters,
+      hasQueryStringParameters: !!event.queryStringParameters,
+      hasBody: !!event.body
     });
     
-    // Route request based on action
-    switch (action) {
-      case 'mcp-tools':
-        return handleListMCPTools(event);
+    // Enhanced logging to troubleshoot missing path/method
+    logger.info('Received request', {
+      brainName,
+      action,
+      noun,
+      path: event.path,
+      method: event.httpMethod,
+      pathParameters: event.pathParameters,
+      requestContext: {
+        path: event.requestContext?.path,
+        resourcePath: event.requestContext?.resourcePath,
+        httpMethod: event.requestContext?.httpMethod,
+        stage: event.requestContext?.stage,
+        apiId: event.requestContext?.apiId
+      },
+      headers: Object.keys(event.headers || {})
+    });
+    
+    // Handle the request based on the action and noun
+    if (action === 'list') {
+      // List actions
+      switch (noun) {
+        case 'mcp':
+          return handleListAllMCPComponents(event);
         
-      case 'mcp-transformers':
-        return handleListMCPTransformers(event);
+        case 'tools':
+          return handleListMCPTools(event);
         
-      case 'mcp-prompts':
-        return handleListMCPPrompts(event);
+        case 'transformers':
+          return handleListMCPTransformers(event);
         
-      case 'mcp-resources':
-        return handleListMCPResources(event);
+        case 'prompts':
+          return handleListMCPPrompts(event);
         
-      case 'mcp-all':
-        return handleListAllMCPComponents(event);
-        
-      case 'mcp-execute':
-        return handleExecuteMCPCommand(event);
-        
-      case 'mcp-status':
-        return handleGetMCPCommandStatus(event);
-        
-      default:
-        return createResponse(400, {
-          error: `Unsupported action: ${action}`,
-          timestamp: new Date().toISOString()
-        });
+        case 'resources':
+          return handleListMCPResources(event);
+          
+        case 'config':
+          return handleGetBrainConfig(event, brainName);
+          
+        default:
+          return createResponse(400, {
+            error: `Unsupported resource type: ${noun}`,
+            timestamp: new Date().toISOString()
+          });
+      }
+    } else if (action === 'execute') {
+      // Execute actions
+      switch (noun) {
+        case 'command':
+          return handleExecuteMCPCommand(event);
+          
+        default:
+          return createResponse(400, {
+            error: `Unsupported execution type: ${noun}`,
+            timestamp: new Date().toISOString()
+          });
+      }
+    } else if (action === 'use') {
+      // Tool usage actions
+      switch (noun) {
+        case 'tool':
+          return handleUseToolRequest(event);
+          
+        default:
+          return createResponse(400, {
+            error: `Unsupported use target: ${noun}`,
+            timestamp: new Date().toISOString()
+          });
+      }
+    } else if (action === 'status') {
+      // Status actions
+      switch (noun) {
+        case 'command':
+          return handleGetMCPCommandStatus(event);
+          
+        default:
+          return createResponse(400, {
+            error: `Unsupported status type: ${noun}`,
+            timestamp: new Date().toISOString()
+          });
+      }
+    } else {
+      // Unsupported action
+      return createResponse(400, {
+        error: `Unsupported action: ${action}`,
+        timestamp: new Date().toISOString()
+      });
     }
   } catch (error) {
     logger.error('Error processing request:', error);

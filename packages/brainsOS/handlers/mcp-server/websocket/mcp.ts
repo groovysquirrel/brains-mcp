@@ -7,8 +7,8 @@
 
 import { Logger } from '../../../utils/logging/logger';
 import { MCPServer } from '../../../modules/mcp-server/src/MCPServer';
-import { ConnectionManager } from '../utils/connectionManager';
-import { WebSocketEvent } from '../websocketTypes';
+import { ConnectionManager } from '../../system/websocket/connectionManager';
+import { WebSocketEvent } from '../../system/websocket/websocketTypes';
 import {
   ToolRequest,
   ToolResponse,

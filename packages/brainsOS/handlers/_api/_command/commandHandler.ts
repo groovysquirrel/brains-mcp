@@ -1,12 +1,12 @@
 import { APIGatewayProxyHandlerV2 } from "aws-lambda";
-import { validateUser } from '../../auth/validateUser';
+import { validateUser } from '../../system/auth/validateUser';
 import { logRequest } from '../../../utils/logging/requestLogger';
 import { parseCommand } from '../../../system/commands/_core/parser/commandParser';
 import { CommandRequest, CommandRequestSchema } from '../../../system/types/api/commands/commandTypes';
 import { createResponse } from '../../../utils/http/response';
 import { handleCommand } from './commandExecutor';
 import { APIGatewayProxyHandlerV2WithIAMAuthorizer } from "aws-lambda";
-import { createUserContext } from '../../auth/createUserContext';
+import { createUserContext } from '../../system/auth/createUserContext';
 
 export const handler: APIGatewayProxyHandlerV2WithIAMAuthorizer = async (event, context) => {
   const requestId = event.requestContext.requestId;

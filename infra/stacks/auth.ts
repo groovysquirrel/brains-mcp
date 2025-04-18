@@ -1,5 +1,3 @@
-import { brainsOS_API } from "./api";
-
 export const bedrockPermissions = {
   actions: [
     'bedrock:ListFoundationModels',
@@ -9,10 +7,6 @@ export const bedrockPermissions = {
   ],
   resources: ['*']
 };
-
-const region = aws.getRegionOutput().name;
-
-
 
 export const brainsOS_userPool = new sst.aws.CognitoUserPool("brainsOS_userPool", {
   usernames: ["email"],
@@ -26,12 +20,10 @@ export const brainsOS_userPoolClient = brainsOS_userPool.addClient("brainsOS_use
         "ALLOW_REFRESH_TOKEN_AUTH",
         "ALLOW_USER_SRP_AUTH"
       ];
-      
       // Set explicit token validity periods (in minutes)
       args.accessTokenValidity = 1; // 1 hour
       args.idTokenValidity = 1;     // 1 hour
       args.refreshTokenValidity = 1440; // 1 day
-      
     }
   }
 });
@@ -39,41 +31,15 @@ export const brainsOS_userPoolClient = brainsOS_userPool.addClient("brainsOS_use
 export const brainsOS_identityPool = new sst.aws.CognitoIdentityPool("brainsOS_identityPool", {
   userPools: [
     {
-      
       userPool: brainsOS_userPool.id,
       client: brainsOS_userPoolClient.id,
     },
   ],
-  // Is this handled by the authorizer?
-  // permissions: {
-  //   authenticated: [
-
-  //     {
-  //       actions: [
-  //         "execute-api:*",
-  //       ],
-  //       resources: [
-  //         $concat(
-  //           "arn:aws:execute-api:",
-  //           region,
-  //           ":",
-  //           aws.getCallerIdentityOutput({}).accountId,
-  //           ":",
-  //           brainsOS_API.nodes.api.id,
-  //           "/*/*/*"
-  //         ),
-  //       ],
-
-
-  //     },
-
-  //   ],
-  // },
 });
 
 
 export const authFunction = new sst.aws.Function("authFunction", {
-  handler: "packages/brainsOS/handlers/auth/authorizer.handler",
+  handler: "packages/brainsOS/handlers/system/auth/authorizer.handler",
   link: [brainsOS_userPool, brainsOS_userPoolClient],
 });
 

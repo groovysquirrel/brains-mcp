@@ -15,10 +15,10 @@
 import { Logger } from '../../../utils/logging/logger';
 import { Gateway, ConversationOptions } from '../../../modules/llm-gateway/src/Gateway';
 import { GatewayRequest } from '../../../modules/llm-gateway/src/types/Request';
-import { ConnectionManager } from '../utils/connectionManager';
-import { StreamHandler } from './streamHandler';
+import { ConnectionManager } from '../../system/websocket/connectionManager';
+import { StreamHandler } from '../../llm-gateway/websocket/streamHandler';
 import { Resource } from 'sst';
-import { WebSocketEvent } from '../websocketTypes';
+import { WebSocketEvent } from '../../system/websocket/websocketTypes';
 
 
 // Initialize logging and connection management

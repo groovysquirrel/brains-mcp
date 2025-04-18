@@ -4,63 +4,14 @@ import { BrainResponse, createErrorResponse, createTerminalResponse, createProce
 import { BrainsRepository } from './repositories/brains/BrainsRepository';
 import { Logger } from './utils/logging/Logger';
 import { Gateway } from '../../llm-gateway/src/Gateway';
+import { MCPServer } from '../../mcp-server/src/MCPServer';
 import * as fs from 'fs';
 import * as path from 'path';
 import { SQSClient, SendMessageCommand } from '@aws-sdk/client-sqs';
 import { Resource } from 'sst';
 import { extractMCPCommands, MCPCommand } from './utils/mcpParser';
+import { MCPTool, MCPTransformer, MCPPrompt, MCPResource, MCPToolRequest } from './types/MCPRequests';
 
-// MCP related types
-interface MCPTool {
-    name: string;
-    description: string;
-    schema: {
-        type: string;
-        function: {
-            name: string;
-            description: string;
-            parameters: {
-                type: string;
-                properties: Record<string, any>;
-                required?: string[];
-            };
-        };
-    };
-}
-
-interface MCPToolRequest {
-    requestType: 'tool';
-    requestId: string;
-    toolName: string;
-    parameters: Record<string, any>;
-}
-
-/**
- * MCP related types for different resource categories
- */
-interface MCPTransformer {
-    name: string;
-    description: string;
-    schema: {
-        type: string;
-        objectType: string;
-        views: string[];
-    };
-}
-
-interface MCPPrompt {
-    name: string;
-    description: string;
-    templateText: string;
-    parameters?: Record<string, any>;
-}
-
-interface MCPResource {
-    name: string;
-    description: string;
-    type: string;
-    data: any;
-}
 
 /**
  * Controller for managing brain operations and conversation state
@@ -78,6 +29,7 @@ export class BrainController {
     private availableMCPPrompts: MCPPrompt[] = [];
     private availableMCPResources: MCPResource[] = [];
     private sqsClient: SQSClient;
+    private mcpServer: MCPServer | null = null;
 
     constructor(options?: {
         repository?: BrainsRepository;
@@ -127,7 +79,11 @@ export class BrainController {
             this.logger.info('Loaded brain configurations:', brains);
             await this.gateway.initialize('local');
             
-            // Fetch available MCP tools
+            // Initialize the MCP server
+            this.mcpServer = await MCPServer.create();
+            await this.mcpServer.initialize();
+            
+            // Fetch available MCP components
             await this.fetchAllMCPComponents();
             
             this.logger.info('BrainController initialized successfully');
@@ -142,20 +98,19 @@ export class BrainController {
      */
     private async fetchMCPTools(): Promise<void> {
         try {
-            // Make request to MCP server's list endpoint
-            const response = await fetch(`${process.env.API_URL}/latest/mcp/index/tool`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
-            
-            if (!response.ok) {
-                throw new Error(`Failed to fetch MCP tools: ${response.statusText}`);
+            if (!this.mcpServer) {
+                throw new Error('MCP Server not initialized');
             }
             
-            const tools = await response.json();
-            this.availableMCPTools = tools;
+            // Get tools directly from MCPServer
+            const tools = await this.mcpServer.listTools();
+            
+            // Adapt tools to our internal format
+            this.availableMCPTools = tools.map(tool => ({
+                name: tool.name,
+                description: tool.description,
+                schema: tool.schema
+            }));
             
             this.logger.info('Fetched MCP tools successfully', { 
                 toolCount: this.availableMCPTools.length,
@@ -172,20 +127,23 @@ export class BrainController {
      */
     private async fetchMCPTransformers(): Promise<void> {
         try {
-            // Make request to MCP server's list endpoint
-            const response = await fetch(`${process.env.API_URL}/latest/mcp/index/transformer`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
-            
-            if (!response.ok) {
-                throw new Error(`Failed to fetch MCP transformers: ${response.statusText}`);
+            if (!this.mcpServer) {
+                throw new Error('MCP Server not initialized');
             }
             
-            const transformers = await response.json();
-            this.availableMCPTransformers = transformers;
+            // Get transformers directly from MCPServer
+            const transformers = await this.mcpServer.listTransformers();
+            
+            // Adapt transformers to our internal format
+            this.availableMCPTransformers = transformers.map(t => ({
+                name: t.name,
+                description: t.description,
+                schema: {
+                    type: 'transformer',
+                    objectType: t.objectType,
+                    views: [t.fromView, t.toView]
+                }
+            }));
             
             this.logger.info('Fetched MCP transformers successfully', { 
                 transformerCount: this.availableMCPTransformers.length,
@@ -202,20 +160,21 @@ export class BrainController {
      */
     private async fetchMCPPrompts(): Promise<void> {
         try {
-            // Make request to MCP server's list endpoint
-            const response = await fetch(`${process.env.API_URL}/latest/mcp/index/prompt`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
-            
-            if (!response.ok) {
-                throw new Error(`Failed to fetch MCP prompts: ${response.statusText}`);
+            if (!this.mcpServer) {
+                throw new Error('MCP Server not initialized');
             }
             
-            const prompts = await response.json();
-            this.availableMCPPrompts = prompts;
+            // For now, we're still accessing the promptRepository directly
+            // In a future refactor, MCPServer should provide a listPrompts method
+            const prompts = await this.mcpServer['promptRepository'].listPrompts();
+            
+            // Adapt prompts to our internal format
+            this.availableMCPPrompts = prompts.map(p => ({
+                name: p.name,
+                description: p.metadata?.description || `Prompt: ${p.name}`,
+                templateText: p.content,
+                parameters: p.metadata?.parameters
+            }));
             
             this.logger.info('Fetched MCP prompts successfully', { 
                 promptCount: this.availableMCPPrompts.length,
@@ -232,20 +191,21 @@ export class BrainController {
      */
     private async fetchMCPResources(): Promise<void> {
         try {
-            // Make request to MCP server's list endpoint
-            const response = await fetch(`${process.env.API_URL}/latest/mcp/index/resource`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
-            
-            if (!response.ok) {
-                throw new Error(`Failed to fetch MCP resources: ${response.statusText}`);
+            if (!this.mcpServer) {
+                throw new Error('MCP Server not initialized');
             }
             
-            const resources = await response.json();
-            this.availableMCPResources = resources;
+            // For now, we're still accessing the resourceRepository directly
+            // In a future refactor, MCPServer should provide a listResources method
+            const resources = await this.mcpServer['resourceRepository'].listResources();
+            
+            // Adapt resources to our internal format
+            this.availableMCPResources = resources.map(r => ({
+                name: r.name,
+                description: r.metadata?.description || `Resource: ${r.name}`,
+                type: r.type,
+                data: r.content
+            }));
             
             this.logger.info('Fetched MCP resources successfully', { 
                 resourceCount: this.availableMCPResources.length,

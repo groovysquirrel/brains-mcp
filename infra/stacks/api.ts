@@ -24,7 +24,7 @@ export const brainsOS_API = new sst.aws.ApiGatewayV2("brainsOS_API", {
 brainsOS_API.addAuthorizer({
   name: "api-gateway-authorizer",
   lambda: {
-    function: "packages/brainsOS/handlers/auth/authorizer.handler"
+    function: "packages/brainsOS/handlers/system/auth/authorizer.handler"
   }
 });
 

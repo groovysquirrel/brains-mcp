@@ -77,6 +77,10 @@ declare module "sst" {
       "name": string
       "type": "sst.aws.Function"
     }
+    "brainsControllerWebsocketMcpRespnseHandlerFunction": {
+      "name": string
+      "type": "sst.aws.Function"
+    }
     "brainsOS_API": {
       "type": "sst.aws.ApiGatewayV2"
       "url": string

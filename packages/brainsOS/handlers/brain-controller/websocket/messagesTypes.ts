@@ -1,5 +1,3 @@
-import { TerminalMessage, TerminalResponse, TerminalError } from '../controller/messagesTypes';
-
 /**
  * Extended message types for brain controller
  */
@@ -31,6 +29,22 @@ export interface BrainResponse {
 }
 
 /**
+ * Terminal message interface
+ */
+export interface TerminalMessage {
+    type: string;
+    data: {
+        rawData: string;
+        requestStreaming: boolean;
+        commandId: string;
+        timestamp: string;
+        source?: string;
+        content?: string;
+        [key: string]: any;
+    };
+}
+
+/**
  * Type guard to check if a message is a BrainMessage
  */
 export const isBrainMessage = (message: any): message is BrainMessage => {
@@ -44,6 +58,21 @@ export const isBrainMessage = (message: any): message is BrainMessage => {
         typeof message.data.commandId === 'string' &&
         typeof message.data.timestamp === 'string' &&
         message.data.source === 'terminal'
+    );
+};
+
+/**
+ * Type guard to check if a message is a TerminalMessage
+ */
+export const isTerminalMessage = (message: any): message is TerminalMessage => {
+    return (
+        message &&
+        typeof message.type === 'string' &&
+        typeof message.data === 'object' &&
+        typeof message.data.rawData === 'string' &&
+        typeof message.data.requestStreaming === 'boolean' &&
+        typeof message.data.commandId === 'string' &&
+        typeof message.data.timestamp === 'string'
     );
 };
 

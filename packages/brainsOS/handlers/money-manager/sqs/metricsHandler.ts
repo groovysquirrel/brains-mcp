@@ -11,7 +11,7 @@ lookup cost information from the gateway?
 */
 
 // Initialize logger and SQS client
-const logger = new Logger('MetricsHandler');
+const logger = new Logger('MetricsHandler-SQS');
 const sqsClient = new SQSClient({});
 
 // Initialize Money Manager

@@ -14,7 +14,7 @@
  */
 
 import { Logger } from '../../../utils/logging/logger';
-import { ConnectionManager } from '../utils/connectionManager';
+import { ConnectionManager } from '../../system/websocket/connectionManager';
 import { GatewayResponse } from '../../../modules/llm-gateway/src/types/Response';
 
 const logger = new Logger('StreamHandler');

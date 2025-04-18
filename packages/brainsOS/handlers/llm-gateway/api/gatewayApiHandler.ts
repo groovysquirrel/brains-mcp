@@ -16,7 +16,7 @@ import { Logger } from '../../../utils/logging/logger';
 import { Gateway, ConversationOptions } from '../../../modules/llm-gateway/src/Gateway';
 import { GatewayRequest } from '../../../modules/llm-gateway/src/types/Request';
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { extractUserId as extractUserIdFromAuth, requireUserId } from '../../auth/authUtils';
+import { extractUserId as extractUserIdFromAuth, requireUserId } from '../../system/auth/authUtils';
 
 // Initialize logging
 const logger = new Logger('LLMGatewayAPIHandler');

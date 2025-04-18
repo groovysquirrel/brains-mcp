@@ -1,6 +1,5 @@
 import { getDomainName } from "../config";
 import { authFunction} from "./auth";
-import { brainsOS_userData } from "./database";
 
 export const brainsOS_wss = new sst.aws.ApiGatewayWebSocket("brainsOS_wss", {
   domain: {
@@ -8,18 +7,20 @@ export const brainsOS_wss = new sst.aws.ApiGatewayWebSocket("brainsOS_wss", {
   },
 });
 
-
-
-const connectHandlerFunction = new sst.aws.Function("connectHandlerFunction", {
-  handler: "packages/brainsOS/handlers/websocket/util/connect.handler",
+const wss_defaultHandlerFunction = new sst.aws.Function("wss_defaultHandlerFunction", {
+  handler: "packages/brainsOS/handlers/system/websocket/default.handler",
 });
 
-const disconnectHandlerFunction = new sst.aws.Function("disconnectHandlerFunction", {
-  handler: "packages/brainsOS/handlers/websocket/util/disconnect.handler",
+const wss_connectHandlerFunction = new sst.aws.Function("wss_connectHandlerFunction", {
+  handler: "packages/brainsOS/handlers/system/websocket/connect.handler",
+});
+
+const wss_disconnectHandlerFunction = new sst.aws.Function("wss_disconnectHandlerFunction", {
+  handler: "packages/brainsOS/handlers/system/websocket/disconnect.handler",
 });
 
 //Add a Lambda authorizer for the WebSocket API
-const authorizer = brainsOS_wss.addAuthorizer("llm-gateway-authorizer", {
+const wss_authorizer = brainsOS_wss.addAuthorizer("wss_authorizer", {
     lambda: {
       function: authFunction.arn,
       identitySources: ["route.request.querystring.token"]
@@ -28,12 +29,12 @@ const authorizer = brainsOS_wss.addAuthorizer("llm-gateway-authorizer", {
 });
 
 // Common routes
-brainsOS_wss.route("$connect", connectHandlerFunction.arn,  {
-  auth: {
-      lambda: authorizer.id
-  },
-
+brainsOS_wss.route("$connect", wss_connectHandlerFunction.arn,  {
+  auth: {lambda: wss_authorizer.id },
 });
-brainsOS_wss.route("$disconnect", disconnectHandlerFunction.arn, {});
+
+brainsOS_wss.route("$disconnect", wss_disconnectHandlerFunction.arn, {});
+
+brainsOS_wss.route("$default", wss_defaultHandlerFunction.arn);
 
 

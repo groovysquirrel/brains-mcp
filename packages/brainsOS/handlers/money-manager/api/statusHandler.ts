@@ -11,7 +11,7 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { Logger } from '../../../utils/logging/logger';
 import { Resource } from 'sst';
 import { MoneyManager } from '../../../modules/money-manager/src/money-manager';
-import { requireUserInfo } from '../../auth/authUtils';
+import { requireUserInfo } from '../../system/auth/authUtils';
 
 // Initialize logging
 const logger = new Logger('MoneyManagerStatusHandler');
