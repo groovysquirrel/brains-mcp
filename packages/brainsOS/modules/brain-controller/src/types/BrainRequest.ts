@@ -5,7 +5,7 @@ import { BrainConfig } from './BrainConfig';
  */
 export interface BrainRequest {
     /** The action to perform */
-    action: string;
+    action: 'brain/terminal/request' | 'brain/chat/request' | 'brain/list/request' | 'brain/get/request' | 'brain/mcp/request';
     
     /** The request data */
     data: {
@@ -39,6 +39,19 @@ export function isBrainRequest(obj: any): obj is BrainRequest {
         typeof obj === 'object' &&
         obj !== null &&
         typeof obj.action === 'string' &&
+        (
+            obj.action === 'brain/terminal/request' ||
+            obj.action === 'brain/chat/request' ||
+            obj.action === 'brain/list/request' ||
+            obj.action === 'brain/get/request' ||
+            obj.action === 'brain/mcp/request' ||
+            // For backward compatibility
+            obj.action === 'brain/terminal' ||
+            obj.action === 'brain/chat' ||
+            obj.action === 'brain/list' ||
+            obj.action === 'brain/get' ||
+            obj.action === 'brain/mcp'
+        ) &&
         typeof obj.data === 'object' &&
         obj.data !== null
     );

@@ -1,7 +1,9 @@
 import { APIGatewayProxyWebsocketEventV2WithRequestContext } from 'aws-lambda';
 import { Logger } from '../../../utils/logging/logger';
+import { ConnectionManager } from './connectionManager';
 
 const logger = new Logger('Websocket Connect');
+const connectionManager = ConnectionManager.getInstance();
 
 // Define custom request context type with authorizer
 interface CustomRequestContext {
@@ -36,15 +38,14 @@ export const handler = async (event: APIGatewayProxyWebsocketEventV2WithRequestC
   const email = event.requestContext.authorizer?.email;
 
   try {
-    // Store connection info in DynamoDB or other storage if needed
-    // logger.info('New WebSocket connection established', {
-    //   connectionId,
-    //   userId,
-    //   email,
-    //   authorizer: event.requestContext.authorizer,
-    //   requestContext: event.requestContext
-    // });
-    logger.info('New WebSocket connection established');
+    // Store connection in DynamoDB using ConnectionManager
+    await connectionManager.addConnection(connectionId, userId);
+    
+    logger.info('New WebSocket connection established and stored', {
+      connectionId,
+      userId,
+      email
+    });
 
     return {
       statusCode: 200,
@@ -60,12 +61,10 @@ export const handler = async (event: APIGatewayProxyWebsocketEventV2WithRequestC
     };
   } catch (error) {
     logger.error('Error in WebSocket connect handler:', {
-      error,
+      error: error instanceof Error ? error.message : String(error),
       connectionId,
       userId,
-      email,
-      authorizer: event.requestContext.authorizer,
-      requestContext: event.requestContext
+      email
     });
 
     return {
@@ -74,7 +73,7 @@ export const handler = async (event: APIGatewayProxyWebsocketEventV2WithRequestC
         success: false,
         error: {
           code: 'CONNECTION_ERROR',
-          message: error.message || 'Failed to establish connection'
+          message: error instanceof Error ? error.message : 'Failed to establish connection'
         },
         metadata: {
           connectionId,

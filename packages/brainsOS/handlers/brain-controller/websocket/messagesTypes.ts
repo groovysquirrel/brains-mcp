@@ -1,8 +1,16 @@
 /**
- * Extended message types for brain controller
+ * Message types for brain controller WebSocket communications
+ */
+
+// -------------------------------------------------------------------------
+// Request Message Types
+// -------------------------------------------------------------------------
+
+/**
+ * Brain request message interface
  */
 export interface BrainMessage {
-    action: 'brain/chat' | 'brain/list' | 'brain/get';
+    action: 'brain/terminal/request' | 'brain/chat/request' | 'brain/list/request' | 'brain/get/request' | 'brain/mcp/request';
     data: {
         rawData: string;
         requestStreaming: boolean;
@@ -11,25 +19,15 @@ export interface BrainMessage {
         source: 'terminal';
         brainName?: string;
         conversationId?: string;
-    };
-}
-
-export interface BrainResponse {
-    type: 'terminal' | 'error' | 'processing';
-    data: {
-        content?: string;
-        source?: string;
-        timestamp?: string;
-        commandId?: string;
-        brainName?: string;
-        conversationId?: string;
-        message?: string;
-        metadata?: Record<string, any>;
+        messages?: Array<{
+            role: string;
+            content: string;
+        }>;
     };
 }
 
 /**
- * Terminal message interface
+ * Legacy terminal message interface (for backward compatibility)
  */
 export interface TerminalMessage {
     type: string;
@@ -44,6 +42,37 @@ export interface TerminalMessage {
     };
 }
 
+// -------------------------------------------------------------------------
+// Response Message Types
+// -------------------------------------------------------------------------
+
+/**
+ * Response message types
+ */
+export type ResponseType = 'brain/terminal/response' | 'brain/terminal/error' | 'brain/terminal/status';
+
+/**
+ * Brain response interface
+ */
+export interface BrainResponse {
+    type: ResponseType;
+    data: {
+        content?: string;
+        source?: string;
+        timestamp?: string;
+        commandId?: string;
+        brainName?: string;
+        conversationId?: string;
+        message?: string;
+        metadata?: Record<string, any>;
+        status?: 'queued' | 'processing' | 'completed' | 'failed';
+    };
+}
+
+// -------------------------------------------------------------------------
+// Type Guards
+// -------------------------------------------------------------------------
+
 /**
  * Type guard to check if a message is a BrainMessage
  */
@@ -51,9 +80,25 @@ export const isBrainMessage = (message: any): message is BrainMessage => {
     return (
         message &&
         typeof message.action === 'string' &&
-        message.action.startsWith('brain/') &&
+        (
+            message.action === 'brain/terminal/request' ||
+            message.action === 'brain/chat/request' ||
+            message.action === 'brain/list/request' ||
+            message.action === 'brain/get/request' ||
+            message.action === 'brain/mcp/request' ||
+            // For backward compatibility
+            message.action === 'brain/terminal' ||
+            message.action === 'brain/chat' ||
+            message.action === 'brain/list' ||
+            message.action === 'brain/get' ||
+            message.action === 'brain/mcp'
+        ) &&
         typeof message.data === 'object' &&
-        typeof message.data.rawData === 'string' &&
+        // Allow either rawData or messages to be provided
+        (
+            (typeof message.data.rawData === 'string') || 
+            (Array.isArray(message.data.messages) && message.data.messages.length > 0)
+        ) &&
         typeof message.data.requestStreaming === 'boolean' &&
         typeof message.data.commandId === 'string' &&
         typeof message.data.timestamp === 'string' &&
@@ -82,7 +127,16 @@ export const isTerminalMessage = (message: any): message is TerminalMessage => {
 export const isBrainResponse = (message: any): message is BrainResponse => {
     return (
         message &&
-        (message.type === 'terminal' || message.type === 'error' || message.type === 'processing') &&
+        typeof message.type === 'string' &&
+        (
+            message.type === 'brain/terminal/response' ||
+            message.type === 'brain/terminal/error' ||
+            message.type === 'brain/terminal/status' ||
+            // For backward compatibility
+            message.type === 'terminal' ||
+            message.type === 'error' ||
+            message.type === 'processing'
+        ) &&
         typeof message.data === 'object'
     );
 }; 

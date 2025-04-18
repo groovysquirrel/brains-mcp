@@ -1,5 +1,6 @@
 import { getDomainName } from "../config";
 import { authFunction} from "./auth";
+import { brainsOS_systemData } from "./database";
 
 export const brainsOS_wss = new sst.aws.ApiGatewayWebSocket("brainsOS_wss", {
   domain: {
@@ -13,10 +14,12 @@ const wss_defaultHandlerFunction = new sst.aws.Function("wss_defaultHandlerFunct
 
 const wss_connectHandlerFunction = new sst.aws.Function("wss_connectHandlerFunction", {
   handler: "packages/brainsOS/handlers/system/websocket/connect.handler",
+  link: [ brainsOS_systemData ],
 });
 
 const wss_disconnectHandlerFunction = new sst.aws.Function("wss_disconnectHandlerFunction", {
   handler: "packages/brainsOS/handlers/system/websocket/disconnect.handler",
+  link: [ brainsOS_systemData ],
 });
 
 //Add a Lambda authorizer for the WebSocket API

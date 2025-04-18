@@ -45,7 +45,12 @@ export const getDocumentClient = (): DynamoDBDocumentClient => {
   return docClient;
 };
 
-export const getServerName = (): string => {
+export const getUserTableName = (): string => {
   // @ts-ignore - This property is added at runtime by SST; the error can be safely ignored
   return Resource.brainsOS_userData.name;
+};
+
+export const getSystemTableName = (): string => {
+  // @ts-ignore - This property is added at runtime by SST; the error can be safely ignored
+  return Resource.brainsOS_systemData.name;
 };

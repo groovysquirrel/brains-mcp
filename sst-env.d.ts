@@ -73,11 +73,15 @@ declare module "sst" {
       "name": string
       "type": "sst.aws.Function"
     }
-    "brainsControllerWebsocketHandlerFunction": {
+    "brain_sqs_mcp_responseHandler": {
       "name": string
       "type": "sst.aws.Function"
     }
-    "brainsControllerWebsocketMcpRespnseHandlerFunction": {
+    "brain_wss_mcp_responseHandler": {
+      "name": string
+      "type": "sst.aws.Function"
+    }
+    "brain_wss_terminalHandler": {
       "name": string
       "type": "sst.aws.Function"
     }
@@ -116,7 +120,11 @@ declare module "sst" {
       "id": string
       "type": "sst.aws.CognitoIdentityPool"
     }
-    "brainsOS_mcpServerRequestQueue": {
+    "brainsOS_queue_mcp_server_request": {
+      "type": "sst.aws.Queue"
+      "url": string
+    }
+    "brainsOS_queue_mcp_server_response": {
       "type": "sst.aws.Queue"
       "url": string
     }
@@ -146,27 +154,31 @@ declare module "sst" {
       "type": "sst.aws.ApiGatewayWebSocket"
       "url": string
     }
-    "connectHandlerFunction": {
+    "llm_gateway_wss_chatFunction": {
       "name": string
       "type": "sst.aws.Function"
     }
-    "disconnectHandlerFunction": {
+    "mcp_server_queue_handlerFunction": {
       "name": string
       "type": "sst.aws.Function"
     }
-    "gwchatFunction": {
-      "name": string
-      "type": "sst.aws.Function"
-    }
-    "mcpServerRequestQueueFunction": {
-      "name": string
-      "type": "sst.aws.Function"
-    }
-    "mcpServerWebSocketFunction": {
+    "mcp_server_wss_requestHandlerFunction": {
       "name": string
       "type": "sst.aws.Function"
     }
     "writeMetricsFunction": {
+      "name": string
+      "type": "sst.aws.Function"
+    }
+    "wss_connectHandlerFunction": {
+      "name": string
+      "type": "sst.aws.Function"
+    }
+    "wss_defaultHandlerFunction": {
+      "name": string
+      "type": "sst.aws.Function"
+    }
+    "wss_disconnectHandlerFunction": {
       "name": string
       "type": "sst.aws.Function"
     }

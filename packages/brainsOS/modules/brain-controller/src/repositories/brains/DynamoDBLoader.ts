@@ -1,4 +1,4 @@
-import { BrainConfig, DEFAULT_BRAIN_CONFIG } from '../../types/BrainConfig';
+import { BrainConfig } from '../../types/BrainConfig';
 
 /**
  * Loads brain configurations from DynamoDB
@@ -12,6 +12,6 @@ export class DynamoDBLoader {
     public async loadConfigs(): Promise<BrainConfig[]> {
         // TODO: Implement DynamoDB integration
         console.warn('DynamoDBLoader not implemented yet, returning default configuration');
-        return [DEFAULT_BRAIN_CONFIG];
+        return ;//[DEFAULT_BRAIN_CONFIG];
     }
 } 

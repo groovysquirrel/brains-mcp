@@ -1,26 +1,6 @@
-/*
-|  +265ms      [2025-04-17T16:50:04.706Z] [BrainControllerAPIHandler] Successfully queued tool request {
-    |  +265ms        requestId: 'req_1744908604462_s91exadyg',
-    |  +265ms        toolName: 'calculator',
-    |  +265ms        userId: 'c4389418-5071-7055-0330-a36545bd8601'
-    |  +265ms      }
-
-*/
-
-/*
-
-Processing message:
-{"requestId":"req_1744908604462_s91exadyg",
-"mcpRequest":{"requestType":"tool","requestId":"req
-_1744908604462_s91exadyg","toolName":"calculator","parameter
-s":{"operation":"add","a":5,"b":3}},"responseChannel":"api_1
-744908604462_jjeb728rr","userId":"c4389418-5071-7055-0330-a3
-6545bd8601","timestamp":"2025-04-17T16:50:04.462Z"}
-
-*/
 import { SQSEvent, SQSRecord, Context } from 'aws-lambda';
 import { Logger } from '../../../utils/logging/logger';
-import { SQSClient, DeleteMessageCommand } from '@aws-sdk/client-sqs';
+import { SQSClient, DeleteMessageCommand, SendMessageCommand } from '@aws-sdk/client-sqs';
 import { Resource } from 'sst';
 import { ConnectionManager } from '../../system/websocket/connectionManager';
 import { MCPServer } from '../../../modules/mcp-server/src/MCPServer';
@@ -40,6 +20,7 @@ interface MCPRequestMessage {
     conversationId?: string;
     commandId?: string;
     timestamp: string;
+    brainName?: string;
 }
 
 export const handler = async (event: SQSEvent, context: Context): Promise<void> => {
@@ -65,7 +46,7 @@ export const handler = async (event: SQSEvent, context: Context): Promise<void> 
             const message: MCPRequestMessage = JSON.parse(record.body);
             logger.info(`Processing MCP request: ${JSON.stringify(message)}`);
 
-            const { requestId, mcpRequest, responseChannel, userId } = message;
+            const { requestId, mcpRequest, responseChannel, userId, conversationId, commandId } = message;
             const requestType = mcpRequest.requestType;
             
             // Select the appropriate MCP service based on request type
@@ -100,38 +81,61 @@ export const handler = async (event: SQSEvent, context: Context): Promise<void> 
                     };
             }
             
-            // Prepare a generic response payload
-            const responsePayload = {
+            // Create the complete message for the queue
+            const queueMessage = {
                 requestId,
-                requestType,
-                success: response.success,
-                result: response.success ? response.data : null,
-                error: !response.success ? extractErrorMessage(response) : '',
-                timestamp: new Date().toISOString(),
-                // Add request-type specific fields
-                ...(requestType === 'tool' && { toolName: mcpRequest.toolName }),
-                ...(requestType === 'transformer' && { 
-                    objectType: mcpRequest.objectType,
-                    fromView: mcpRequest.fromView,
-                    toView: mcpRequest.toView
-                })
+                mcpRequest,
+                responseChannel,
+                userId,
+                conversationId,
+                commandId,
+                brainName: message.brainName || 'default',
+                timestamp: new Date().toISOString()
             };
 
-            // Send response to the WebSocket connection
+            // Prepare a generic response payload
+            const responsePayload = {
+                action: 'brain/mcp/response',
+                data: {
+                    requestId,
+                    requestType,
+                    success: response.success,
+                    result: response.success ? response.data : null,
+                    error: !response.success ? extractErrorMessage(response) : '',
+                    timestamp: new Date().toISOString(),
+                    responseChannel,
+                    userId,
+                    conversationId,
+                    commandId,
+                    brainName: message.brainName || 'default',
+                    // Add request-type specific fields
+                    ...(requestType === 'tool' && { toolName: mcpRequest.toolName }),
+                    ...(requestType === 'transformer' && { 
+                        objectType: mcpRequest.objectType,
+                        fromView: mcpRequest.fromView,
+                        toView: mcpRequest.toView
+                    })
+                }
+            };
+
+            // Send response to the response queue instead of directly to WebSocket
             if (responseChannel) {
                 try {
-                    logger.info(`Sending ${requestType} response to channel: ${responseChannel}`, {
-                        success: response.success
+                    logger.info(`Sending ${requestType} response to response queue`, {
+                        success: response.success,
+                        responseChannel,
+                        requestId
                     });
                     
-                    await connectionManager.sendMessage(responseChannel, {
-                        type: 'rain/mcp/response',
-                        data: responsePayload
-                    });
+                    // Send to SQS response queue
+                    await sqsClient.send(new SendMessageCommand({
+                        QueueUrl: Resource.brainsOS_queue_mcp_server_response.url,
+                        MessageBody: JSON.stringify(responsePayload)
+                    }));
                     
-                    logger.info(`Successfully sent response to channel: ${responseChannel}`);
-                } catch (wsError) {
-                    logger.error(`Error sending response to WebSocket:`, wsError);
+                    logger.info(`Successfully sent response to queue for channel: ${responseChannel}`);
+                } catch (sqsError) {
+                    logger.error(`Error sending response to SQS queue:`, sqsError);
                 }
             } else {
                 logger.warn(`No response channel provided for request: ${requestId}`);
@@ -140,7 +144,7 @@ export const handler = async (event: SQSEvent, context: Context): Promise<void> 
             // Delete the processed message from the queue
             try {
                 await sqsClient.send(new DeleteMessageCommand({
-                    QueueUrl: Resource.brainsOS_mcpServerRequestQueue.url,
+                    QueueUrl: Resource.brainsOS_queue_mcp_server_request.url,
                     ReceiptHandle: record.receiptHandle
                 }));
                 logger.info(`Deleted processed message from queue: ${requestId}`);
@@ -153,7 +157,7 @@ export const handler = async (event: SQSEvent, context: Context): Promise<void> 
             // Still try to delete the message to prevent reprocessing
             try {
                 await sqsClient.send(new DeleteMessageCommand({
-                    QueueUrl: Resource.brainsOS_mcpServerRequestQueue.url,
+                    QueueUrl: Resource.brainsOS_queue_mcp_server_request.url,
                     ReceiptHandle: record.receiptHandle
                 }));
                 logger.info(`Deleted failed message from queue`);

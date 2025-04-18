@@ -17,7 +17,7 @@ import {
   ListConversationsResponse,
   ConversationMessage
 } from '../../types/Conversation';
-import { getDynamoClient, getServerName } from '../../../../utils/aws/DynamoClient';
+import { getDynamoClient, getUserTableName } from '../../../../utils/aws/DynamoClient';
 import { Resource } from 'sst';
 
 /**
@@ -59,7 +59,7 @@ export class DynamoConversationRepository implements ConversationRepository {
   constructor() {
     this.logger = new Logger('DynamoConversationRepository');
     
-    this.tableName = getServerName(); 
+    this.tableName = getUserTableName(); 
     
     // Fallback if the Resource isn't available
     if (!this.tableName) {

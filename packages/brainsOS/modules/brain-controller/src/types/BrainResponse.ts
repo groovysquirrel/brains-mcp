@@ -3,7 +3,7 @@
  */
 export interface BrainResponse {
     /** The type of response */
-    type: 'terminal' | 'error' | 'processing';
+    type: 'brain/terminal/response' | 'brain/terminal/error' | 'brain/terminal/status';
     
     /** The response data */
     data: {
@@ -24,6 +24,9 @@ export interface BrainResponse {
         
         /** Additional response metadata */
         metadata?: Record<string, any>;
+
+        /** Status for status updates */
+        status?: 'queued' | 'processing' | 'completed' | 'failed';
     };
 }
 
@@ -40,7 +43,7 @@ export function createTerminalResponse(
     commandId?: string
 ): BrainResponse {
     return {
-        type: 'terminal',
+        type: 'brain/terminal/response',
         data: {
             content,
             source,
@@ -61,7 +64,7 @@ export function createErrorResponse(
     source: string = 'system'
 ): BrainResponse {
     return {
-        type: 'error',
+        type: 'brain/terminal/error',
         data: {
             message,
             source,
@@ -76,9 +79,33 @@ export function createErrorResponse(
  */
 export function createProcessingResponse(): BrainResponse {
     return {
-        type: 'processing',
+        type: 'brain/terminal/status',
         data: {
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
+            status: 'processing'
+        }
+    };
+}
+
+/**
+ * Creates a status response
+ * @param status The status of the operation
+ * @param commandId The command ID
+ * @param metadata Additional metadata
+ * @returns A BrainResponse of type 'status'
+ */
+export function createStatusResponse(
+    status: 'queued' | 'processing' | 'completed' | 'failed',
+    commandId?: string,
+    metadata?: Record<string, any>
+): BrainResponse {
+    return {
+        type: 'brain/terminal/status',
+        data: {
+            status,
+            timestamp: new Date().toISOString(),
+            commandId,
+            metadata
         }
     };
 } 

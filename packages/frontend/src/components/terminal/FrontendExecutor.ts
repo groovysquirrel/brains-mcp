@@ -374,7 +374,7 @@ export class FrontendExecutor {
       try {
         // Send only the input string as rawData
         const message = {
-          action: 'terminal',
+          action: 'brain/terminal',
           data: {
             rawData: input,
             requestStreaming: false,

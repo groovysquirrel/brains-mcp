@@ -41,7 +41,7 @@ interface WebSocketMessage {
  * Interface for WebSocket response structure
  */
 interface WebSocketResponse {
-  type: 'mcp/response' | 'error';
+  action: 'mcp/response' | 'mcp/error';
   data: ToolResponse | TransformerResult | ToolInfo[] | TransformerInfo[] | {
     message: string;
     code: MCPErrorCode;
@@ -163,7 +163,7 @@ async function handleTransformerRequest(transformerAction: string, data: WebSock
  */
 async function sendErrorResponse(connectionId: string, error: Error): Promise<void> {
   await connectionManager.sendMessage(connectionId, {
-    type: 'error',
+    action: 'mcp/error',
     data: {
       message: error.message,
       code: MCPErrorCode.INTERNAL_ERROR
@@ -217,7 +217,7 @@ export const handler = async (event: WebSocketEvent) => {
 
     // Send success response to client
     await connectionManager.sendMessage(connectionId, {
-      type: 'mcp/response',
+      action: 'mcp/response',
       data: response
     } as WebSocketResponse);
 

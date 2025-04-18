@@ -8,7 +8,7 @@
  * 
  * Key Concepts:
  * - Singleton Pattern: Ensures only one connection manager instance
- * - Set Data Structure: Used to track active connections
+ * - DynamoDB Repository: Used for persistent connection storage across Lambda invocations
  * - AWS API Gateway: Used for WebSocket communication
  * - Error Handling: Proper error handling for connection issues
  */
@@ -16,13 +16,15 @@
 import { Logger } from '../../../utils/logging/logger';
 import { ApiGatewayManagementApi } from 'aws-sdk';
 import { Resource } from 'sst';
+import { ConnectionRepository } from './connectionRepository/ConnectionRepository';
+import { DynamoDBConnectionRepository } from './connectionRepository/DynamoDBConnectionRepository';
 
 // Create logger with configured log level
 const logger = new Logger('ConnectionManager');
 
 // Define the structure of a WebSocket message
 interface Message {
-  type: string;    // Message type (e.g., 'chat', 'error', 'stream')
+  action: string;    // Message type/action (e.g., 'brain/terminal/response', 'brain/terminal/error')
   data: any;       // Message payload
 }
 
@@ -30,8 +32,8 @@ export class ConnectionManager {
   // Singleton instance
   private static instance: ConnectionManager;
   
-  // Set of active connection IDs
-  private connections: Set<string>;
+  // Connection repository for persistent storage
+  private connectionRepository: ConnectionRepository;
   
   // AWS API Gateway client for WebSocket communication
   private apiGatewayManagementApi: ApiGatewayManagementApi | null;
@@ -39,13 +41,13 @@ export class ConnectionManager {
   /**
    * Private constructor for singleton pattern.
    * Initializes:
-   * 1. Empty connections set
+   * 1. Connection repository
    * 2. API Gateway client with endpoint from environment
    */
   private constructor() {
-    this.connections = new Set<string>();
+    this.connectionRepository = new DynamoDBConnectionRepository();
     this.apiGatewayManagementApi = null;
-    logger.info('ConnectionManager initialized');
+    logger.info('ConnectionManager initialized with DynamoDB repository');
   }
 
   /**
@@ -85,35 +87,78 @@ export class ConnectionManager {
   }
 
   /**
-   * Adds a new connection to the active connections set.
+   * Adds a new connection to the repository.
    * This is called when a new WebSocket connection is established.
    * 
    * @param connectionId - The ID of the new connection
+   * @param userId - Optional user ID for the connection
    */
-  public addConnection(connectionId: string): void {
-    this.connections.add(connectionId);
-    logger.info('Added new connection', { 
-      connectionId, 
-      totalConnections: this.connections.size 
-    });
+  public async addConnection(connectionId: string, userId?: string): Promise<void> {
+    await this.connectionRepository.addConnection(connectionId, userId);
+    logger.info('Added new connection', { connectionId, userId });
   }
 
   /**
-   * Removes a connection from the active connections set.
+   * Removes a connection from the repository.
    * This is called when a WebSocket connection is closed.
    * 
    * @param connectionId - The ID of the connection to remove
    */
-  public removeConnection(connectionId: string): void {
-    this.connections.delete(connectionId);
-    logger.info('Removed connection', { 
-      connectionId, 
-      totalConnections: this.connections.size 
-    });
+  public async removeConnection(connectionId: string): Promise<void> {
+    await this.connectionRepository.removeConnection(connectionId);
+    logger.info('Removed connection', { connectionId });
   }
 
-  public isConnectionActive(connectionId: string): boolean {
-    return this.connections.has(connectionId);
+  /**
+   * Checks if a connection is active by checking the repository and API Gateway.
+   * This method attempts to verify an active connection by:
+   * 1. First checking the DynamoDB repository for connection state
+   * 2. If found, verifying with API Gateway it's still active
+   * 
+   * @param connectionId - The ID of the connection to check
+   * @returns Promise resolving to true if connection is active, false otherwise
+   */
+  public async isConnectionActive(connectionId: string): Promise<boolean> {
+    // First check DynamoDB for connection state
+    const isActive = await this.connectionRepository.isConnectionActive(connectionId);
+    if (!isActive) {
+      logger.debug('Connection not found in repository', { connectionId });
+      return false;
+    }
+
+    // Now verify with API Gateway
+    if (!this.apiGatewayManagementApi) {
+      this.initializeApiGateway();
+    }
+    
+    try {
+      // Try to get connection info - this will throw if connection is closed
+      await this.apiGatewayManagementApi!.getConnection({
+        ConnectionId: connectionId
+      }).promise();
+      
+      // Update connection last activity time
+      await this.connectionRepository.updateLastActivity(connectionId);
+      
+      // If we get here, connection is active
+      return true;
+    } catch (error) {
+      if (error.statusCode === 410) {
+        // Connection is gone, remove from repository
+        logger.info('Connection is stale, removing from repository', { connectionId });
+        await this.removeConnection(connectionId);
+        return false;
+      }
+      
+      // For other errors, log but assume connection might be active
+      logger.warn('Error checking connection status with API Gateway', {
+        connectionId,
+        error: error.message
+      });
+      
+      // Default to returning the repository state as fallback
+      return isActive;
+    }
   }
 
   /**
@@ -121,7 +166,7 @@ export class ConnectionManager {
    * This method:
    * 1. Attempts to send the message via API Gateway
    * 2. Handles connection errors (e.g., closed connections)
-   * 3. Cleans up invalid connections
+   * 3. Updates connection activity status on success
    * 
    * @param connectionId - The ID of the connection to send to
    * @param message - The message to send
@@ -133,15 +178,10 @@ export class ConnectionManager {
         logger.info('API Gateway not initialized, initializing now...');
         this.initializeApiGateway();
       }
-
-      if (!this.isConnectionActive(connectionId)) {
-        logger.warn('Attempted to send message to inactive connection', { connectionId });
-        return;
-      }
-
+      
       logger.info('Sending message to connection', { 
         connectionId, 
-        messageType: message.type,
+        messageType: message.action,
         endpoint: this.apiGatewayManagementApi?.config.endpoint
       });
 
@@ -150,11 +190,14 @@ export class ConnectionManager {
         Data: JSON.stringify(message)
       }).promise();
 
+      // Update last activity timestamp on success
+      await this.connectionRepository.updateLastActivity(connectionId);
+      
       logger.info('Successfully sent message', { connectionId });
     } catch (error) {
       if (error.statusCode === 410) {
         logger.info('Connection stale, removing', { connectionId });
-        this.removeConnection(connectionId);
+        await this.removeConnection(connectionId);
       } else {
         logger.error('Failed to send message', { 
           error,
@@ -178,15 +221,45 @@ export class ConnectionManager {
    * @param message - The message to broadcast
    */
   public async broadcast(message: Message): Promise<void> {
+    // Get all active connections from the repository
+    const connectionIds = await this.connectionRepository.getActiveConnections();
+    
+    logger.info('Broadcasting message to connections', { 
+      connectionCount: connectionIds.length,
+      messageType: message.action
+    });
+    
     // Create an array of promises for sending to each connection
-    const promises = Array.from(this.connections).map(connectionId =>
+    const promises = connectionIds.map(connectionId =>
       this.sendMessage(connectionId, message).catch(error => {
         // Log errors but don't throw them
-        logger.error('Failed to broadcast message', { error, connectionId });
+        logger.error('Failed to broadcast message to connection', { error, connectionId });
       })
     );
     
     // Wait for all sends to complete
     await Promise.all(promises);
+  }
+
+  /**
+   * Updates conversation mapping for a connection
+   * This helps track which conversation is associated with which connection
+   * 
+   * @param connectionId - The WebSocket connection ID
+   * @param conversationId - The conversation ID to associate
+   */
+  public async updateConversationMapping(connectionId: string, conversationId: string): Promise<void> {
+    await this.connectionRepository.updateConversationMapping(connectionId, conversationId);
+    logger.info('Updated conversation mapping', { connectionId, conversationId });
+  }
+
+  /**
+   * Gets the conversation ID for a connection
+   * 
+   * @param connectionId - The WebSocket connection ID
+   * @returns The associated conversation ID, or undefined if not found
+   */
+  public async getConversationId(connectionId: string): Promise<string | undefined> {
+    return this.connectionRepository.getConversationId(connectionId);
   }
 } 
