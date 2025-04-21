@@ -9,11 +9,11 @@ import {
 } from '@aws-sdk/lib-dynamodb';
 import { Resource } from 'sst';
 import { ConnectionRepository, ConnectionData } from './ConnectionRepository';
-import { Logger } from '../../../../utils/logging/logger';
+import { Logger } from '../../../../shared/Logger';
 import { getDynamoClient, getDocumentClient, getSystemTableName } from '../../../../modules/utils/aws/DynamoClient';
 
 // Initialize logger
-const logger = new Logger('DynamoDBConnectionRepository');
+const logger = new Logger('ConnectionRepository.DynamoDB', 'warn');
 
 /**
  * DynamoDB-based implementation of ConnectionRepository
@@ -53,6 +53,37 @@ export class DynamoDBConnectionRepository implements ConnectionRepository {
   }
 
   /**
+   * Finds a connection by connectionId
+   * This is a helper method to find the primary key for a given connectionId
+   * @param connectionId The WebSocket connection ID
+   * @returns The item if found, undefined otherwise
+   * @private
+   */
+  private async findConnectionByConnectionId(connectionId: string): Promise<Record<string, any> | undefined> {
+    // Always use SYSTEM as the userId for consistency
+    const userIdKey = 'SYSTEM-Connections';
+    const typeNameKey = `CONNECTION#${connectionId}`;
+    
+    try {
+      const result = await this.client.send(new GetCommand({
+        TableName: this.tableName,
+        Key: {
+          userId: userIdKey,
+          typeName: typeNameKey
+        }
+      }));
+      
+      return result.Item;
+    } catch (error) {
+      logger.error('Error finding connection by connectionId', {
+        error: error instanceof Error ? error.message : String(error),
+        connectionId
+      });
+      return undefined;
+    }
+  }
+
+  /**
    * Adds a new connection to the repository
    * @param connectionId The WebSocket connection ID
    * @param userId Optional user ID associated with the connection
@@ -62,8 +93,34 @@ export class DynamoDBConnectionRepository implements ConnectionRepository {
       const now = Date.now();
       const expiresAt = Math.floor(now / 1000) + this.ttlInSeconds;
       
-      // Use default 'SYSTEM' userId if not provided to satisfy the primary key requirement
+      // Always use SYSTEM-Connections as the userIdKey for consistent storage
       const userIdKey = 'SYSTEM-Connections';
+      const typeNameKey = `CONNECTION#${connectionId}`;
+      
+      // Check if connection already exists
+      const existingConnection = await this.findConnectionByConnectionId(connectionId);
+      if (existingConnection) {
+        logger.warn('Connection already exists in DynamoDB, updating timestamp', {
+          connectionId,
+          userIdKey
+        });
+        
+        // Update the timestamp for existing connection
+        await this.client.send(new UpdateCommand({
+          TableName: this.tableName,
+          Key: {
+            userId: userIdKey,
+            typeName: typeNameKey
+          },
+          UpdateExpression: 'SET lastActivity = :lastActivity, expiresAt = :expiresAt',
+          ExpressionAttributeValues: {
+            ':lastActivity': now,
+            ':expiresAt': expiresAt
+          }
+        }));
+        
+        return;
+      }
       
       logger.info('Adding connection to DynamoDB', {
         connectionId,
@@ -72,8 +129,8 @@ export class DynamoDBConnectionRepository implements ConnectionRepository {
       });
       
       const item: Record<string, any> = {
-        userId: userIdKey, // Ensure this is never undefined or null
-        typeName: `CONNECTION#${connectionId}`,
+        userId: userIdKey,
+        typeName: typeNameKey,
         connectionId,
         createdAt: now,
         lastActivity: now,
@@ -81,14 +138,8 @@ export class DynamoDBConnectionRepository implements ConnectionRepository {
         type: 'connection'
       };
       
-      // Double-check that userId is set before sending to DynamoDB
-      if (!item.userId) {
-        item.userId = 'SYSTEM';
-        logger.warn('Forcing userId to SYSTEM as it was undefined', { connectionId });
-      }
-      
-      // Only add the actual userId as a separate property if it's different from the key
-      if (userId && userId !== 'SYSTEM') {
+      // Store the actual userId as a separate property if provided
+      if (userId) {
         item.actualUserId = userId;
       }
       
@@ -113,52 +164,16 @@ export class DynamoDBConnectionRepository implements ConnectionRepository {
   }
 
   /**
-   * Finds a connection by connectionId
-   * This is a helper method to find the primary key for a given connectionId
-   * @param connectionId The WebSocket connection ID
-   * @returns The item if found, undefined otherwise
-   * @private
-   */
-  private async findConnectionByConnectionId(connectionId: string): Promise<Record<string, any> | undefined> {
-    // Since we know our typeName pattern, try a direct get first 
-    // with the default SYSTEM userId for anonymous connections
-    const systemResult = await this.client.send(new GetCommand({
-      TableName: this.tableName,
-      Key: {
-        userId: 'SYSTEM',
-        typeName: `CONNECTION#${connectionId}`
-      }
-    }));
-    
-    if (systemResult.Item) {
-      return systemResult.Item;
-    }
-    
-    // If not found with SYSTEM user, use scan with filter as fallback
-    // This is not ideal for performance but necessary without a GSI
-    const scanResult = await this.client.send(new ScanCommand({
-      TableName: this.tableName,
-      FilterExpression: 'connectionId = :connectionId',
-      ExpressionAttributeValues: {
-        ':connectionId': connectionId
-      },
-      Limit: 1
-    }));
-    
-    if (scanResult.Items && scanResult.Items.length > 0) {
-      return scanResult.Items[0];
-    }
-    
-    return undefined;
-  }
-
-  /**
    * Removes a connection from the repository
    * @param connectionId The WebSocket connection ID to remove
    */
   public async removeConnection(connectionId: string): Promise<void> {
     try {
-      // Find the connection first to get the primary key
+      // Use consistent SYSTEM-Connections as userId
+      const userIdKey = 'SYSTEM-Connections';
+      const connectionTypeNameKey = `CONNECTION#${connectionId}`;
+      
+      // Check if connection exists before trying to delete
       const connection = await this.findConnectionByConnectionId(connectionId);
       
       if (!connection) {
@@ -166,14 +181,33 @@ export class DynamoDBConnectionRepository implements ConnectionRepository {
         return;
       }
       
-      // Delete the connection using the found primary key
+      // Delete the connection using the consistent key pattern
       await this.client.send(new DeleteCommand({
         TableName: this.tableName,
         Key: {
-          userId: connection.userId,
-          typeName: connection.typeName
+          userId: userIdKey,
+          typeName: connectionTypeNameKey
         }
       }));
+      
+      // If this connection had a conversation ID, also clean up the conversation mapping
+      if (connection.conversationId) {
+        const conversationTypeNameKey = `CONVERSATION#${connection.conversationId}#${connectionId}`;
+        
+        // Delete the conversation mapping entry
+        await this.client.send(new DeleteCommand({
+          TableName: this.tableName,
+          Key: {
+            userId: userIdKey,
+            typeName: conversationTypeNameKey
+          }
+        }));
+        
+        logger.info('Removed conversation mapping from DynamoDB', { 
+          connectionId, 
+          conversationId: connection.conversationId 
+        });
+      }
       
       logger.info('Removed connection from DynamoDB', { connectionId });
     } catch (error) {
@@ -209,12 +243,17 @@ export class DynamoDBConnectionRepository implements ConnectionRepository {
    */
   public async getActiveConnections(): Promise<string[]> {
     try {
-      // Scan for all items with type='connection' and extract connectionId
-      const result = await this.client.send(new ScanCommand({
+      // Use consistent SYSTEM-Connections userId pattern
+      const userIdKey = 'SYSTEM-Connections';
+      
+      // Query using the userId key and filter for connections
+      // This is more efficient than scanning the entire table
+      const result = await this.client.send(new QueryCommand({
         TableName: this.tableName,
-        FilterExpression: 'type = :type',
+        KeyConditionExpression: 'userId = :userId AND begins_with(typeName, :typePrefix)',
         ExpressionAttributeValues: {
-          ':type': 'connection'
+          ':userId': userIdKey,
+          ':typePrefix': 'CONNECTION#'
         }
       }));
       
@@ -272,6 +311,12 @@ export class DynamoDBConnectionRepository implements ConnectionRepository {
    */
   public async updateConversationMapping(connectionId: string, conversationId: string): Promise<void> {
     try {
+      // Use consistent SYSTEM-Connections as userId
+      const userIdKey = 'SYSTEM-Connections';
+      const connectionTypeNameKey = `CONNECTION#${connectionId}`;
+      const conversationTypeNameKey = `CONVERSATION#${conversationId}#${connectionId}`;
+      
+      // Check if connection exists
       const connection = await this.findConnectionByConnectionId(connectionId);
       
       if (!connection) {
@@ -280,17 +325,35 @@ export class DynamoDBConnectionRepository implements ConnectionRepository {
       }
       
       const now = Date.now();
+      const expiresAt = Math.floor(now / 1000) + this.ttlInSeconds;
       
+      // Update the connection record with the conversationId
       await this.client.send(new UpdateCommand({
         TableName: this.tableName,
         Key: {
-          userId: connection.userId,
-          typeName: connection.typeName
+          userId: userIdKey,
+          typeName: connectionTypeNameKey
         },
-        UpdateExpression: 'SET conversationId = :conversationId, lastActivity = :lastActivity',
+        UpdateExpression: 'SET conversationId = :conversationId, lastActivity = :lastActivity, expiresAt = :expiresAt',
         ExpressionAttributeValues: {
           ':conversationId': conversationId,
-          ':lastActivity': now
+          ':lastActivity': now,
+          ':expiresAt': expiresAt
+        }
+      }));
+      
+      // Create a separate record for the conversation mapping
+      await this.client.send(new PutCommand({
+        TableName: this.tableName,
+        Item: {
+          userId: userIdKey,
+          typeName: conversationTypeNameKey,
+          connectionId,
+          conversationId,
+          createdAt: now,
+          lastActivity: now,
+          expiresAt,
+          type: 'conversation-connection'
         }
       }));
       
@@ -340,16 +403,22 @@ export class DynamoDBConnectionRepository implements ConnectionRepository {
       }
       
       const now = Date.now();
+      const expiresAt = Math.floor(now / 1000) + this.ttlInSeconds;
+      
+      // Always use consistent SYSTEM-Connections as userId
+      const userIdKey = 'SYSTEM-Connections';
+      const typeNameKey = `CONNECTION#${connectionId}`;
       
       await this.client.send(new UpdateCommand({
         TableName: this.tableName,
         Key: {
-          userId: connection.userId,
-          typeName: connection.typeName
+          userId: userIdKey,
+          typeName: typeNameKey
         },
-        UpdateExpression: 'SET lastActivity = :lastActivity',
+        UpdateExpression: 'SET lastActivity = :lastActivity, expiresAt = :expiresAt',
         ExpressionAttributeValues: {
-          ':lastActivity': now
+          ':lastActivity': now,
+          ':expiresAt': expiresAt
         }
       }));
       
@@ -363,6 +432,43 @@ export class DynamoDBConnectionRepository implements ConnectionRepository {
         connectionId
       });
       // Don't throw - this is a non-critical operation
+    }
+  }
+
+  /**
+   * Gets all connection IDs associated with a conversation
+   * @param conversationId The conversation ID to get connections for
+   * @returns Array of connection IDs
+   */
+  public async getConnectionsByConversation(conversationId: string): Promise<string[]> {
+    try {
+      // Use consistent SYSTEM-Connections as userId
+      const userIdKey = 'SYSTEM-Connections';
+      const conversationPrefix = `CONVERSATION#${conversationId}#`;
+      
+      // Query for all items with the conversation prefix
+      const result = await this.client.send(new QueryCommand({
+        TableName: this.tableName,
+        KeyConditionExpression: 'userId = :userId AND begins_with(typeName, :typePrefix)',
+        ExpressionAttributeValues: {
+          ':userId': userIdKey,
+          ':typePrefix': conversationPrefix
+        }
+      }));
+      
+      if (!result.Items || result.Items.length === 0) {
+        return [];
+      }
+      
+      return result.Items
+        .filter(item => item.connectionId)
+        .map(item => item.connectionId);
+    } catch (error) {
+      logger.error('Failed to get connections by conversation from DynamoDB', {
+        error: error instanceof Error ? error.message : String(error),
+        conversationId
+      });
+      return [];
     }
   }
 } 

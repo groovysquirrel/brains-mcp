@@ -1,4 +1,4 @@
-import { Logger } from '../../../../utils/logging/Logger';
+import { Logger } from '../../../../../shared/Logger';
 import { ToolRepository } from '../../repositories/services/ToolRepository';
 import { calculatorTool } from '../system/tools/calculator/calculator';
 import { randomNumberTool } from '../system/tools/randomNumber/randomNumber';
@@ -11,6 +11,7 @@ export class SystemToolRegistry {
   private static instance: SystemToolRegistry;
   private toolRepository: ToolRepository;
   private logger: Logger;
+  private initialized: boolean = false;
 
   private constructor() {
     this.toolRepository = ToolRepository.getInstance();
@@ -28,6 +29,11 @@ export class SystemToolRegistry {
    * Initialize and register all built-in tools
    */
   public async registerBuiltInTools(): Promise<void> {
+    if (this.initialized) {
+      this.logger.info('Built-in tools already registered, skipping');
+      return;
+    }
+
     try {
       this.logger.info('Registering built-in tools...');
 
@@ -39,8 +45,7 @@ export class SystemToolRegistry {
       await this.toolRepository.registerTool(randomNumberTool);
       this.logger.info('Registered tool:' + randomNumberTool.name);
 
-      
-
+      this.initialized = true;
       this.logger.info('All built-in tools registered successfully');
     } catch (error) {
       this.logger.error('Failed to register built-in tools:', error);

@@ -6,7 +6,7 @@ import {
   GetItemCommand
 } from '@aws-sdk/client-dynamodb';
 import { v4 as uuidv4 } from 'uuid';
-import { Logger } from '../../../../utils/logging/Logger';
+import { Logger } from '../../../../../shared/Logger';
 import { ConversationRepository } from './ConversationRepository';
 import {
   Conversation,
@@ -57,7 +57,7 @@ export class DynamoConversationRepository implements ConversationRepository {
    * Constructor initializes the repository with the DynamoDB table name
    */
   constructor() {
-    this.logger = new Logger('DynamoConversationRepository');
+    this.logger = new Logger('ConversationRepository.DynamoDb', 'warn');
     
     this.tableName = getUserTableName(); 
     

@@ -13,14 +13,14 @@
  * - Error Handling: Proper error handling for connection issues
  */
 
-import { Logger } from '../../../utils/logging/logger';
+import { Logger } from '../../../shared/Logger';
 import { ApiGatewayManagementApi } from 'aws-sdk';
 import { Resource } from 'sst';
 import { ConnectionRepository } from './connectionRepository/ConnectionRepository';
 import { DynamoDBConnectionRepository } from './connectionRepository/DynamoDBConnectionRepository';
 
 // Create logger with configured log level
-const logger = new Logger('ConnectionManager');
+const logger = new Logger('ConnectionManager', 'warn');
 
 // Define the structure of a WebSocket message
 interface Message {
@@ -261,5 +261,45 @@ export class ConnectionManager {
    */
   public async getConversationId(connectionId: string): Promise<string | undefined> {
     return this.connectionRepository.getConversationId(connectionId);
+  }
+
+  /**
+   * Broadcasts a message to all connections in a specific conversation.
+   * This is useful for:
+   * 1. Sending updates to all clients in a conversation
+   * 2. Notifying all participants of events in a conversation
+   * 
+   * @param conversationId - The ID of the conversation to broadcast to
+   * @param message - The message to broadcast
+   */
+  public async broadcastToConversation(conversationId: string, message: Message): Promise<void> {
+    // Get all connections for this conversation
+    const connectionIds = await this.connectionRepository.getConnectionsByConversation(conversationId);
+    
+    if (connectionIds.length === 0) {
+      logger.info('No active connections found for conversation', { conversationId });
+      return;
+    }
+    
+    logger.info('Broadcasting message to conversation connections', { 
+      connectionCount: connectionIds.length,
+      conversationId,
+      messageType: message.action
+    });
+    
+    // Create an array of promises for sending to each connection
+    const promises = connectionIds.map(connectionId =>
+      this.sendMessage(connectionId, message).catch(error => {
+        // Log errors but don't throw them
+        logger.error('Failed to broadcast message to connection in conversation', { 
+          error, 
+          connectionId,
+          conversationId 
+        });
+      })
+    );
+    
+    // Wait for all sends to complete
+    await Promise.all(promises);
   }
 } 

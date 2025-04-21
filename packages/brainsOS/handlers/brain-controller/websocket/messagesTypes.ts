@@ -38,6 +38,7 @@ export interface TerminalMessage {
         timestamp: string;
         source?: string;
         content?: string;
+        conversationId?: string;
         [key: string]: any;
     };
 }
@@ -102,7 +103,7 @@ export const isBrainMessage = (message: any): message is BrainMessage => {
         typeof message.data.requestStreaming === 'boolean' &&
         typeof message.data.commandId === 'string' &&
         typeof message.data.timestamp === 'string' &&
-        message.data.source === 'terminal'
+        typeof message.data.source === 'string'
     );
 };
 

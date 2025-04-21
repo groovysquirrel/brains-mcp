@@ -6,10 +6,10 @@
  * the Model Context Protocol standard.
  */
 
-import { Logger } from './logging/Logger';
+import { Logger } from '../../../../shared/Logger';
 
 // Initialize logger
-const logger = new Logger('MCPParser');
+const logger = new Logger('BRAIN - MCPParser', 'warn');
 
 /**
  * Interface for MCP command structure
@@ -36,14 +36,91 @@ export interface ParsedMCPResponse {
 }
 
 /**
+ * Clean response content from the LLM by removing special tokens and artifacts
+ * 
+ * This method removes:
+ * - Special tokens like <|assistant|> or <|user|>
+ * - Duplicated JSON objects
+ * - Extraneous text outside the main JSON structure
+ * 
+ * @param content - The raw content from the LLM response
+ * @returns Cleaned content ready for command extraction
+ */
+export function cleanResponseContent(content: string): string {
+  if (!content) return content;
+  
+  // Log original content preview for debugging
+  logger.debug('Cleaning response content', {
+    contentPreview: content.substring(0, 50) + '...',
+    contentLength: content.length
+  });
+  
+  // Remove all types of special tokens that might appear in LLM responses
+  let cleaned = content
+      // Basic role markers
+      .replace(/<\|assistant\|>/g, '')
+      .replace(/<\|user\|>/g, '')
+      .replace(/<\|system\|>/g, '')
+      
+      // Complex anthropic markers (seen in the response examples)
+      .replace(/<\|assistant<\|end_header_id\|>>/g, '')
+      .replace(/<\|assistant<\|im_start\|>\|>/g, '')
+      .replace(/<\|im_end\|>/g, '')
+      .replace(/<\|im_start\|>/g, '')
+      .replace(/<\|im_sep\|>/g, '')
+      
+      // Other common markers
+      .replace(/<\|endoftext\|>/g, '')
+      .replace(/<\|endofprompt\|>/g, '')
+      
+      // Handle nested anthropic markers as seen in the example
+      .replace(/<\|assistant<\|[^>]+\|>>/g, '')
+      
+      // Any remaining special tokens with this pattern
+      .replace(/<\|[^>]+\|>/g, '')
+      .trim();
+  
+  // Check if there appear to be duplicated JSON objects (common with some LLMs)
+  const jsonStartCount = (cleaned.match(/\{\s*"thoughts"/g) || []).length;
+  
+  if (jsonStartCount > 1) {
+      logger.warn('Detected potential duplicate JSON objects', { count: jsonStartCount });
+      
+      // Try to extract just the first complete JSON object
+      const jsonMatch = /\{[\s\S]*?\}\s*(?=\{|$)/.exec(cleaned);
+      if (jsonMatch) {
+          logger.warn('Extracted first JSON object', { 
+              matchLength: jsonMatch[0].length,
+              fullLength: cleaned.length
+          });
+          cleaned = jsonMatch[0].trim();
+      }
+  }
+  
+  // Remove any trailing non-JSON text (e.g., "Your random number is 43")
+  // This matches a valid JSON structure and removes anything after it
+  const trailingTextMatch = /^(\{[\s\S]*\})[^{}]*$/.exec(cleaned);
+  if (trailingTextMatch) {
+      cleaned = trailingTextMatch[1];
+  }
+  
+  // Log the cleaning results
+  logger.debug('Cleaned response content', {
+      originalLength: content.length,
+      cleanedLength: cleaned.length,
+      diff: content.length - cleaned.length
+  });
+  
+  return cleaned;
+}
+
+/**
  * Extract JSON from a text string that may contain markdown or other content
  * 
  * @param text - The text to extract JSON from
  * @returns The extracted JSON string or null if no JSON found
  */
 function extractJsonFromText(text: string): string | null {
-  logger.debug('Attempting to extract JSON from text', { textLength: text.length });
-  
   // First, clean the text of any special tokens or markers
   const cleanedText = text
     .replace(/<\|assistant\|>/g, '') // Remove assistant tokens
@@ -53,11 +130,9 @@ function extractJsonFromText(text: string): string | null {
   // Try to parse as complete JSON first (common case)
   try {
     JSON.parse(cleanedText);
-    logger.debug('Cleaned text is complete valid JSON');
     return cleanedText;
   } catch (e) {
     // Not a complete JSON object, continue with extraction
-    logger.debug('Cleaned text is not a complete JSON object, trying extraction patterns');
   }
   
   // Patterns to match JSON blocks in different formats
@@ -80,8 +155,6 @@ function extractJsonFromText(text: string): string | null {
   
   // Try each pattern in order
   for (const pattern of patterns) {
-    logger.debug('Trying extraction pattern', { pattern: pattern.toString() });
-    
     let match;
     let matches = [];
     
@@ -92,8 +165,6 @@ function extractJsonFromText(text: string): string | null {
     
     // If we found matches, try each one
     if (matches.length > 0) {
-      logger.debug('Found potential JSON matches', { count: matches.length });
-      
       // Sort by length descending to try largest first
       matches.sort((a, b) => b.length - a.length);
       
@@ -101,7 +172,6 @@ function extractJsonFromText(text: string): string | null {
         try {
           // Test if this is valid JSON
           JSON.parse(potentialJson);
-          logger.debug('Found valid JSON match', { length: potentialJson.length });
           allJsonMatches.push(potentialJson);
         } catch (e) {
           // Not valid JSON, try cleaning it first
@@ -109,14 +179,9 @@ function extractJsonFromText(text: string): string | null {
             // Try to clean potential trailing/leading text
             const cleaned = potentialJson.replace(/([{\[].*[}\]])[^{\[\]}\r\n]*$/s, '$1');
             JSON.parse(cleaned);
-            logger.debug('Found valid JSON after cleaning', { length: cleaned.length });
             allJsonMatches.push(cleaned);
           } catch (e2) {
             // Still not valid JSON, continue to next match
-            logger.debug('Invalid JSON match, continuing', { 
-              error: e instanceof Error ? e.message : String(e),
-              potentialJsonPreview: potentialJson.substring(0, 100) + '...'
-            });
             continue;
           }
         }
@@ -126,8 +191,6 @@ function extractJsonFromText(text: string): string | null {
   
   // If we found any valid JSON matches, return the best one
   if (allJsonMatches.length > 0) {
-    logger.debug('Found multiple valid JSON matches', { count: allJsonMatches.length });
-    
     // Check each match for the presence of 'command' and 'thoughts'
     // to find the most likely MCP command
     const withCommand = allJsonMatches.filter(json => {
@@ -140,16 +203,13 @@ function extractJsonFromText(text: string): string | null {
     });
     
     if (withCommand.length > 0) {
-      logger.debug('Found JSON with command and thoughts', { count: withCommand.length });
       return withCommand[0]; // Return the first one that has command and thoughts
     }
     
     // If none have both command and thoughts, return the first valid JSON
-    logger.debug('Returning first valid JSON match', { length: allJsonMatches[0].length });
     return allJsonMatches[0];
   }
   
-  logger.debug('No valid JSON found in text');
   return null;
 }
 
@@ -161,13 +221,10 @@ function extractJsonFromText(text: string): string | null {
  */
 export function parseMCPResponse(text: string): ParsedMCPResponse {
   try {
-    logger.debug('Parsing MCP response', { textLength: text.length, textPreview: text.substring(0, 100) });
-    
     // Extract JSON if the response contains it
     const jsonStr = extractJsonFromText(text);
     
     if (!jsonStr) {
-      logger.debug('No JSON found in response');
       return {
         original: text
       };
@@ -175,43 +232,21 @@ export function parseMCPResponse(text: string): ParsedMCPResponse {
     
     // Parse the JSON
     const parsed = JSON.parse(jsonStr);
-    logger.debug('Successfully parsed JSON', { 
-      hasThoughts: !!parsed.thoughts,
-      hasCommand: parsed.command !== undefined,
-      commandType: parsed.command !== null ? typeof parsed.command : 'null'
-    });
     
     // Validate that it follows MCP format
     if (typeof parsed !== 'object' || parsed === null) {
-      logger.debug('Parsed JSON is not an object');
       return {
         original: text
       };
     }
     
-    // Check for thoughts section
-    if (!parsed.thoughts) {
-      logger.debug('No thoughts section found in MCP response');
-    }
-    
-    // Check for command section
+    // Create a properly formatted command if present
     if (parsed.command !== null && parsed.command !== undefined) {
       if (typeof parsed.command === 'object' && parsed.command !== null) {
-        if (!parsed.command.name) {
-          logger.debug('Command is missing required name field');
-        } else {
-          logger.debug('Found command with name', { commandName: parsed.command.name });
-        }
-        
         if (!parsed.command.args) {
-          logger.debug('Command is missing args field, adding empty args object');
           parsed.command.args = {};
         }
-      } else {
-        logger.debug('Command is not an object', { commandType: typeof parsed.command });
       }
-    } else {
-      logger.debug('Command is null or undefined', { command: parsed.command });
     }
     
     return {
@@ -238,13 +273,17 @@ export function parseMCPResponse(text: string): ParsedMCPResponse {
  * @returns Array of extracted MCP commands
  */
 export function extractMCPCommands(text: string): MCPCommand[] {
-  const parsedResponse = parseMCPResponse(text);
+  // First clean the response content to remove artifacts
+  const cleanedText = cleanResponseContent(text);
+  
+  // Then parse the response to extract commands
+  const parsedResponse = parseMCPResponse(cleanedText);
   const commands: MCPCommand[] = [];
   
   if (parsedResponse?.command) {
     // Add a unique request ID
     const requestId = `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    logger.debug('Extracted MCP command', { 
+    logger.info('Extracted MCP command', { 
       commandName: parsedResponse.command.name,
       argsCount: Object.keys(parsedResponse.command.args || {}).length,
       requestId
@@ -255,7 +294,7 @@ export function extractMCPCommands(text: string): MCPCommand[] {
       requestId
     });
   } else {
-    logger.debug('No command found in parsed response');
+    logger.info('No command found in parsed response');
   }
   
   return commands;

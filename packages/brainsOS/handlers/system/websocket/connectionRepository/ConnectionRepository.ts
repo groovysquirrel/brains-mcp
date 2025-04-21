@@ -61,6 +61,13 @@ export interface ConnectionRepository {
    * @returns Promise resolving when timestamp is updated
    */
   updateLastActivity(connectionId: string): Promise<void>;
+  
+  /**
+   * Gets all connection IDs associated with a conversation
+   * @param conversationId The conversation ID to get connections for
+   * @returns Promise resolving to array of connection IDs
+   */
+  getConnectionsByConversation(conversationId: string): Promise<string[]>;
 }
 
 /**

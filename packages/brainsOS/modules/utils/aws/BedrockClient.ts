@@ -1,5 +1,5 @@
 import { BedrockRuntimeClient } from '@aws-sdk/client-bedrock-runtime';
-import { Logger } from '../logging/Logger';
+import { Logger } from '../../../shared/Logger';
 import { Resource } from 'sst';
 
 // Global variables for Lambda reuse

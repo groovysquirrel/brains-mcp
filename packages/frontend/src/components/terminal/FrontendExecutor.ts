@@ -271,8 +271,8 @@ export class FrontendExecutor {
         FrontendExecutor.connectionStatus = 'connected';
       }
 
-      // Handle different message types
-      if (message.type === 'terminal' || message.type === 'error') {
+      // Handle expected response/error actions
+      if (message.action === 'brain/terminal/response' || message.action === 'brain/terminal/error') {
         const commandId = message.data?.commandId;
         const pendingCommand = commandId ? FrontendExecutor.pendingCommands.get(commandId) : null;
 
@@ -280,50 +280,37 @@ export class FrontendExecutor {
           clearTimeout(pendingCommand.timeoutId);
           FrontendExecutor.pendingCommands.delete(commandId);
           
-          if (message.type === 'error') {
+          // Check if the action indicates an error
+          if (message.action === 'brain/terminal/error') { // Assuming error action format
             pendingCommand.resolve({
               success: false,
-              error: message.data.content || 'Unknown error occurred'
+              error: message.data?.content || message.data?.error || 'Unknown error occurred'
             });
           } else {
-            // Handle terminal responses
+            // Handle successful terminal responses - flatten the structure
             pendingCommand.resolve({
               success: true,
-              data: {
-                type: message.type,
-                data: {
-                  content: message.data.content,
-                  source: message.data.source || 'unknown',
-                  timestamp: message.data.timestamp
-                }
+              data: { // Directly place the relevant data here
+                content: message.data.content,
+                source: message.data.source || 'unknown',
+                timestamp: message.data.timestamp,
+                commandId: message.data.commandId, 
+                conversationId: message.data.conversationId,
+                action: message.action // Optionally include the action type
               }
             });
           }
         } else {
-          // Handle messages without a commandId
-          const result: ExecutionResult = {
-            success: true,
-            data: {
-              type: message.type,
-              data: {
-                content: message.data.content,
-                source: message.data.source || 'unknown',
-                timestamp: message.data.timestamp
-              }
-            }
-          };
-          
-          // If there are any pending commands, resolve the first one
-          if (FrontendExecutor.pendingCommands.size > 0) {
-            const [firstCommandId] = FrontendExecutor.pendingCommands.keys();
-            const pendingCommand = FrontendExecutor.pendingCommands.get(firstCommandId);
-            if (pendingCommand) {
-              clearTimeout(pendingCommand.timeoutId);
-              FrontendExecutor.pendingCommands.delete(firstCommandId);
-              pendingCommand.resolve(result);
-            }
-          }
+          // Handle messages with expected actions but no matching commandId (e.g., late responses?)
+          console.warn('Received message with commandId not pending:', message);
+          // Decide how to handle these - maybe log or display as unprompted output?
+          // The previous logic of resolving the *first* pending command was likely incorrect.
+          // For now, we just log a warning.
         }
+      } else {
+        // Handle other message actions (e.g., system messages, broadcasts not tied to a command)
+        console.log('Received unhandled WebSocket action:', message.action, message.data);
+        // Potentially handle other actions like status updates, etc.
       }
     });
   }
@@ -361,7 +348,8 @@ export class FrontendExecutor {
    * Executes a command through WebSocket
    */
   private static async executeRemoteCommand(input: string, _mode: 'command' | 'prompt'): Promise<ExecutionResult> {
-    const commandId = Date.now().toString();
+    // Prepend "cmd_" to match the expected response format
+    const commandId = `cmd_${Date.now().toString()}`;
     
     return new Promise<ExecutionResult>((resolve, reject) => {
       const timeoutId = setTimeout(() => {
@@ -372,29 +360,34 @@ export class FrontendExecutor {
       FrontendExecutor.pendingCommands.set(commandId, { resolve, reject, timeoutId });
       
       try {
-        // Send only the input string as rawData
+        // Updated message format based on test script
         const message = {
-          action: 'brain/terminal',
+          action: 'brain/terminal/request', // Changed action
           data: {
-            rawData: input,
-            requestStreaming: false,
+            rawData: input, // Use rawData for the input string
+            requestStreaming: false, // Default to false, adjust if needed later
             commandId,
             timestamp: new Date().toISOString(),
-            source: 'terminal'
+            source: 'terminal' // Added source field
           }
         };
         
-        console.log('Sending WebSocket message:', message); // Debug log
+        console.log('Sending WebSocket message:', message); // Debug log remains
         FrontendExecutor.websocket!.sendMessage(message);
       } catch (error) {
         clearTimeout(timeoutId);
         FrontendExecutor.pendingCommands.delete(commandId);
-        reject(new Error('Failed to send command to server'));
+        // Use Error type assertion for better error handling
+        if (error instanceof Error) {
+          reject(new Error(`Failed to send command to server: ${error.message}`));
+        } else {
+          reject(new Error('Failed to send command to server due to an unknown error'));
+        }
       }
     })
     .catch(error => ({
       success: false,
-      error: `Error executing command: ${error.message}`
+      error: `Error executing command: ${error instanceof Error ? error.message : 'Unknown error'}`
     }));
   }
 } 

@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import Terminal, { TerminalRef } from '../components/Terminal';
-import { ExecutionResult, FrontendExecutor } from '../components/terminal/FrontendExecutor';
+import { ExecutionResult, FrontendExecutor } from '../components/Terminal/FrontendExecutor';
 import { useAppContext } from '../lib/contextLib';
 import { fetchAuthSession } from 'aws-amplify/auth';
 import './css/TerminalContainer.css';

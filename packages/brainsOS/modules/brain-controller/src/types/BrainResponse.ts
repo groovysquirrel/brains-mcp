@@ -19,6 +19,9 @@ export interface BrainResponse {
         /** The command ID associated with the response */
         commandId?: string;
         
+        /** The conversation ID associated with the response */
+        conversationId?: string;
+        
         /** The error message (for error type) */
         message?: string;
         
@@ -35,12 +38,14 @@ export interface BrainResponse {
  * @param content The response content
  * @param source The response source
  * @param commandId Optional command ID
+ * @param conversationId Optional conversation ID
  * @returns A BrainResponse of type 'terminal'
  */
 export function createTerminalResponse(
     content: string,
     source: string,
-    commandId?: string
+    commandId?: string,
+    conversationId?: string
 ): BrainResponse {
     return {
         type: 'brain/terminal/response',
@@ -48,7 +53,8 @@ export function createTerminalResponse(
             content,
             source,
             timestamp: new Date().toISOString(),
-            commandId
+            commandId,
+            conversationId
         }
     };
 }

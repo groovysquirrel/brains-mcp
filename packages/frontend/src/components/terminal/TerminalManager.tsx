@@ -1,7 +1,7 @@
 import { Terminal } from 'xterm';
 import { FitAddon } from 'xterm-addon-fit';
 import { FrontendExecutor, ExecutionResult } from './FrontendExecutor';
-import { TerminalFormatter, TerminalMode } from './TerminalModes';
+import { TerminalFormatter, TerminalMode, BrainThoughtProcess } from './TerminalModes';
 import config from '../../config';
 
 
@@ -287,21 +287,50 @@ export class TerminalManager {
               this.formatter.setMode(newMode);
               this.writeSuccess('\n' + result.data.message + '\n');
             }
-          } else if (result.data.type === 'error') {
+          } else if (result.data.action === 'brain/terminal/error') {
             // Handle error messages
-            const errorMessage = result.data.data?.content || result.data.data?.message || 'An error occurred';
+            const errorMessage = result.data.content || result.data.error || 'An error occurred';
             this.writeError(errorMessage + '\n');
-          } else if (result.data.type === 'terminal') {
+          } else if (result.data.action === 'brain/terminal/response') {
             // Handle terminal responses
-            const content = result.data.data?.content || result.data.data?.message;
-            const source = result.data.data?.source;
+            const content = result.data.content;
+            const source = result.data.source;
+            
             if (content) {
-              let formattedContent = content;
-              if (this.formatter.getMode() === 'source' && source) {
-                formattedContent = `[${source}] ${content}`;
-              } else if (this.formatter.getMode() === 'raw') {
-                formattedContent = JSON.stringify(result.data, null, 2);
+              let formattedContent = content; // Default to raw content
+              const currentMode = this.formatter.getMode();
+
+              if (currentMode === 'raw') {
+                // Raw mode already uses the original content string
+                formattedContent = content;
+              } else {
+                // Try parsing for content and source modes
+                try {
+                  const parsedContent: BrainThoughtProcess = JSON.parse(content);
+                  const speakContent = parsedContent.thoughts?.speak;
+
+                  if (speakContent) {
+                    if (currentMode === 'content') {
+                      formattedContent = speakContent;
+                    } else if (currentMode === 'source' && source) {
+                      formattedContent = `[${source}] ${speakContent}`;
+                    } else {
+                      // Fallback if mode is unexpected or source is missing for source mode
+                      formattedContent = speakContent; 
+                    }
+                  } else {
+                    // If parsing succeeds but speak is missing, show raw content
+                    formattedContent = content; 
+                    this.writeError('[Warning: Could not extract speak content from parsed response]\n');
+                  }
+
+                } catch (parseError) {
+                  // If JSON parsing fails, display the raw content and a warning
+                  formattedContent = content;
+                  this.writeError('[Warning: Could not parse response content as JSON]\n');
+                }
               }
+              
               this.writeMessage('\n' + formattedContent + '\n');
             }
           } else if (result.data.message) {

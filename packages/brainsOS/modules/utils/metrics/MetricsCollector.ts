@@ -1,10 +1,10 @@
-import { Logger } from './Logger';
+import { Logger } from '../../../shared/Logger';
 import { initializeSQSClient, sendMetricsToSQS } from '../aws/SQSClient';
 import { initializeS3Client, storeMetricsInS3 } from '../aws/S3Client';
-import { LLMUsageMetadata, MetricsDestination, MetricsConfig } from '../types/Metrics';
+import { LLMUsageMetadata, MetricsDestination, MetricsConfig } from './LLMMetrics';
 
 // Logger for metrics tracking
-const logger = new Logger('MetricsCollector');
+const logger = new Logger('MetricsCollector', 'warn');
 
 // Store config once for reuse
 let metricsConfig: MetricsConfig | null = null;

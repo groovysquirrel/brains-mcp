@@ -1,6 +1,6 @@
 import { SQSClient, SendMessageCommand } from '@aws-sdk/client-sqs';
-import { Logger } from '../logging/Logger';
-import { LLMUsageMetadata } from '../types/Metrics';
+import { Logger } from '../../../shared/Logger';
+import { LLMUsageMetadata } from '../metrics/LLMMetrics';
 import { Resource } from 'sst';
 
 // Global variables for Lambda reuse

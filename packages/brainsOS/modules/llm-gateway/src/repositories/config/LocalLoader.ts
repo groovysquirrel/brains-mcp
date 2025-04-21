@@ -4,10 +4,10 @@ import { VendorConfig } from '../../types/Vendor';
 import { ModelConfig } from '../../types/Model';
 import { ModalityConfig } from '../../types/Modality';
 import { GatewayModelState, GatewayModelAliases } from '../../types/GatewayState';
-import { MetricsConfig, MetricsDestination } from '../../../../utils/types/Metrics';
+import { MetricsConfig, MetricsDestination } from '../../../../utils/metrics/LLMMetrics';
 import * as fs from 'fs/promises';
 import path from 'path';
-import { Logger, LogLevel } from '../../../../utils/logging/Logger';
+import { Logger, LogLevel } from '../../../../../shared/Logger';
 import { Resource } from 'sst';
 import { TextModalityHandler } from '../../core/modalities/TextModalityHandler';
 import { ModalityHandler } from '../../types/Modality';
@@ -35,7 +35,7 @@ export class LocalConfigLoader implements ConfigRepository {
    * @param configPath - Base path for configuration files
    */
   constructor(configPath?: string) {
-    this.logger = new Logger('LocalConfigLoader');
+    this.logger = new Logger('LLM Gateway - LocalConfigLoader', 'warn');
     this.configPath = configPath || `${process.cwd()}/llm-gateway/config`;
   }
 

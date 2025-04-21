@@ -1,5 +1,5 @@
-import { Logger } from '../../utils/logging/Logger';
-import { recordLLMMetrics } from '../../utils/logging/MetricsCollector';
+import { Logger } from '../../../shared/Logger';
+import { recordLLMMetrics } from '../../utils/metrics/MetricsCollector';
 import { MCPServerConfig } from './repositories/config/ConfigRepository';
 import { ToolRepository } from './repositories/services/ToolRepository';
 import { ResourceRepository } from './repositories/services/ResourceRepository';
@@ -86,6 +86,7 @@ export class MCPServer {
   private promptRepository: PromptRepository;
   private transformerRepository: TransformerRepository;
   private logger: Logger;
+  private initialized: boolean = false;
 
   private constructor(config: MCPServerConfig) {
     this.config = config;
@@ -112,6 +113,12 @@ export class MCPServer {
   }
 
   public async initialize(): Promise<void> {
+    // Skip initialization if already initialized
+    if (this.initialized) {
+      this.logger.info('MCPServer already initialized, skipping initialization');
+      return;
+    }
+
     this.logger.info('Initializing MCPServer');
     
     // Initialize repositories
@@ -128,7 +135,24 @@ export class MCPServer {
       this.initializeTransformers()
     ]);
 
+    this.initialized = true;
     this.logger.info('MCPServer initialized successfully');
+  }
+
+  /**
+   * Check if MCPServer is initialized 
+   */
+  public isInitialized(): boolean {
+    return this.initialized;
+  }
+
+  /**
+   * Ensure MCPServer is initialized
+   */
+  public async ensureInitialized(): Promise<void> {
+    if (!this.initialized) {
+      await this.initialize();
+    }
   }
 
   private async initializeTools(): Promise<void> {

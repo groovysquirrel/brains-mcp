@@ -1,6 +1,6 @@
 import { GatewayRequest } from '../../types/Request';
 import { VendorConfig } from '../../types/Vendor';
-import { Logger } from '../../../../utils/logging/Logger';
+import { Logger } from '../../../../../shared/Logger';
 import { ProviderConfig } from '../../types/Provider';
 import { ModelConfig } from '../../types/Model';
 import { GatewayResponse } from '../../types/Response';

@@ -1,5 +1,5 @@
 import { ConfigRepository, MCPServerConfig } from './ConfigRepository';
-import { Logger, LogLevel } from '../../../../utils/logging/Logger';
+import { Logger, LogLevel } from '../../../../../shared/Logger';
 import * as fs from 'fs/promises';
 import path from 'path';
 

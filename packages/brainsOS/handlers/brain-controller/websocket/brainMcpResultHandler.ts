@@ -4,7 +4,7 @@
  * These are typically used for direct command results from the MCP server.
  */
 
-import { Logger } from '../../../utils/logging/logger';
+import { Logger } from '../../../shared/Logger';
 import { ConnectionManager } from '../../system/websocket/connectionManager';
 import { WebSocketEvent } from '../../system/websocket/websocketTypes';
 import { BrainController } from '../../../modules/brain-controller/src/BrainController';
@@ -97,6 +97,7 @@ export const handler = async (event: WebSocketEvent) => {
             data: {
                 requestId: body.data?.requestId,
                 commandId: body.data?.commandId,
+                conversationId: body.data?.conversationId,
                 status: 'received',
                 message: `Received result from command "${body.data?.toolName}"`,
                 timestamp: new Date().toISOString(),
@@ -165,7 +166,7 @@ export const handler = async (event: WebSocketEvent) => {
                         connectionId,
                         userId,
                         conversationId,
-                        commandId: `result_${body.data.commandId || body.data.requestId}`,
+                        commandId: body.data.commandId || body.data.requestId,
                         // Important: Use messages array instead of rawData to maintain conversation context
                         messages: [{
                             role: 'user',
@@ -207,7 +208,8 @@ export const handler = async (event: WebSocketEvent) => {
                             action: response.type,
                             data: {
                                 ...response.data,
-                                commandId: `result_${body.data.commandId || body.data.requestId}`,
+                                commandId: body.data.commandId || body.data.requestId,
+                                conversationId: body.data.conversationId,
                                 timestamp: new Date().toISOString()
                             }
                         };
@@ -249,7 +251,8 @@ export const handler = async (event: WebSocketEvent) => {
                                 action: retryResponse.type,
                                 data: {
                                     ...retryResponse.data,
-                                    commandId: `result_${body.data.commandId || body.data.requestId}`,
+                                    commandId: body.data.commandId || body.data.requestId,
+                                    conversationId: body.data.conversationId,
                                     timestamp: new Date().toISOString()
                                 }
                             };
@@ -277,7 +280,8 @@ export const handler = async (event: WebSocketEvent) => {
                                 content: `Failed to process MCP command result: ${retryError instanceof Error ? retryError.message : 'Unknown error'}`,
                                 source: 'system',
                                 timestamp: new Date().toISOString(),
-                                commandId: body.data.commandId || 'error_' + Date.now()
+                                commandId: body.data.commandId || 'error_' + Date.now(),
+                                conversationId: body.data.conversationId
                             }
                         });
                     }
@@ -299,7 +303,8 @@ export const handler = async (event: WebSocketEvent) => {
                             content: `Error processing MCP command result: ${llmError instanceof Error ? llmError.message : 'Unknown error'}. Please try again.`,
                             source: 'system',
                             timestamp: new Date().toISOString(),
-                            commandId: body.data.commandId || 'error_' + Date.now()
+                            commandId: body.data.commandId || 'error_' + Date.now(),
+                            conversationId: body.data.conversationId
                         }
                     });
                 } catch (sendError) {
@@ -337,7 +342,8 @@ export const handler = async (event: WebSocketEvent) => {
                     content: `Error processing MCP response: ${error instanceof Error ? error.message : 'Unknown error'}`,
                     source: 'system',
                     timestamp: new Date().toISOString(),
-                    commandId: 'error_' + Date.now()
+                    commandId: 'error_' + Date.now(),
+                    conversationId: event.body ? JSON.parse(event.body).data?.conversationId : undefined
                 }
             });
         } catch (sendError) {

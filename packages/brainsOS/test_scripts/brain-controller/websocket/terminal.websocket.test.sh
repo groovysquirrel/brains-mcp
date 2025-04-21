@@ -41,6 +41,25 @@ echo ""
 echo "3. SIMPLE CHAT: Test with system command:"
 echo '{"action": "brain/terminal/request", "data": {"rawData": "Can you list files in the current directory?", "requestStreaming": false, "commandId": "test_cmd_003", "timestamp": "2023-04-14T12:02:00Z", "source": "terminal"}}'
 echo ""
+echo "4. CONVERSATION TEST 1: First message with explicit conversationId:"
+echo '{"action": "brain/terminal/request", "data": {"rawData": "My name is John. Remember that.", "requestStreaming": false, "commandId": "conv_cmd_001", "timestamp": "2023-04-14T12:03:00Z", "source": "terminal", "conversationId": "test-conversation-1234"}}'
+echo ""
+echo "5. CONVERSATION TEST 2: Follow-up message with same conversationId:"
+echo '{"action": "brain/terminal/request", "data": {"rawData": "What is my name?", "requestStreaming": false, "commandId": "conv_cmd_002", "timestamp": "2023-04-14T12:04:00Z", "source": "terminal", "conversationId": "test-conversation-1234"}}'
+echo ""
+echo "6. CONVERSATION TEST 3: MCP Command with same conversationId:"
+echo '{"action": "brain/terminal/request", "data": {"rawData": "Generate a random number between 1 and 100 using the random number generator tool", "requestStreaming": false, "commandId": "conv_cmd_003", "timestamp": "2023-04-14T12:05:00Z", "source": "terminal", "conversationId": "test-conversation-1234"}}'
+echo ""
+echo "7. CONVERSATION TEST 4: Follow-up after MCP Command with same conversationId:"
+echo '{"action": "brain/terminal/request", "data": {"rawData": "What was the previous random number you generated for me?", "requestStreaming": false, "commandId": "conv_cmd_004", "timestamp": "2023-04-14T12:06:00Z", "source": "terminal", "conversationId": "test-conversation-1234"}}'
+echo ""
+echo "8. NEW CONVERSATION: Start a new conversation with different conversationId:"
+echo '{"action": "brain/terminal/request", "data": {"rawData": "This is a new conversation. I am Jane.", "requestStreaming": false, "commandId": "new_conv_001", "timestamp": "2023-04-14T12:07:00Z", "source": "terminal", "conversationId": "test-conversation-456"}}'
+echo ""
+echo "9. NEW CONVERSATION FOLLOW-UP: Message to the second conversation:"
+echo '{"action": "brain/terminal/request", "data": {"rawData": "What is my name in this conversation?", "requestStreaming": false, "commandId": "new_conv_002", "timestamp": "2023-04-14T12:08:00Z", "source": "terminal", "conversationId": "test-conversation-456"}}'
+echo ""
+echo ""
 echo ""
 echo "Note: The WebSocket route 'brain/terminal' expects messages with 'brain/terminal' action."
 echo "The handler has been updated to also accept legacy 'terminal' format for backward compatibility."

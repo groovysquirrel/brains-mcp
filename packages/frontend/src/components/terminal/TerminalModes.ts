@@ -1,5 +1,23 @@
 export type TerminalMode = 'raw' | 'content' | 'source';
 
+/**
+ * Interface for the parsed content from the brain's response,
+ * often containing thoughts and a potential command.
+ */
+export interface BrainThoughtProcess {
+  thoughts: {
+    text?: string;
+    reasoning?: string;
+    plan?: string[];
+    criticism?: string;
+    speak?: string;
+  } | null;
+  command: {
+    name: string;
+    args: Record<string, any>;
+  } | null;
+}
+
 export interface TerminalMessage {
   type: string;
   data: {

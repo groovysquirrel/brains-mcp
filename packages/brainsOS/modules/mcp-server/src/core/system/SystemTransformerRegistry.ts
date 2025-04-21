@@ -1,4 +1,4 @@
-import { Logger } from '../../../../utils/logging/Logger';
+import { Logger } from '../../../../../shared/Logger';
 import { TransformerRepository } from '../../repositories/services/TransformerRepository';
 
 // DataTable transformers
@@ -21,6 +21,7 @@ export class SystemTransformerRegistry {
   private static instance: SystemTransformerRegistry;
   private transformerRepository: TransformerRepository;
   private logger: Logger;
+  private initialized: boolean = false;
 
   private constructor() {
     this.transformerRepository = TransformerRepository.getInstance();
@@ -38,6 +39,11 @@ export class SystemTransformerRegistry {
    * Initialize and register all built-in transformers
    */
   public async registerBuiltInTransformers(): Promise<void> {
+    if (this.initialized) {
+      this.logger.info('Built-in transformers already registered, skipping');
+      return;
+    }
+
     try {
       this.logger.info('Registering built-in transformers...');
 
@@ -72,9 +78,10 @@ export class SystemTransformerRegistry {
       await this.transformerRepository.registerTransformer(itrg_bra_objectToCsvTransformer);
       this.logger.info(`Registered ${itrg_bra_objectToCsvTransformer.config.name}`);
 
+      this.initialized = true;
       this.logger.info('All built-in transformers registered successfully');
     } catch (error) {
-      this.logger.error('Failed to register built-in transformers:', error);
+      this.logger.error('Failed to initialize transformers:', error);
       throw error;
     }
   }

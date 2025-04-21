@@ -1,10 +1,20 @@
 import { APIGatewayProxyHandlerV2WithIAMAuthorizer } from 'aws-lambda';
-import { Logger } from '../../../utils/logging/logger';
-import { createResponse } from '../../../utils/http/response';
+import { Logger } from '../../../shared/Logger';
 import { ConnectionManager } from './connectionManager';
 
-const logger = new Logger('WebsocketDisconnect');
+const logger = new Logger('Websocket $Disconnect', 'warn');
 const connectionManager = ConnectionManager.getInstance();
+
+// Helper function to create a standardized response format
+const formatResponse = (statusCode: number, body: Record<string, any>) => {
+  return {
+    statusCode,
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(body)
+  };
+};
 
 export const handler: APIGatewayProxyHandlerV2WithIAMAuthorizer = async (event) => {
   const connectionId = (event.requestContext as any).connectionId;
@@ -19,7 +29,7 @@ export const handler: APIGatewayProxyHandlerV2WithIAMAuthorizer = async (event) 
       userId
     });
 
-    return createResponse(200, {
+    return formatResponse(200, {
       success: true,
       metadata: {
         connectionId,
@@ -33,7 +43,7 @@ export const handler: APIGatewayProxyHandlerV2WithIAMAuthorizer = async (event) 
       userId
     });
 
-    return createResponse(500, {
+    return formatResponse(500, {
       success: false,
       error: {
         code: 'DISCONNECT_ERROR',

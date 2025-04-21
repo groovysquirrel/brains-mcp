@@ -2,15 +2,17 @@ import { BrainConfig } from './types/BrainConfig';
 import { BrainRequest } from './types/BrainRequest';
 import { BrainResponse, createErrorResponse, createTerminalResponse, createProcessingResponse } from './types/BrainResponse';
 import { BrainsRepository } from './repositories/brains/BrainsRepository';
-import { Logger } from './utils/logging/Logger';
+import { Logger } from '../../../shared/Logger';
 import { Gateway } from '../../llm-gateway/src/Gateway';
 import { MCPServer } from '../../mcp-server/src/MCPServer';
 import * as fs from 'fs';
 import * as path from 'path';
 import { SQSClient, SendMessageCommand } from '@aws-sdk/client-sqs';
 import { Resource } from 'sst';
-import { extractMCPCommands, MCPCommand } from './utils/mcpParser';
+import { extractMCPCommands, isValidCommand, MCPCommand, cleanResponseContent } from './utils/MCPParser';
 import { MCPTool, MCPTransformer, MCPPrompt, MCPResource, MCPToolRequest } from './types/MCPRequests';
+import { MCPComponentManager } from './utils/MCPComponentManager';
+import { MCPPromptBuilder } from './utils/MCPPromptBuilder';
 
 /**
  * BrainController - Central controller for managing AI brain operations
@@ -83,28 +85,14 @@ export class BrainController {
     private brainName: string;
     
     /**
-     * Collection of available MCP tools that can be used by the brain
-     * These are commands that can be executed by the system
+     * Manager for MCP components (tools, transformers, prompts, resources)
      */
-    private availableMCPTools: MCPTool[] = [];
+    private componentManager: MCPComponentManager;
     
     /**
-     * Collection of available MCP transformers for data conversion
-     * These convert data between different formats
+     * Utility for building MCP prompts and documentation
      */
-    private availableMCPTransformers: MCPTransformer[] = [];
-    
-    /**
-     * Collection of available MCP prompts
-     * These are templates that can be used for specific scenarios
-     */
-    private availableMCPPrompts: MCPPrompt[] = [];
-    
-    /**
-     * Collection of available MCP resources
-     * These are static data sources that can be accessed
-     */
-    private availableMCPResources: MCPResource[] = [];
+    private promptBuilder: MCPPromptBuilder;
     
     /**
      * AWS SQS client for sending asynchronous messages
@@ -147,12 +135,15 @@ export class BrainController {
     }) {
         // Initialize dependencies with provided options or defaults
         this.repository = options?.repository || BrainsRepository.getInstance();
-        this.logger = new Logger('BrainController');
+        this.logger = new Logger('BrainController', 'warn');
         this.gateway = options?.gateway || new Gateway();
         this.connectionManager = options?.connectionManager;
         this.conversationMap = new Map();
         this.brainName = options?.brainName || 'default';
         this.sqsClient = new SQSClient({});
+        
+        // Initialize utility classes (will be fully set up during initialize())
+        this.promptBuilder = new MCPPromptBuilder();
         
         // Load MCP prompt from file
         try {
@@ -232,7 +223,7 @@ export class BrainController {
             // Initialize the brain repository
             await this.repository.initialize();
             const brains = await this.repository.getAllBrains();
-            this.logger.info('Loaded brain configurations:', brains);
+            this.logger.info('Loaded brain configurations:', { brains });
             
             // Initialize the LLM gateway
             await this.gateway.initialize('local');
@@ -241,8 +232,9 @@ export class BrainController {
             this.mcpServer = await MCPServer.create();
             await this.mcpServer.initialize();
             
-            // Fetch available MCP components
-            await this.fetchAllMCPComponents();
+            // Initialize the component manager with the MCP server
+            this.componentManager = new MCPComponentManager(this.mcpServer);
+            await this.componentManager.initialize();
             
             this.initialized = true;
             this.logger.info('BrainController initialized successfully');
@@ -277,272 +269,9 @@ export class BrainController {
     }
 
     // -------------------------------------------------------------------------
-    // MCP Component Management
-    // -------------------------------------------------------------------------
-    
-    /**
-     * Fetch available MCP tools from the MCP server
-     * 
-     * Tools are executable commands that can perform actions like calculations,
-     * fetching data, or processing information.
-     */
-    private async fetchMCPTools(): Promise<void> {
-        try {
-            // Ensure MCP server is initialized
-            if (!this.mcpServer) {
-                throw new Error('MCP Server not initialized');
-            }
-            
-            // Get tools directly from MCPServer
-            const tools = await this.mcpServer.listTools();
-            
-            // Adapt tools to our internal format for consistency
-            this.availableMCPTools = tools.map(tool => ({
-                name: tool.name,
-                description: tool.description,
-                schema: tool.schema
-            }));
-            
-            this.logger.info('Fetched MCP tools successfully', { 
-                toolCount: this.availableMCPTools.length,
-                tools: this.availableMCPTools.map(t => t.name)
-            });
-        } catch (error) {
-            this.logger.error('Failed to fetch MCP tools:', error);
-            // Don't throw the error, just log it - we can still function without tool data
-        }
-    }
-
-    /**
-     * Fetch available MCP transformers from the MCP server
-     * 
-     * Transformers convert data between different formats,
-     * like CSV to JSON or markdown to HTML.
-     */
-    private async fetchMCPTransformers(): Promise<void> {
-        try {
-            // Ensure MCP server is initialized
-            if (!this.mcpServer) {
-                throw new Error('MCP Server not initialized');
-            }
-            
-            // Get transformers directly from MCPServer
-            const transformers = await this.mcpServer.listTransformers();
-            
-            // Adapt transformers to our internal format
-            this.availableMCPTransformers = transformers.map(t => ({
-                name: t.name,
-                description: t.description,
-                schema: {
-                    type: 'transformer',
-                    objectType: t.objectType,
-                    views: [t.fromView, t.toView]
-                }
-            }));
-            
-            this.logger.info('Fetched MCP transformers successfully', { 
-                transformerCount: this.availableMCPTransformers.length,
-                transformers: this.availableMCPTransformers.map(t => t.name)
-            });
-        } catch (error) {
-            this.logger.error('Failed to fetch MCP transformers:', error);
-            // Don't throw the error, just log it - we can still function without transformer data
-        }
-    }
-
-    /**
-     * Fetch available MCP prompts from the MCP server
-     * 
-     * Prompts are reusable templates for common LLM interactions,
-     * which can be parameterized with variables.
-     */
-    private async fetchMCPPrompts(): Promise<void> {
-        try {
-            // Ensure MCP server is initialized
-            if (!this.mcpServer) {
-                throw new Error('MCP Server not initialized');
-            }
-            
-            // For now, we're accessing the promptRepository directly
-            // In a future refactor, MCPServer should provide a listPrompts method
-            const prompts = await this.mcpServer['promptRepository'].listPrompts();
-            
-            // Adapt prompts to our internal format
-            this.availableMCPPrompts = prompts.map(p => ({
-                name: p.name,
-                description: p.metadata?.description || `Prompt: ${p.name}`,
-                templateText: p.content,
-                parameters: p.metadata?.parameters
-            }));
-            
-            this.logger.info('Fetched MCP prompts successfully', { 
-                promptCount: this.availableMCPPrompts.length,
-                prompts: this.availableMCPPrompts.map(p => p.name)
-            });
-        } catch (error) {
-            this.logger.error('Failed to fetch MCP prompts:', error);
-            // Don't throw the error, just log it - we can still function without prompt data
-        }
-    }
-
-    /**
-     * Fetch available MCP resources from the MCP server
-     * 
-     * Resources are static data sources like tables, datasets,
-     * or reference materials that can be accessed by the LLM.
-     */
-    private async fetchMCPResources(): Promise<void> {
-        try {
-            // Ensure MCP server is initialized
-            if (!this.mcpServer) {
-                throw new Error('MCP Server not initialized');
-            }
-            
-            // For now, we're accessing the resourceRepository directly
-            // In a future refactor, MCPServer should provide a listResources method
-            const resources = await this.mcpServer['resourceRepository'].listResources();
-            
-            // Adapt resources to our internal format
-            this.availableMCPResources = resources.map(r => ({
-                name: r.name,
-                description: r.metadata?.description || `Resource: ${r.name}`,
-                type: r.type,
-                data: r.content
-            }));
-            
-            this.logger.info('Fetched MCP resources successfully', { 
-                resourceCount: this.availableMCPResources.length,
-                resources: this.availableMCPResources.map(r => r.name)
-            });
-        } catch (error) {
-            this.logger.error('Failed to fetch MCP resources:', error);
-            // Don't throw the error, just log it - we can still function without resource data
-        }
-    }
-
-    /**
-     * Fetch all available MCP components from the MCP server
-     * 
-     * This is a convenience method that fetches all component types
-     * in parallel for efficiency.
-     */
-    private async fetchAllMCPComponents(): Promise<void> {
-        // Fetch all components in parallel for better performance
-        await Promise.all([
-            this.fetchMCPTools(),
-            this.fetchMCPTransformers(),
-            this.fetchMCPPrompts(),
-            this.fetchMCPResources()
-        ]);
-        
-        this.logger.info('Fetched all MCP components successfully', {
-            toolCount: this.availableMCPTools.length,
-            transformerCount: this.availableMCPTransformers.length,
-            promptCount: this.availableMCPPrompts.length,
-            resourceCount: this.availableMCPResources.length
-        });
-    }
-
-    // -------------------------------------------------------------------------
     // MCP Documentation & Communication
     // -------------------------------------------------------------------------
     
-    /**
-     * Generate comprehensive documentation for all available MCP components
-     * 
-     * This method creates detailed documentation for all available MCP components:
-     * - Tools: Available commands that can be executed
-     * - Transformers: Data conversion utilities
-     * - Prompts: Pre-defined prompt templates
-     * - Resources: Static data resources
-     * 
-     * The documentation is formatted in markdown and appended to the system prompt.
-     * 
-     * @returns Formatted markdown documentation of all MCP components
-     */
-    private generateMCPDocumentation(): string {
-        // Start with an empty documentation string
-        let documentation = '\n\n## MCP Components\n\n';
-        
-        // Add Tools documentation
-        if (this.availableMCPTools && this.availableMCPTools.length > 0) {
-            documentation += '### Available Commands\n\n';
-            documentation += 'To use a command, include it in your response like this:\n\n';
-            documentation += '```json\n';
-            documentation += '{\n';
-            documentation += '  "thoughts": { ... },\n';
-            documentation += '  "command": {\n';
-            documentation += '    "name": "command_name",\n';
-            documentation += '    "args": { "param1": "value1" }\n';
-            documentation += '  }\n';
-            documentation += '}\n';
-            documentation += '```\n\n';
-            documentation += 'Available commands:\n\n';
-            
-            for (const tool of this.availableMCPTools) {
-                documentation += `#### ${tool.name}\n`;
-                documentation += `${tool.description}\n\n`;
-                documentation += '**Parameters:**\n\n';
-                documentation += '```json\n';
-                documentation += JSON.stringify(tool.schema, null, 2);
-                documentation += '\n```\n\n';
-            }
-        }
-        
-        // Add Transformers documentation
-        if (this.availableMCPTransformers && this.availableMCPTransformers.length > 0) {
-            documentation += '### Available Transformers\n\n';
-            documentation += 'Transformers convert data between different formats.\n\n';
-            
-            for (const transformer of this.availableMCPTransformers) {
-                documentation += `#### ${transformer.name}\n`;
-                documentation += `${transformer.description}\n\n`;
-                documentation += `**Object Type:** ${transformer.schema.objectType}\n`;
-                documentation += `**Views:** ${transformer.schema.views.join(' → ')}\n\n`;
-            }
-        }
-        
-        // Add Prompts documentation
-        if (this.availableMCPPrompts && this.availableMCPPrompts.length > 0) {
-            documentation += '### Available Prompts\n\n';
-            documentation += 'Pre-defined prompt templates you can reference.\n\n';
-            
-            for (const prompt of this.availableMCPPrompts) {
-                documentation += `#### ${prompt.name}\n`;
-                documentation += `${prompt.description}\n\n`;
-                
-                if (prompt.parameters) {
-                    documentation += '**Parameters:**\n\n';
-                    documentation += '```json\n';
-                    documentation += JSON.stringify(prompt.parameters, null, 2);
-                    documentation += '\n```\n\n';
-                }
-            }
-        }
-        
-        // Add Resources documentation
-        if (this.availableMCPResources && this.availableMCPResources.length > 0) {
-            documentation += '### Available Resources\n\n';
-            documentation += 'Static data resources you can reference.\n\n';
-            
-            for (const resource of this.availableMCPResources) {
-                documentation += `#### ${resource.name}\n`;
-                documentation += `${resource.description}\n\n`;
-                documentation += `**Type:** ${resource.type}\n\n`;
-            }
-        }
-        
-        this.logger.debug('Generated MCP documentation', {
-            documentationLength: documentation.length,
-            toolCount: this.availableMCPTools.length,
-            transformerCount: this.availableMCPTransformers.length,
-            promptCount: this.availableMCPPrompts.length, 
-            resourceCount: this.availableMCPResources.length
-        });
-        
-        return documentation;
-    }
-
     /**
      * Send an MCP request to the queue for processing
      * 
@@ -753,7 +482,13 @@ export class BrainController {
      * @returns A formatted error response
      */
     public handleError(error: Error): BrainResponse {
-        this.logger.error('BrainController error:', error);
+        this.logger.error('BrainController error:', { 
+            error: {
+                message: error.message,
+                name: error.name,
+                stack: error.stack
+            } 
+        });
         return createErrorResponse(error.message);
     }
 
@@ -776,7 +511,7 @@ export class BrainController {
      * @returns A formatted response for the terminal
      */
     private async handleChatRequest(data: any): Promise<BrainResponse> {
-        const { connectionId, userId, messages } = data;
+        const { connectionId, userId, messages, conversationId: providedConversationId } = data;
 
         try {
             // Ensure we're initialized before proceeding
@@ -785,14 +520,24 @@ export class BrainController {
             // STEP 1: Manage conversation context
             // -----------------------------------
             
-            // Get or create a conversation ID for tracking context
-            let conversationId = this.conversationMap.get(connectionId);
+            // First check if the client provided a conversationId
+            let conversationId = providedConversationId;
+            
+            // If no conversationId was provided, check the mapping or generate a new one
             if (!conversationId) {
-                // Create a new conversation ID if one doesn't exist
-                conversationId = `conv_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-                this.conversationMap.set(connectionId, conversationId);
-                this.logger.info('Created new conversation', { connectionId, conversationId });
+                // Get from mapping if it exists
+                conversationId = this.conversationMap.get(connectionId);
+                
+                // Generate a new one if we don't have one yet
+                if (!conversationId) {
+                    conversationId = `conv_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+                    this.logger.info('Created new conversation', { connectionId, conversationId });
+                }
             }
+            
+            // Update the mapping with the current conversationId
+            this.conversationMap.set(connectionId, conversationId);
+            this.logger.info('Using conversation', { connectionId, conversationId, providedByClient: !!providedConversationId });
 
             // STEP 2: Load brain configuration
             // --------------------------------
@@ -808,30 +553,28 @@ export class BrainController {
             // STEP 3: Prepare the system prompt
             // --------------------------------
             
+            // Get MCP components from the component manager
+            const tools = this.componentManager.getAvailableMCPTools();
+            const transformers = this.componentManager.getAvailableMCPTransformers();
+            const prompts = this.componentManager.getAvailableMCPPrompts();
+            const resources = this.componentManager.getAvailableMCPResources();
+            
             // Generate documentation for MCP components
-            const mcpDocumentation = this.generateMCPDocumentation();
+            const mcpDocumentation = this.promptBuilder.generateMCPDocumentation(
+                tools, transformers, prompts, resources
+            );
             this.logger.info('Generated MCP documentation', { 
                 documentationLength: mcpDocumentation.length 
             });
 
             // Format the system prompt with brain config and MCP documentation
-            const formattedSystemPrompt = `Your name and nickname is ${brain.config.nickname}.
-
-PERSONA: ${brain.config.persona}
-
-${brain.config.systemPrompt}
-
-${this.mcpPrompt}${mcpDocumentation}`;
-
-            this.logger.debug('Formatted system prompt', {
-                promptLength: formattedSystemPrompt.length,
-                includes: {
-                    persona: true,
-                    systemPrompt: true,
-                    mcpPrompt: true,
-                    mcpDocumentation: mcpDocumentation.length > 0
-                }
-            });
+            const formattedSystemPrompt = this.promptBuilder.formatSystemPrompt(
+                brain.config.nickname,
+                brain.config.persona,
+                brain.config.systemPrompt,
+                this.mcpPrompt,
+                mcpDocumentation
+            );
 
             // STEP 4: Send request to LLM gateway
             // ----------------------------------
@@ -861,8 +604,18 @@ ${this.mcpPrompt}${mcpDocumentation}`;
             // STEP 5: Process MCP commands
             // ----------------------------
             
-            // Extract any command ID from the original request for tracking
-            const commandId = data.commandId || `cmd_${Date.now()}`;
+            // Extract the command ID from the original request. It MUST be present.
+            const commandId = data.commandId;
+            if (!commandId) {
+                const errorMsg = 'Critical Error: commandId is missing from chat request data';
+                this.logger.error(errorMsg, { connectionId, userId, conversationId });
+                // Optionally, throw an error to prevent further processing without a commandId
+                throw new Error(errorMsg); 
+                // Or return an error response immediately:
+                // return createErrorResponse(errorMsg, 'system');
+            }
+            
+            this.logger.info('Processing command with ID', { commandId }); // Log the commandId being used
 
             // Process any MCP commands from the response
             const { parsedContent, extractedCommands } = await this.processMCPCommands(
@@ -876,8 +629,29 @@ ${this.mcpPrompt}${mcpDocumentation}`;
             // STEP 6: Format and return response
             // ---------------------------------
             
-            // Use the original content for now
-            let responseContent = gatewayResponse.content;
+            // Add debug logging to see what we're getting from the LLM gateway
+            this.logger.debug('Raw LLM gateway response content:', {
+                contentLength: gatewayResponse.content.length,
+                conversationId,
+                connectionId
+            });
+            
+            // Log detailed analysis of the LLM response
+            this.logLLMResponseDetails(gatewayResponse.content, conversationId, connectionId);
+            
+            // Clean the response content for the client
+            const cleanedContent = this.cleanResponseForClient(gatewayResponse.content);
+            
+            // Log a comparison of original vs cleaned content
+            if (gatewayResponse.content.length !== cleanedContent.length) {
+                this.logger.info('Response content comparison:', {
+                    originalLength: gatewayResponse.content.length,
+                    cleanedLength: cleanedContent.length,
+                    diffBytes: gatewayResponse.content.length - cleanedContent.length,
+                    originalSample: gatewayResponse.content.substring(0, 100) + '...',
+                    cleanedSample: cleanedContent.substring(0, 100) + '...'
+                });
+            }
             
             // If commands were extracted, log the information
             if (extractedCommands.length > 0) {
@@ -895,10 +669,12 @@ ${this.mcpPrompt}${mcpDocumentation}`;
                 // In a future enhancement, we might append status information
             }
 
-            // Return the formatted response
+            // Return the formatted response with cleaned content
             return createTerminalResponse(
-                responseContent,
-                brain.config.nickname
+                cleanedContent,
+                brain.config.nickname,
+                commandId,
+                conversationId
             );
         } catch (error) {
             this.logger.error('Error handling chat request:', error);
@@ -942,15 +718,6 @@ ${this.mcpPrompt}${mcpDocumentation}`;
             contentPreview: content.substring(0, 100) + '...' // Log just a preview
         });
         
-        // Pre-process the content to clean any artifacts or formatting issues
-        const cleanedContent = this.cleanResponseContent(content);
-        if (cleanedContent !== content) {
-            this.logger.info('Cleaned response content', {
-                originalLength: content.length,
-                cleanedLength: cleanedContent.length
-            });
-        }
-        
         // If a conversation ID is provided, ensure it's registered in the conversation map
         if (conversationId) {
             // Register the mapping to ensure response handlers can find it
@@ -958,7 +725,7 @@ ${this.mcpPrompt}${mcpDocumentation}`;
         }
 
         // Extract any MCP commands from the content
-        const commands = extractMCPCommands(cleanedContent);
+        const commands = extractMCPCommands(content);
         
         // If no commands found, return early
         if (commands.length === 0) {
@@ -982,7 +749,7 @@ ${this.mcpPrompt}${mcpDocumentation}`;
         // ------------------------------------
         
         // Get available tool names for validation
-        const availableToolNames = this.availableMCPTools.map(tool => tool.name);
+        const availableToolNames = this.componentManager.getAvailableMCPTools().map(tool => tool.name);
         
         // Track successfully processed commands
         const processedCommands: MCPCommand[] = [];
@@ -1142,7 +909,8 @@ ${this.mcpPrompt}${mcpDocumentation}`;
                 }
             });
             
-            this.logger.debug(`Sent status message: ${action}`, { connectionId });
+            //this.logger.debug(`Sent status message: ${action}`, { connectionId });
+
         } catch (error) {
             this.logger.error(`Failed to send status message: ${action}`, {
                 error: error instanceof Error ? error.message : String(error),
@@ -1160,7 +928,7 @@ ${this.mcpPrompt}${mcpDocumentation}`;
             this.logger.warn('BrainController not initialized when getting MCP tools');
             // Don't block the call, but log warning
         }
-        return this.availableMCPTools;
+        return this.componentManager.getAvailableMCPTools();
     }
 
     /**
@@ -1172,7 +940,7 @@ ${this.mcpPrompt}${mcpDocumentation}`;
             this.logger.warn('BrainController not initialized when getting MCP transformers');
             // Don't block the call, but log warning
         }
-        return this.availableMCPTransformers;
+        return this.componentManager.getAvailableMCPTransformers();
     }
 
     /**
@@ -1184,7 +952,7 @@ ${this.mcpPrompt}${mcpDocumentation}`;
             this.logger.warn('BrainController not initialized when getting MCP prompts');
             // Don't block the call, but log warning
         }
-        return this.availableMCPPrompts;
+        return this.componentManager.getAvailableMCPPrompts();
     }
 
     /**
@@ -1196,60 +964,7 @@ ${this.mcpPrompt}${mcpDocumentation}`;
             this.logger.warn('BrainController not initialized when getting MCP resources');
             // Don't block the call, but log warning
         }
-        return this.availableMCPResources;
-    }
-
-    /**
-     * Clean response content from the LLM by removing special tokens and artifacts
-     * 
-     * This method removes:
-     * - Special tokens like <|assistant|> or <|user|>
-     * - Duplicated JSON objects
-     * - Extraneous text outside the main JSON structure
-     * 
-     * @param content - The raw content from the LLM response
-     * @returns Cleaned content ready for command extraction
-     */
-    private cleanResponseContent(content: string): string {
-        if (!content) return content;
-        
-        this.logger.debug('Cleaning response content', { length: content.length });
-        
-        // Remove special tokens
-        let cleaned = content
-            .replace(/<\|assistant\|>/g, '')
-            .replace(/<\|user\|>/g, '')
-            .trim();
-        
-        // Check if there appear to be duplicated JSON objects (common with some LLMs)
-        const jsonStartCount = (cleaned.match(/\{\s*"thoughts"/g) || []).length;
-        
-        if (jsonStartCount > 1) {
-            this.logger.debug('Detected potential duplicate JSON objects', { count: jsonStartCount });
-            
-            // Try to extract just the first complete JSON object
-            const jsonMatch = /\{[\s\S]*?\}\s*(?=\{|$)/.exec(cleaned);
-            if (jsonMatch) {
-                this.logger.debug('Extracted first JSON object', { 
-                    matchLength: jsonMatch[0].length,
-                    fullLength: cleaned.length
-                });
-                cleaned = jsonMatch[0].trim();
-            }
-        }
-        
-        // Remove any trailing non-JSON text (e.g., "Your random number is 43")
-        // This matches a valid JSON structure and removes anything after it
-        const trailingTextMatch = /^(\{[\s\S]*\})[^{}]*$/.exec(cleaned);
-        if (trailingTextMatch) {
-            this.logger.debug('Removing trailing text after JSON', {
-                originalLength: cleaned.length,
-                jsonLength: trailingTextMatch[1].length
-            });
-            cleaned = trailingTextMatch[1];
-        }
-        
-        return cleaned;
+        return this.componentManager.getAvailableMCPResources();
     }
 
     /**
@@ -1278,6 +993,111 @@ ${this.mcpPrompt}${mcpDocumentation}`;
             connectionId,
             conversationId,
             totalMappings: this.conversationMap.size
+        });
+    }
+
+    // Add a new method to clean the response content for the client
+    private cleanResponseForClient(content: string): string {
+        // Use the enhanced cleanResponseContent function to handle all token types
+        let cleaned = cleanResponseContent(content);
+        
+        // Log what was cleaned
+        const cleaningDiff = content.length - cleaned.length;
+        if (cleaningDiff > 0) {
+            this.logger.info('Cleaned LLM response for client', {
+                originalLength: content.length,
+                cleanedLength: cleaned.length,
+                cleanedBytes: cleaningDiff
+            });
+        }
+        
+        return cleaned;
+    }
+
+    private logLLMResponseDetails(content: string, conversationId: string, connectionId: string): void {
+        // Log the full content for detailed analysis during debugging
+        this.logger.debug('======= LLM RESPONSE DETAIL START =======');
+        
+        // Check for special tokens and report their presence
+        const assistantTokens = (content.match(/<\|assistant\|>/g) || []).length;
+        const userTokens = (content.match(/<\|user\|>/g) || []).length;
+        const otherSpecialTokens = (content.match(/<\|[^>]+\|>/g) || [])
+            .filter(token => token !== '<|assistant|>' && token !== '<|user|>')
+            .join(', ');
+        
+        this.logger.debug('LLM Response Token Analysis:', {
+            conversationId,
+            connectionId,
+            contentLength: content.length,
+            assistantTokenCount: assistantTokens,
+            userTokenCount: userTokens,
+            otherSpecialTokens,
+            contentPreview: content.substring(0, 200) + (content.length > 200 ? '...' : '')
+        });
+        
+        // Create a mapping of all special token positions to identify where they appear
+        const tokenPositions: {token: string, position: number}[] = [];
+        const tokenRegex = /<\|[^>]+\|>/g;
+        let match;
+        
+        while ((match = tokenRegex.exec(content)) !== null) {
+            tokenPositions.push({
+                token: match[0],
+                position: match.index
+            });
+        }
+        
+        if (tokenPositions.length > 0) {
+            this.logger.debug('Special token positions in response:', {
+                positions: tokenPositions.slice(0, 10), // Limit to first 10 for brevity
+                totalTokens: tokenPositions.length
+            });
+            
+            // If we have assistant tokens specifically, log more details about them
+            if (assistantTokens > 0) {
+                this.logAssistantTokenDetails(content, conversationId);
+            }
+        }
+        
+        this.logger.debug('======= LLM RESPONSE DETAIL END =======');
+    }
+    
+    /**
+     * Log detailed information about assistant tokens in the response
+     * This helps debug issues with <|assistant|> tokens appearing in the output
+     */
+    private logAssistantTokenDetails(content: string, conversationId: string): void {
+        // Find all instances of assistant tokens
+        const assistantRegex = /<\|assistant\|>/g;
+        const positions: number[] = [];
+        let match;
+        
+        while ((match = assistantRegex.exec(content)) !== null) {
+            positions.push(match.index);
+        }
+        
+        if (positions.length === 0) return;
+        
+        // For each position, extract surrounding context to see what's happening
+        const contextEntries = positions.map((position, index) => {
+            const start = Math.max(0, position - 30);
+            const end = Math.min(content.length, position + 30);
+            const before = content.substring(start, position);
+            const after = content.substring(position + 13, end); // 13 is length of <|assistant|>
+            
+            return {
+                tokenIndex: index + 1,
+                position,
+                contextBefore: before,
+                token: '<|assistant|>',
+                contextAfter: after
+            };
+        });
+        
+        this.logger.warn('Found assistant tokens in LLM response', {
+            conversationId,
+            tokenCount: positions.length,
+            tokenDetails: contextEntries
         });
     }
 } 

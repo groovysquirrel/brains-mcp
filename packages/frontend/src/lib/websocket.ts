@@ -1,5 +1,5 @@
 export interface WebSocketMessage {
-  type: string;
+  action: string;
   data: any;
 }
 
@@ -104,7 +104,7 @@ export class WebSocketService {
     try {
       // Ensure message has required fields
       const formattedMessage = {
-        type: message.type || 'default',
+        action: message.action || 'default',
         data: {
           ...message.data,
           timestamp: new Date().toISOString(),

@@ -1,4 +1,4 @@
-import { Logger } from '../../../../utils/logging/Logger';
+import { Logger } from '../../../../../shared/Logger';
 
 export interface BaseRepository<T> {
   initialize(): Promise<void>;
@@ -10,14 +10,22 @@ export interface BaseRepository<T> {
 export abstract class AbstractRepository<T> implements BaseRepository<T> {
   protected items: Map<string, T> = new Map();
   protected logger: Logger;
+  protected initialized: boolean = false;
 
   constructor(protected repositoryName: string) {
     this.logger = new Logger(`MCP-${repositoryName}-Repository`);
   }
 
   public async initialize(): Promise<void> {
+    if (this.initialized) {
+      this.logger.debug(`${this.repositoryName} repository already initialized, skipping`);
+      return;
+    }
+    
     this.logger.info(`Initializing ${this.repositoryName} repository`);
     // Load initial items if needed
+    
+    this.initialized = true;
   }
 
   public async get(id: string): Promise<T | undefined> {
@@ -31,7 +39,8 @@ export abstract class AbstractRepository<T> implements BaseRepository<T> {
   public async register(item: T): Promise<void> {
     const id = this.getId(item);
     if (this.items.has(id)) {
-      throw new Error(`Item with id ${id} already exists in ${this.repositoryName} repository`);
+      this.logger.warn(`Item with id ${id} already exists in ${this.repositoryName} repository, skipping registration`);
+      return;
     }
     this.items.set(id, item);
     this.logger.info(`Registered item in ${this.repositoryName} repository: ${id}`);

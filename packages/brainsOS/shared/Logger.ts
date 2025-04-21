@@ -2,15 +2,17 @@ export type LogLevel = 'debug' | 'info' | 'warn' | 'error' | 'none';
 
 export class Logger {
   private context: string;
-  private static logLevel: LogLevel;
+  private static globalLogLevel: LogLevel;
+  private instanceLogLevel?: LogLevel;
 
-  constructor(context: string) {
+  constructor(context: string, level?: LogLevel) {
     this.context = context;
+    this.instanceLogLevel = level;
     
-    // Initialize log level from environment variable if not already set
-    if (!Logger.logLevel) {
-      Logger.logLevel = (process.env.LOG_LEVEL || 'info').toLowerCase() as LogLevel;
-      console.log(`[Logger] Setting log level to: ${Logger.logLevel}`);
+    // Initialize global log level from environment variable if not already set
+    if (!Logger.globalLogLevel) {
+      Logger.globalLogLevel = (process.env.LOG_LEVEL || 'info').toLowerCase() as LogLevel;
+      console.log(`[Logger] Setting global log level to: ${Logger.globalLogLevel}`);
     }
   }
 
@@ -20,22 +22,40 @@ export class Logger {
    * @param level The log level to set
    */
   public static setLogLevel(level: LogLevel): void {
-    Logger.logLevel = level;
-    console.log(`[Logger] Changed log level to: ${level}`);
+    Logger.globalLogLevel = level;
+    console.log(`[Logger] Changed global log level to: ${level}`);
   }
 
   /**
-   * Get the current log level
+   * Get the current global log level
    */
   public static getLogLevel(): LogLevel {
-    return Logger.logLevel;
+    return Logger.globalLogLevel;
+  }
+
+  /**
+   * Set instance-specific log level
+   * 
+   * @param level The log level to set
+   */
+  public setLevel(level: LogLevel): void {
+    this.instanceLogLevel = level;
+  }
+
+  /**
+   * Get the effective log level for this logger instance
+   */
+  public getLevel(): LogLevel {
+    // Instance level overrides global level if set
+    return this.instanceLogLevel || Logger.globalLogLevel;
   }
 
   /**
    * Determine if a given level should be logged based on current settings
    */
   private shouldLog(level: LogLevel): boolean {
-    if (Logger.logLevel === 'none') return false;
+    const effectiveLogLevel = this.getLevel();
+    if (effectiveLogLevel === 'none') return false;
     
     const levelPriority: Record<LogLevel, number> = {
       'debug': 0,
@@ -45,7 +65,7 @@ export class Logger {
       'none': 4
     };
 
-    return levelPriority[level] >= levelPriority[Logger.logLevel];
+    return levelPriority[level] >= levelPriority[effectiveLogLevel];
   }
 
   info(message: string, metadata?: Record<string, unknown>): void {

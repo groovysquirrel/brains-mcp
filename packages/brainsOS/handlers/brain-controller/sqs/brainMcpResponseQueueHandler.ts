@@ -5,7 +5,7 @@
  */
 
 import { SQSEvent, SQSRecord } from 'aws-lambda';
-import { Logger } from '../../../utils/logging/logger';
+import { Logger } from '../../../shared/Logger';
 import { SQSClient, DeleteMessageCommand } from '@aws-sdk/client-sqs';
 import { Resource } from 'sst';
 import { ConnectionManager } from '../../system/websocket/connectionManager';
@@ -87,6 +87,7 @@ export const handler = async (event: SQSEvent): Promise<void> => {
         data: {
           requestId,
           commandId,
+          conversationId,
           status: message.data.success ? 'completed' : 'failed',
           message: message.data.success 
             ? `Command "${message.data.toolName}" completed successfully` 
@@ -167,7 +168,7 @@ export const handler = async (event: SQSEvent): Promise<void> => {
               connectionId: responseChannel,
               userId,
               conversationId,
-              commandId: `result_${commandId || requestId}`,
+              commandId: commandId || requestId,
               messages: [{
                 role: 'user',
                 content: `Process these command results: ${resultSummary}`
@@ -198,7 +199,8 @@ export const handler = async (event: SQSEvent): Promise<void> => {
                 action: response.type,
                 data: {
                   ...response.data,
-                  commandId: `result_${commandId || requestId}`,
+                  commandId: commandId || requestId,
+                  conversationId,
                   timestamp: new Date().toISOString()
                 }
               };
@@ -240,7 +242,8 @@ export const handler = async (event: SQSEvent): Promise<void> => {
                   action: retryResponse.type,
                   data: {
                     ...retryResponse.data,
-                    commandId: `result_${commandId || requestId}`,
+                    commandId: commandId || requestId,
+                    conversationId,
                     timestamp: new Date().toISOString()
                   }
                 };
@@ -269,7 +272,8 @@ export const handler = async (event: SQSEvent): Promise<void> => {
                     content: `Failed to process MCP command result: ${retryError instanceof Error ? retryError.message : 'Unknown error'}`,
                     source: 'system',
                     timestamp: new Date().toISOString(),
-                    commandId: commandId || 'error_' + Date.now()
+                    commandId: commandId || 'error_' + Date.now(),
+                    conversationId
                   }
                 });
               } catch (sendError) {

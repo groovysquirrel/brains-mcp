@@ -7,7 +7,7 @@
  * 4. Handling errors and providing appropriate responses
  */
 
-import { Logger } from '../../../utils/logging/logger';
+import { Logger } from '../../../shared/Logger';
 import { ConnectionManager } from '../../system/websocket/connectionManager';
 import { WebSocketEvent } from '../../system/websocket/websocketTypes';
 import { BrainController } from '../../../modules/brain-controller/src/BrainController';
@@ -41,7 +41,8 @@ const convertTerminalToBrainMessage = (message: TerminalMessage): BrainMessage =
         commandId: message.data.commandId,
         timestamp: message.data.timestamp,
         source: 'terminal',
-        brainName: 'default'  // Terminal messages always use default brain
+        brainName: 'default',  // Terminal messages always use default brain
+        conversationId: message.data.conversationId  // Preserve conversationId if it exists
     }
 });
 
@@ -55,7 +56,6 @@ const createDefaultBrainMessage = (rawInput?: string): BrainMessage => {
         action: 'brain/terminal/request',
         data: {
             requestStreaming: false,
-            commandId: `cmd_${Date.now()}`,
             timestamp: new Date().toISOString(),
             source: 'terminal'
         }
@@ -79,6 +79,7 @@ const convertBrainToTerminalResponse = (response: BrainResponse, commandId: stri
     // Map the response type to action
     const responseAction = mapResponseType(response.type);
     
+    // Use the original commandId, don't modify it
     return {
         action: responseAction,
         data: {
@@ -86,6 +87,7 @@ const convertBrainToTerminalResponse = (response: BrainResponse, commandId: stri
             source: response.data.source || 'system',
             timestamp: response.data.timestamp || new Date().toISOString(),
             commandId,
+            conversationId: response.data.conversationId,
             status: response.data.status,
             metadata: response.data.metadata
         }
@@ -170,6 +172,8 @@ export const handler = async (event: WebSocketEvent) => {
                 userId, // Pass userId from auth context
                 brainName: request.data.brainName || 'default',
                 conversationId: request.data.conversationId,
+                // Preserve the original commandId for consistent tracking
+                commandId: request.data.commandId,
                 // Check if messages are provided directly first, then fall back to constructing from rawData
                 messages: request.data.messages || (request.data.rawData ? [{
                     role: 'user',
@@ -225,7 +229,9 @@ export const handler = async (event: WebSocketEvent) => {
 
         return { statusCode: 200, body: 'Message processed' };
     } catch (error) {
-        logger.error('Brain controller handler error:', error instanceof Error ? error.message : String(error), {
+        logger.error('Brain controller handler error:', {
+            error,
+            message: error instanceof Error ? error.message : String(error),
             stack: error instanceof Error ? error.stack : undefined,
             connectionId,
             userId

@@ -3,8 +3,8 @@ import { VendorConfig } from '../../types/Vendor';
 import { ModelConfig } from '../../types/Model';
 import { ModalityConfig, ModalityHandler } from '../../types/Modality';
 import { GatewayModelState, GatewayModelAliases } from '../../types/GatewayState';
-import { MetricsConfig } from '../../../../utils/types/Metrics';
-import { LogLevel } from '../../../../utils/logging/Logger';
+import { MetricsConfig } from '../../../../utils/metrics/LLMMetrics';
+import { LogLevel } from '../../../../../shared/Logger';
 
 /**
  * Interface that defines methods for loading various configurations

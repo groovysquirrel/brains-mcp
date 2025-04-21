@@ -1,4 +1,4 @@
-import { LogLevel } from '../../../../utils/logging/Logger';
+import { LogLevel } from '../../../../../shared/Logger';
 
 /**
  * Interface for MCP server configuration

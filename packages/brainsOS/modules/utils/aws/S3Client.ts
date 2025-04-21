@@ -1,6 +1,6 @@
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
-import { Logger } from '../logging/Logger';
-import { LLMUsageMetadata } from '../types/Metrics';
+import { Logger } from '../../../shared/Logger';
+import { LLMUsageMetadata } from '../metrics/LLMMetrics';
 import { Resource } from 'sst';
 
 // Global variables for Lambda reuse

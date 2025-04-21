@@ -1,4 +1,4 @@
-import { Logger } from '../../utils/logging/Logger';
+import { Logger } from '../../../shared/Logger';
 import { GatewayRequest } from './types/Request';
 import { GatewayResponse } from './types/Response';
 import { ModelConfig } from './types/Model';
@@ -7,8 +7,8 @@ import { LocalConfigLoader } from './repositories/config/LocalLoader';
 import { ConversationRepository } from './repositories/conversation/ConversationRepository';
 import { DynamoConversationRepository } from './repositories/conversation/DynamoConversationRepository';
 import { Conversation, ListConversationsResponse } from './types/Conversation';
-import { MetricsConfig, MetricsDestination } from '../../utils/types/Metrics';
-import { initializeMetricsCollector } from '../../utils/logging/MetricsCollector';
+import { MetricsConfig, MetricsDestination } from '../../utils/metrics/LLMMetrics';
+import { initializeMetricsCollector } from '../../utils/metrics/MetricsCollector';
 import * as ConversationManager from './core/ConversationManager';
 import * as MetricsManager from './core/MetricsManager';
 import * as RequestProcessor from './core/RequestProcessor';
@@ -124,7 +124,7 @@ export class Gateway {
     conversationRepositoryImpl?: ConversationRepository;
     configPath?: string;
   }) {
-    this.logger = new Logger('Gateway');
+    this.logger = new Logger('LLM Gateway', 'warn');
     this.configSource = options?.configRepositorySource || 'local';
     
     // Use provided config repository or create a new one

@@ -1,5 +1,5 @@
 import { SQSEvent, SQSRecord, Context } from 'aws-lambda';
-import { Logger } from '../../../utils/logging/logger';
+import { Logger } from '../../../shared/Logger';
 import { SQSClient, DeleteMessageCommand, SendMessageCommand } from '@aws-sdk/client-sqs';
 import { Resource } from 'sst';
 import { ConnectionManager } from '../../system/websocket/connectionManager';
@@ -34,8 +34,8 @@ export const handler = async (event: SQSEvent, context: Context): Promise<void> 
     let mcpServer: MCPServer;
     try {
         mcpServer = await MCPServer.create();
-        await mcpServer.initialize();
-        logger.info('MCP Server initialized successfully');
+        await mcpServer.ensureInitialized();
+        logger.info('MCP Server initialization check completed');
     } catch (error) {
         logger.error('Failed to initialize MCP Server:', error);
         throw error; // Cannot proceed without MCPServer

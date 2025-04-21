@@ -1,8 +1,8 @@
 import { APIGatewayProxyWebsocketEventV2WithRequestContext } from 'aws-lambda';
-import { Logger } from '../../../utils/logging/logger';
+import { Logger } from '../../../shared/Logger';
 import { ConnectionManager } from './connectionManager';
 
-const logger = new Logger('Websocket Connect');
+const logger = new Logger('Websocket $Connect', 'warn');
 const connectionManager = ConnectionManager.getInstance();
 
 // Define custom request context type with authorizer
