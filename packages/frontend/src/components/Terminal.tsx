@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
-import { TerminalManager } from './terminal/TerminalManager';
+import { TerminalManager } from './BRAIN_Terminal/TerminalManager';
 import 'xterm/css/xterm.css';
 import './Terminal.css';
 

@@ -1,9 +1,10 @@
 import React, { useRef, useEffect, useState } from 'react';
-import Terminal, { TerminalRef } from '../components/Terminal';
-import { ExecutionResult, FrontendExecutor } from '../components/Terminal/FrontendExecutor';
+import Terminal, { TerminalRef } from '../components//Terminal';
+import { ExecutionResult, BrainConnectionService } from '../components/BRAIN_Terminal/BrainConnectionService';
 import { useAppContext } from '../lib/contextLib';
 import { fetchAuthSession } from 'aws-amplify/auth';
 import './css/TerminalContainer.css';
+import { ConnectionStatus } from '../components/BRAIN_Terminal/WebSocketConnection';
 
 type TerminalMode = 'raw' | 'content' | 'source';
 
@@ -14,12 +15,15 @@ type TerminalMode = 'raw' | 'content' | 'source';
 const TerminalContainer: React.FC = () => {
   const terminalRef = useRef<TerminalRef>(null);
   const { isAuthenticated } = useAppContext();
-  const [connectionStatus, setConnectionStatus] = useState<'disconnected' | 'connecting' | 'connected'>('disconnected');
+  const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>('disconnected');
   const [currentAgent, _setCurrentAgent] = useState<string>('default');
   const [displayMode, setDisplayMode] = useState<TerminalMode>('content');
   const [wsUrl, _setWsUrl] = useState<string>('');
 
-  // Check authentication status when component mounts
+  useEffect(() => {
+    BrainConnectionService.initialize();
+  }, []);
+
   useEffect(() => {
     const checkAuth = async () => {
       try {
@@ -35,13 +39,11 @@ const TerminalContainer: React.FC = () => {
     checkAuth();
   }, [isAuthenticated]);
 
-  // Subscribe to connection status changes
   useEffect(() => {
-    const unsubscribe = FrontendExecutor.onConnectionStatusChange(setConnectionStatus);
+    const unsubscribe = BrainConnectionService.onConnectionStatusChange(setConnectionStatus);
     return () => unsubscribe();
   }, []);
 
-  // Handle window resize to fit terminal
   useEffect(() => {
     const handleResize = () => {
       terminalRef.current?.fit();
@@ -51,12 +53,8 @@ const TerminalContainer: React.FC = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  /**
-   * Handles terminal responses
-   */
   const handleResponse = (response: ExecutionResult) => {
     if (response.isLocalCommand) {
-      // Check for mode change command
       const command = response.data?.command || response.data?.message;
       if (typeof command === 'string' && command.startsWith('mode ')) {
         const newMode = command.split(' ')[1] as TerminalMode;
@@ -67,9 +65,6 @@ const TerminalContainer: React.FC = () => {
     }
   };
 
-  /**
-   * Gets the CSS class for the connection status indicator
-   */
   const getStatusColor = () => {
     switch (connectionStatus) {
       case 'connected':
@@ -81,9 +76,6 @@ const TerminalContainer: React.FC = () => {
     }
   };
 
-  /**
-   * Gets the text to display for the current connection status
-   */
   const getStatusText = () => {
     switch (connectionStatus) {
       case 'connected':

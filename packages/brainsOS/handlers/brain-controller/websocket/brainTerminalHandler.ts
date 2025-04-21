@@ -15,7 +15,7 @@ import { BrainMessage, BrainResponse, isBrainMessage } from './messagesTypes';
 import { TerminalMessage, isTerminalMessage } from './messagesTypes';
 
 // Initialize logging and connection management
-const logger = new Logger('BrainControllerWebSocket');
+const logger = new Logger('Brain.WebSocketHandler', 'info');
 const connectionManager = ConnectionManager.getInstance();
 const brainController = BrainController.getInstance({
     connectionManager: connectionManager
@@ -161,7 +161,8 @@ export const handler = async (event: WebSocketEvent) => {
             action: request.action,
             connectionId,
             userId,
-            brainName: request.data.brainName
+            brainName: request.data.brainName,
+            commandId: request.data.commandId,
         });
 
         // Process the request through the brain controller
@@ -172,9 +173,7 @@ export const handler = async (event: WebSocketEvent) => {
                 userId, // Pass userId from auth context
                 brainName: request.data.brainName || 'default',
                 conversationId: request.data.conversationId,
-                // Preserve the original commandId for consistent tracking
                 commandId: request.data.commandId,
-                // Check if messages are provided directly first, then fall back to constructing from rawData
                 messages: request.data.messages || (request.data.rawData ? [{
                     role: 'user',
                     content: request.data.rawData
@@ -182,20 +181,9 @@ export const handler = async (event: WebSocketEvent) => {
             }
         };
 
-        logger.info('Sending request to brain controller', { 
-            request: JSON.stringify({
-                ...brainRequest,
-                data: {
-                    ...brainRequest.data,
-                    messages: brainRequest.data.messages.length > 0 ? 
-                        [{...brainRequest.data.messages[0], content: brainRequest.data.messages[0]?.content?.substring(0, 50) + '...'}] : 
-                        []
-                }
-            }),
-            messageCount: brainRequest.data.messages.length,
-            hasRawData: !!request.data.rawData,
-            hasMessages: !!request.data.messages
-        });
+        logger.debug('Constructed brainRequest object', { brainRequest });
+
+        logger.info('Sending data to brainController.processRequest', { data: brainRequest.data });
 
         const response = await brainController.processRequest(brainRequest);
         
@@ -259,69 +247,32 @@ export const handler = async (event: WebSocketEvent) => {
  */
 async function parseIncomingMessage(body: string | null): Promise<BrainMessage> {
     if (!body) {
-        logger.warn('Received empty message body');
+        logger.warn('Received empty message body, creating default brain message');
         return createDefaultBrainMessage('');
     }
 
     try {
         logger.info('Parsing incoming message', { body });
         const parsedBody = JSON.parse(body);
-        logger.info('Parsed JSON message', { 
-            action: parsedBody.action,
-            hasData: !!parsedBody.data,
-            dataKeys: parsedBody.data ? Object.keys(parsedBody.data) : [],
-            hasMessages: Array.isArray(parsedBody.data?.messages),
-            hasRawData: typeof parsedBody.data?.rawData === 'string'
-        });
-        
-        if (isBrainMessage(parsedBody)) {
-            logger.info('Message is valid BrainMessage');
+        logger.info('Successfully parsed JSON', { parsedBody });
+
+        // Check the structure *after* parsing 
+        if (parsedBody.action === 'brain/terminal/request' && typeof parsedBody.data === 'object' && parsedBody.data !== null) {
+            logger.info('Identified brain/terminal/request structure');
             
-            // Ensure rawData exists if not provided but messages are
-            if (!parsedBody.data.rawData && Array.isArray(parsedBody.data.messages) && parsedBody.data.messages.length > 0) {
-                logger.info('Message has messages but no rawData, keeping as is');
-            }
-            
-            return parsedBody;
+            const messageData = parsedBody.data;
+            // --- Corrected Construction of BrainMessage --- 
+            const brainMessage: BrainMessage = {action: parsedBody.action, data: {rawData: typeof messageData.rawData === 'string' ? messageData.rawData : '', requestStreaming: typeof messageData.requestStreaming === 'boolean' ? messageData.requestStreaming : false, commandId: typeof messageData.commandId === 'string' ? messageData.commandId : undefined, timestamp: typeof messageData.timestamp === 'string' ? messageData.timestamp : new Date().toISOString(), source: typeof messageData.source === 'string' ? messageData.source : 'terminal', brainName: typeof messageData.brainName === 'string' ? messageData.brainName : 'default', conversationId: typeof messageData.conversationId === 'string' ? messageData.conversationId : undefined, messages: Array.isArray(messageData.messages) ? messageData.messages : undefined}};
+            return brainMessage;
         }
-        
-        // If the message has 'action' set to 'terminal', convert it to 'brain/terminal/request'
-        if (parsedBody.action === 'terminal' && typeof parsedBody.data === 'object') {
-            logger.info('Converting terminal action to brain/terminal/request');
-            return {
-                action: 'brain/terminal/request',
-                data: {
-                    ...parsedBody.data,
-                    source: parsedBody.data.source || 'terminal',
-                    brainName: parsedBody.data.brainName || 'default'
-                }
-            };
-        }
-        
-        // Handle legacy 'brain/terminal' action
-        if (parsedBody.action === 'brain/terminal' && typeof parsedBody.data === 'object') {
-            logger.info('Converting legacy brain/terminal action to brain/terminal/request');
-            return {
-                action: 'brain/terminal/request',
-                data: {
-                    ...parsedBody.data,
-                    source: parsedBody.data.source || 'terminal',
-                    brainName: parsedBody.data.brainName || 'default'
-                }
-            };
-        }
-        
-        if (isTerminalMessage(parsedBody)) {
-            logger.info('Message is valid TerminalMessage, converting to BrainMessage');
-            return convertTerminalToBrainMessage(parsedBody);
-        }
-        
-        // If it's JSON but not a recognized message type
-        logger.info('Unknown message format, treating as raw input', { body: JSON.stringify(parsedBody) });
+
+        // If it doesn't match the expected structure, log warning and treat as raw.
+        logger.warn('Unknown message format after JSON parse, treating body as raw input', { parsedBody });
         return createDefaultBrainMessage(body);
+
     } catch (e) {
-        // If parsing fails, treat as plain text input
-        logger.info('Failed to parse message as JSON, treating as raw input', { error: e instanceof Error ? e.message : String(e) });
+        // If JSON parsing fails entirely, treat the original body as raw input
+        logger.info('Failed to parse message as JSON, treating original body as raw input', { error: e instanceof Error ? e.message : String(e) });
         return createDefaultBrainMessage(body);
     }
 } 

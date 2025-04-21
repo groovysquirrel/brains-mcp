@@ -135,7 +135,7 @@ export class BrainController {
     }) {
         // Initialize dependencies with provided options or defaults
         this.repository = options?.repository || BrainsRepository.getInstance();
-        this.logger = new Logger('BrainController', 'warn');
+        this.logger = new Logger('BrainController', 'info');
         this.gateway = options?.gateway || new Gateway();
         this.connectionManager = options?.connectionManager;
         this.conversationMap = new Map();
@@ -363,7 +363,6 @@ export class BrainController {
             // Route the request to the appropriate handler
             switch (actionType) {
                 case 'brain/terminal/request':
-                case 'brain/chat/request':
                     return this.handleChatRequest(request.data);
                 case 'brain/list/request':
                     return this.handleListRequest();
@@ -511,6 +510,9 @@ export class BrainController {
      * @returns A formatted response for the terminal
      */
     private async handleChatRequest(data: any): Promise<BrainResponse> {
+
+        this.logger.debug('Handling chat request DATA:', { data });
+
         const { connectionId, userId, messages, conversationId: providedConversationId } = data;
 
         try {
@@ -592,7 +594,7 @@ export class BrainController {
                 conversationId,
                 userId,
                 messages: messages || [],
-                systemPrompt: formattedSystemPrompt
+                systemPrompt: formattedSystemPrompt,
             });
 
             this.logger.info('Received gateway response', { 
@@ -608,7 +610,7 @@ export class BrainController {
             const commandId = data.commandId;
             if (!commandId) {
                 const errorMsg = 'Critical Error: commandId is missing from chat request data';
-                this.logger.error(errorMsg, { connectionId, userId, conversationId });
+                this.logger.error(errorMsg, { connectionId, userId, conversationId, "data": data});
                 // Optionally, throw an error to prevent further processing without a commandId
                 throw new Error(errorMsg); 
                 // Or return an error response immediately:
