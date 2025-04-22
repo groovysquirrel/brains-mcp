@@ -114,6 +114,7 @@ const TerminalContainer: React.FC = () => {
           theme="dark"
           mode="command"
           onResponse={handleResponse}
+          showCommandStatus={true}
         />
       </div>
     </div>
