@@ -12,7 +12,7 @@
  * - Error Handling: Comprehensive error handling with proper logging and HTTP status codes
  */
 
-import { Logger } from '../../../utils/logging/logger';
+import { Logger } from '../../../shared/Logger';
 import { Gateway, ConversationOptions } from '../../../modules/llm-gateway/src/Gateway';
 import { GatewayRequest } from '../../../modules/llm-gateway/src/types/Request';
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';

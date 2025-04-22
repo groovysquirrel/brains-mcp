@@ -1,6 +1,5 @@
-import React, { useEffect, useRef, forwardRef, useImperativeHandle, useState } from 'react';
-import { TerminalManager } from './BRAIN_Terminal/TerminalManager';
-import CommandStatus from './BRAIN_Terminal/CommandStatus';
+import React, { useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
+import { TerminalManager } from './TerminalManager';
 import 'xterm/css/xterm.css';
 import './Terminal.css';
 
@@ -45,17 +44,11 @@ const Terminal = forwardRef<TerminalRef, TerminalProps>((props, ref) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const terminalRef = useRef<TerminalManager | null>(null);
   const onResponseRef = useRef(props.onResponse);
-  const [showStatus, setShowStatus] = useState(props.showCommandStatus !== false);
 
   // Update response callback when props change
   useEffect(() => {
     onResponseRef.current = props.onResponse;
   }, [props.onResponse]);
-
-  // Update showStatus when props change
-  useEffect(() => {
-    setShowStatus(props.showCommandStatus !== false);
-  }, [props.showCommandStatus]);
 
   // Initialize terminal when component mounts
   useEffect(() => {
@@ -86,34 +79,12 @@ const Terminal = forwardRef<TerminalRef, TerminalProps>((props, ref) => {
     }
   }));
 
-  // Toggle command status panel
-  const toggleCommandStatus = () => {
-    setShowStatus(!showStatus);
-  };
-
   return (
-    <div className="terminal-wrapper">
-      <div className="terminal-layout">
-        <div 
-          ref={containerRef} 
-          className={`terminal-xterm ${props.theme || 'dark'}`} 
-          style={props.style} 
-        />
-        
-        {showStatus && (
-          <div className="terminal-command-status">
-            <CommandStatus />
-          </div>
-        )}
-      </div>
-      
-      <button 
-        className="terminal-toggle-status"
-        onClick={toggleCommandStatus}
-      >
-        {showStatus ? '◀ Hide Status' : 'Show Status ▶'}
-      </button>
-    </div>
+    <div 
+      ref={containerRef} 
+      className={`terminal-xterm ${props.theme || 'dark'}`} 
+      style={props.style} 
+    />
   );
 });
 

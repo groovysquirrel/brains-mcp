@@ -5,7 +5,7 @@
  * It manages tool execution, tool listing, and error handling through WebSocket connections.
  */
 
-import { Logger } from '../../../utils/logging/logger';
+import { Logger } from '../../../shared/Logger';
 import { MCPServer } from '../../../modules/mcp-server/src/MCPServer';
 import { ConnectionManager } from '../../system/websocket/connectionManager';
 import { WebSocketEvent } from '../../system/websocket/websocketTypes';

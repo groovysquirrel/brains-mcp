@@ -54,7 +54,7 @@
     "react-use-websocket": "^4.13.0",
     "reactflow": "^11.11.4",
     "socket.io-client": "^4.8.1",
-    "sst": "3.11.11",
+    "sst": "3.13.15",
     "styled-components": "^6.1.17",
     "ts-node": "^10.9.2",
     "use-undo": "^1.1.1",

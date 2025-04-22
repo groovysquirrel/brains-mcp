@@ -1,0 +1,118 @@
+.mcp-functions-container {
+  padding: 20px;
+}
+
+.mcp-functions-header {
+  border-bottom: 1px solid #e9ecef;
+  padding-bottom: 1rem;
+}
+
+.mcp-functions-content {
+  height: calc(100vh - 200px);
+}
+
+/* Vertical tabs styling */
+.vertical-tabs {
+  min-width: 220px;
+  border-right: 1px solid #e9ecef;
+}
+
+.vertical-tabs .nav-item {
+  width: 100%;
+}
+
+.vertical-tabs .nav-link {
+  border-radius: 0;
+  border: none;
+  border-left: 3px solid transparent;
+  text-align: left;
+  padding: 10px 15px;
+  transition: all 0.2s ease;
+}
+
+.vertical-tabs .nav-link.active {
+  background-color: #f8f9fa;
+  border-left: 3px solid #007bff;
+  font-weight: 500;
+}
+
+.vertical-tabs .nav-link:hover:not(.active) {
+  background-color: #f1f1f1;
+}
+
+.tab-content-area {
+  padding-left: 20px;
+  overflow-y: auto;
+}
+
+.category-icon {
+  opacity: 0.7;
+}
+
+.category-description {
+  color: #000000;
+  font-size: 0.95rem;
+}
+
+.function-card {
+  height: 100%;
+  transition: all 0.2s ease;
+  border-width: 1px;
+}
+
+.function-card.enabled {
+  border-color: #28a745;
+  box-shadow: 0 0 0 1px rgba(40, 167, 69, 0.25);
+}
+
+.function-card.disabled {
+  border-color: #6c757d;
+  opacity: 0.7;
+}
+
+.function-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.add-function {
+  height: 100%;
+  border-style: dashed;
+  background-color: #f8f9fa;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+
+.add-function.full-width {
+  min-height: 30px;
+  margin-bottom: 20px;
+  background-color: #e6f7ff;
+  border-color: #1890ff;
+  transition: all 0.3s ease;
+}
+
+.add-function:hover {
+  background-color: #e9ecef;
+}
+
+.add-function.full-width:hover {
+  background-color: #000304;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.15);
+}
+
+.add-function.full-width {
+    background-color: #939394;
+    
+  }
+
+.add-function.full-width .card-title {
+  color: #ffffff;
+  font-weight: 500;
+}
+
+.add-function.full-width svg {
+  color: #ffffff;
+}

@@ -1,4 +1,4 @@
-import { ToolSchema } from '../ToolTypes';
+import { ToolSchema } from '../../../../types/core/Tool';
 
 // What operations can our calculator do?
 export type CalculatorOperation = 'add' | 'subtract' | 'multiply' | 'divide';

@@ -1,4 +1,4 @@
-import { WebSocketService, WebSocketOptions } from '../../lib/websocket';
+import { WebSocketService, WebSocketOptions } from '../../../lib/websocket';
 import { fetchAuthSession } from 'aws-amplify/auth';
 
 // --- Simple Browser-Friendly Event Emitter ---

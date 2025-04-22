@@ -6,7 +6,7 @@ brainsOS_bucket_email.notify({
   notifications: [
     {
       name: "EmailBucketNotifications",
-      function: "packages/brainsOS/handlers/email/emailResponse.handler",
+      function: "packages/brainsOS/handlers/system/email/emailResponse.handler",
       events: ["s3:ObjectCreated:*", "s3:ObjectRemoved:*"]
     }
   ]

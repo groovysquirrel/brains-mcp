@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { BrainConnectionService } from './BrainConnectionService';
+import { BrainConnectionService } from '../connection/BrainConnectionService';
 import './CommandStatus.css';
 
 // Type definitions for command status items
@@ -108,24 +108,20 @@ const CommandStatus: React.FC<CommandStatusProps> = ({ className = '' }) => {
     });
   };
 
-  // Format timestamp for display
-  const formatTime = (timestamp: string) => {
-    try {
-      const date = new Date(timestamp);
-      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    } catch (e) {
-      return 'Unknown time';
-    }
-  };
 
-  // Get status icon based on status
-  const getStatusIcon = (status: string) => {
+  // Get status badge based on status
+  const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'queued': return '⏳';
-      case 'processing': return '⚙️';
-      case 'completed': return '✅';
-      case 'error': return '❌';
-      default: return '❓';
+      case 'queued':
+        return <span className="status-badge waiting">Queued</span>;
+      case 'processing':
+        return <span className="status-badge processing">Processing</span>;
+      case 'completed':
+        return <span className="status-badge success">Success</span>;
+      case 'error':
+        return <span className="status-badge error">Error</span>;
+      default:
+        return <span className="status-badge">Unknown</span>;
     }
   };
 
@@ -135,39 +131,29 @@ const CommandStatus: React.FC<CommandStatusProps> = ({ className = '' }) => {
   });
 
   return (
-    <div className={`mcp-command-status ${className}`}>
-      <div className="command-status-header">
-        <h3>MCP Command Status</h3>
-      </div>
-      <div className="command-status-container" ref={statusContainerRef}>
-        {sortedItems.length === 0 ? (
-          <div className="command-status-empty">
-            No command activity yet
-          </div>
-        ) : (
-          sortedItems.map(item => (
-            <div key={item.id} className={`command-status-item status-${item.status}`}>
-              <div className="command-status-bubble">
-                <div className="command-status-header">
-                  <span className="command-status-tool">{item.tool || 'Command'}</span>
-                  <span className="command-status-time">{formatTime(item.timestamp)}</span>
+    <div className={`status-container ${className}`} ref={statusContainerRef}>
+      {sortedItems.length === 0 ? (
+        <div className="no-activity">
+          No command activity yet
+        </div>
+      ) : (
+        sortedItems.map(item => (
+          <div key={item.id} className="status-item">
+            {getStatusBadge(item.status)}
+            <div className="status-content">
+              <div className="status-title">{item.tool || 'Command'}</div>
+              <div className="status-details">{item.message}</div>
+              {item.result && (
+                <div className="status-result">
+                  <pre>{typeof item.result === 'object' 
+                    ? JSON.stringify(item.result, null, 2)
+                    : item.result.toString()}</pre>
                 </div>
-                <div className="command-status-content">
-                  <span className="status-icon">{getStatusIcon(item.status)}</span>
-                  <span className="status-message">{item.message}</span>
-                </div>
-                {item.result && (
-                  <div className="command-status-result">
-                    {typeof item.result === 'object' 
-                      ? JSON.stringify(item.result, null, 2)
-                      : item.result.toString()}
-                  </div>
-                )}
-              </div>
+              )}
             </div>
-          ))
-        )}
-      </div>
+          </div>
+        ))
+      )}
     </div>
   );
 };

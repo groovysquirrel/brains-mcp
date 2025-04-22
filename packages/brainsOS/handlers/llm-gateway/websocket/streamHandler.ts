@@ -13,7 +13,7 @@
  * - State Management: Tracking active streams
  */
 
-import { Logger } from '../../../utils/logging/logger';
+import { Logger } from '../../../shared/Logger';
 import { ConnectionManager } from '../../system/websocket/connectionManager';
 import { GatewayResponse } from '../../../modules/llm-gateway/src/types/Response';
 
@@ -106,7 +106,7 @@ export class StreamHandler {
       
       // Send final message with metadata and token counts
       await connectionManager.sendMessage(connectionId, {
-        type: 'stream_end',
+        action: 'stream_end',
         data: {
           metadata: {
             ...metadata,
@@ -129,7 +129,7 @@ export class StreamHandler {
       });
       
       await connectionManager.sendMessage(connectionId, {
-        type: 'error',
+        action: 'error',
         data: {
           message: error.message,
           code: error.code || 'INTERNAL_ERROR'
@@ -172,7 +172,7 @@ export class StreamHandler {
     
     // Pass through all chunks directly without buffering
     await connectionManager.sendMessage(connectionId, {
-      type: 'stream',
+      action: 'stream',
       data: {
         content: chunk.content,
         metadata: metadata

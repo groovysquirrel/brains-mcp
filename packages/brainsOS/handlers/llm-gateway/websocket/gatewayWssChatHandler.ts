@@ -12,7 +12,7 @@
  * - Error Handling: Comprehensive error handling with proper logging
  */
 
-import { Logger } from '../../../utils/logging/logger';
+import { Logger } from '../../../shared/Logger';
 import { Gateway, ConversationOptions } from '../../../modules/llm-gateway/src/Gateway';
 import { GatewayRequest } from '../../../modules/llm-gateway/src/types/Request';
 import { ConnectionManager } from '../../system/websocket/connectionManager';
@@ -77,7 +77,7 @@ const handleWebSocketEvent = async (event: WebSocketEvent, handler: MessageHandl
     
     // Send error message to client
     await connectionManager.sendMessage(connectionId, {
-      type: 'error',
+      action: 'error',
       data: {
         message: error.message,
         code: error.code || 'INTERNAL_ERROR'
@@ -399,7 +399,7 @@ export class LLMChatMessageHandler implements MessageHandler {
               
               // Send conversation info message 
               await connectionManager.sendMessage(data.connectionId, {
-                type: 'conversation_info',
+                action: 'llm/conversation/info',
                 data: {
                   conversationId,
                   isNewConversation: true,
@@ -417,7 +417,7 @@ export class LLMChatMessageHandler implements MessageHandler {
         
         // Return immediately with processing status
         return {
-          type: 'processing',
+          type: 'llm/conversation/processing',
           data: {
             message: 'Stream processing started',
             metadata: {

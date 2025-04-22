@@ -5,7 +5,7 @@
  * including MCP functionality for listing tools and executing commands.
  */
 
-import { Logger } from '../../../utils/logging/logger';
+import { Logger } from '../../../shared/Logger';
 import { BrainController } from '../../../modules/brain-controller/src/BrainController';
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { extractUserId as extractUserIdFromAuth } from '../../system/auth/authUtils';

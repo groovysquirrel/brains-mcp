@@ -1,5 +1,5 @@
 import { SQSEvent, SQSRecord, Context } from 'aws-lambda';
-import { Logger } from '../../../utils/logging/logger';
+import { Logger } from '../../../shared/Logger';
 import { Resource } from 'sst';
 import { SQSClient, DeleteMessageCommand } from '@aws-sdk/client-sqs';
 import { MoneyManager, UsageMetrics } from '../../../modules/money-manager/src/money-manager';

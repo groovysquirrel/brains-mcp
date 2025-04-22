@@ -1,4 +1,4 @@
-import { ToolSchema } from '../ToolTypes';
+import { ToolSchema } from '../../../../types/core/Tool';
 
 // What types of numbers can we generate?
 export type NumberType = 'integer' | 'float';

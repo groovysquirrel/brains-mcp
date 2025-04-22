@@ -21,6 +21,7 @@ const config = {
     ? [
       "/",
       "/about",
+      "/brain",
       "/terminal",
       "/cost-manager",
       "/prompt-studio",
@@ -32,6 +33,7 @@ const config = {
     : [
       "/",
       "/about",
+      "/brain",
       "/terminal",
       "/cost-manager",
       "/prompt-studio",
@@ -41,6 +43,7 @@ const config = {
       "/about"
     ],
   allowedMenuItems: [
+    "Brain Interface",
     "Terminal",
     "Cost Manager",
     "Prompt Studio",

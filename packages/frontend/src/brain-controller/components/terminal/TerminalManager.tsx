@@ -1,9 +1,10 @@
-import { Terminal } from 'xterm';
+
 import { FitAddon } from 'xterm-addon-fit';
-import { BrainConnectionService} from './BrainConnectionService';
-import { TerminalFormatter, TerminalMode, BrainThoughtProcess } from './TerminalModes';
-import config from '../../config';
-import { ConnectionStatus } from './WebSocketConnection';
+import { BrainConnectionService} from '../connection/BrainConnectionService';
+import { TerminalFormatter, TerminalMode} from './TerminalModes';
+import { Terminal } from 'xterm';
+import config from '../../../config';
+import { ConnectionStatus } from '../connection/WebSocketConnection';
 
 // Message type definitions
 type TerminalResponseMessage = { 

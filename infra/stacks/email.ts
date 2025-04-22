@@ -8,7 +8,7 @@ export const UserApprovalEmail = new sst.aws.Email("UserApprovalEmail", {
 
  // Lambda for PostConfirmation Trigger
  const postConfirmationFunction = new sst.aws.Function("PostConfirmationFunction", {
-    handler: "packages/brainsOS/handlers/email/postConfirmation.handler",
+    handler: "packages/brainsOS/handlers/system/email/postConfirmation.handler",
     environment: {
       APPROVER_EMAIL: "your-approver-email@example.com",
     },

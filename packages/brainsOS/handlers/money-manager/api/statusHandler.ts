@@ -8,7 +8,7 @@
  */
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { Logger } from '../../../utils/logging/logger';
+import { Logger } from '../../../shared/Logger';
 import { Resource } from 'sst';
 import { MoneyManager } from '../../../modules/money-manager/src/money-manager';
 import { requireUserInfo } from '../../system/auth/authUtils';

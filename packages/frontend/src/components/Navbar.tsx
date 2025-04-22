@@ -24,11 +24,12 @@ export default function Navbar({ isAuthenticated, onLogout }: NavbarProps) {
       <BsNavbar.Collapse>
         <Nav className="me-auto">
           
-          {isAuthenticated && filterMenuItem('Terminal') && (
-            <LinkContainer to="/terminal">
-              <Nav.Link>Terminal</Nav.Link>
+          {isAuthenticated && filterMenuItem('BRAIN CONFIG') && (
+            <LinkContainer to="/brain">
+              <Nav.Link>Brain Interface</Nav.Link>
             </LinkContainer>
           )}
+          
           {isAuthenticated && filterMenuItem('Cost Manager') && (
             <LinkContainer to="/cost-manager">
               <Nav.Link>Cost Manager</Nav.Link>
